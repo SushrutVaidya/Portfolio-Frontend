@@ -437,3 +437,43 @@ strong {
     cursor: pointer;
   }
 }
+
+/* ========================================
+   PATENT HOVER EFFECT
+   ======================================== */
+
+.patent-hover {
+  text-decoration: underline;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  display: inline-block;
+}
+
+.patent-hover:hover {
+  transform: scale(1.02);
+  opacity: 0.8;
+}
+
+/* ========================================
+   RICKROLL MESSAGE
+   ======================================== */
+
+.rickroll-message {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #0b24fb;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  z-index: 9999;
+}
+
+.rickroll-message.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

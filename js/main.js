@@ -168,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupScrollColorTransition();
   setupFadeInAnimations();
   setupMobileTouchSupport();
+  setupRickrollCounter();
 });
 
 // ========================================
@@ -180,6 +181,7 @@ function setupScrollColorTransition() {
     { id: 'about', color: '#fc0' },
     { id: 'interests', color: '#ff3838' },
     { id: 'tracking', color: '#2ed573' },
+    { id: 'patent', color: '#9b59b6' },
     { id: 'footer', color: '#0b24fb' }
   ];
 
@@ -290,4 +292,63 @@ function setupMobileTouchSupport() {
       }
     });
   }
+}
+
+// ========================================
+// Rickroll Counter
+// ========================================
+
+function setupRickrollCounter() {
+  const youtubeLink = document.querySelector('a[title="YouTube"]');
+
+  if (youtubeLink) {
+    youtubeLink.addEventListener('click', () => {
+      // Mark that user clicked the link
+      sessionStorage.setItem('rickrolled', 'true');
+
+      // Increment counter on backend
+      fetch(API_URL.replace('/api/stats', '/api/rickroll'))
+        .catch(() => {});
+    });
+  }
+
+  // Check on page load
+  checkRickrolled();
+
+  // Check when user comes back to tab (without refresh)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkRickrolled();
+    }
+  });
+}
+
+function checkRickrolled() {
+  if (sessionStorage.getItem('rickrolled') === 'true') {
+    sessionStorage.removeItem('rickrolled');
+
+    // Fetch and display count
+    fetch(API_URL.replace('/api/stats', '/api/rickroll/count'))
+      .then(res => res.json())
+      .then(data => {
+        showRickrollMessage(data.count);
+      })
+      .catch(() => {});
+  }
+}
+
+function showRickrollMessage(count) {
+  const message = document.createElement('div');
+  message.className = 'rickroll-message';
+  message.innerHTML = `You're rickroll victim #${count}! Never gonna give you up 🎵`;
+  document.body.appendChild(message);
+
+  setTimeout(() => {
+    message.classList.add('visible');
+  }, 100);
+
+  setTimeout(() => {
+    message.classList.remove('visible');
+    setTimeout(() => message.remove(), 500);
+  }, 5000);
 }

@@ -1,0 +1,439 @@
+/* ========================================
+   GLOBAL STYLES
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  transition: background-color 0.8s ease;
+}
+
+/* ========================================
+   SECTION LAYOUT
+   ======================================== */
+
+.wrapper {
+  width: 100%;
+}
+
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  position: relative;
+  background: transparent;
+}
+
+.section.short {
+  min-height: 60vh;
+}
+
+.inner {
+  max-width: 900px;
+  width: 100%;
+}
+
+/* Section Colors - removed since background is on body now */
+.section.light {
+  color: #fff;
+}
+
+.section.dark {
+  color: #000;
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+h1 {
+  font-size: 10rem;
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+  line-height: 0.9;
+  position: relative;
+  display: inline-block;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0 0 2rem 0;
+  line-height: 1.4;
+}
+
+p {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  margin: 0 0 1.5rem 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+strong {
+  font-weight: 700;
+}
+
+/* ========================================
+   ANIMATED DOTS & DROPPING DOT
+   ======================================== */
+
+/* Dropping dot animation */
+.dropping-dot {
+  display: inline-block;
+  position: relative;
+  opacity: 0;
+  animation: dropIn 1.5s ease-out 2s forwards;
+}
+
+@keyframes dropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100vh) rotate(0deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(10px) rotate(360deg);
+  }
+  80% {
+    transform: translateY(-5px) rotate(380deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+/* Footer dots */
+.dot1, .dot2, .dot3 {
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.dot1 {
+  animation-delay: 0s;
+}
+
+.dot2 {
+  animation-delay: 0.3s;
+}
+
+.dot3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ========================================
+   HERO SECTION - HOVER EFFECTS
+   ======================================== */
+
+/* Location, Song, and Game hover styling */
+.location-hover,
+.song-hover,
+.game-hover {
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  transition: transform 0.2s ease;
+}
+
+.location-hover:hover,
+.song-hover:hover,
+.game-hover:hover {
+  transform: scale(1.05);
+}
+
+/* ========================================
+   CITY OVERLAY (Location Hover)
+   ======================================== */
+
+/* City Overlay - Hidden by default */
+.city-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+.city-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s 0s;
+}
+
+/* Shaking City Name - REMOVED */
+.city-name-shake {
+  display: none;
+}
+
+/* City GIF - Uses same scale animation as media overlays */
+.city-gif {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('../img/hyderabad.gif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.city-overlay.active .city-gif {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ========================================
+   SONG & GAME OVERLAY (Media Hover)
+   ======================================== */
+
+.media-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+.media-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s 0s;
+}
+
+.media-gif {
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.media-overlay.active .media-gif {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+#loading {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+#loading.hidden {
+  opacity: 0;
+  display: none;
+}
+
+#stat-content {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#stat-content.visible {
+  opacity: 1;
+  display: block;
+}
+
+/* ========================================
+   SOCIAL LINKS
+   ======================================== */
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+#social-arrow {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.social-links a {
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.social-links a:hover {
+  transform: scale(1.2);
+  opacity: 0.7;
+}
+
+.social-links svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  .section {
+    padding: 3rem 1.5rem;
+  }
+
+  .city-name-shake {
+    font-size: 4rem;
+  }
+
+  .social-links {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 3.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+
+  .city-name-shake {
+    font-size: 2.5rem;
+  }
+}
+
+/* ========================================
+   SCROLL FADE-IN ANIMATIONS
+   ======================================== */
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================
+   LOADING SKELETON
+   ======================================== */
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.skeleton-text {
+  height: 1.8rem;
+  width: 80%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-text-short {
+  height: 1.8rem;
+  width: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ========================================
+   RESUME DOWNLOAD BUTTON
+   ======================================== */
+
+.resume-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.resume-link:hover {
+  transform: scale(1.1);
+  opacity: 0.7;
+}
+
+/* ========================================
+   MOBILE TOUCH SUPPORT
+   ======================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .location-hover,
+  .song-hover,
+  .game-hover {
+    cursor: pointer;
+  }
+}

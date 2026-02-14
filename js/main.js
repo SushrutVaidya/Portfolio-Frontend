@@ -1,0 +1,293 @@
+// ========================================
+// API Configuration
+// ========================================
+
+const API_URL = 'http://localhost:8081/api/stats';
+
+// ========================================
+// DOM Elements
+// ========================================
+
+const loadingEl = document.getElementById('loading');
+const statContentEl = document.getElementById('stat-content');
+const currentTimeEl = document.getElementById('current-time');
+const locationTextEl = document.getElementById('location-text');
+const songNameEl = document.getElementById('song-name');
+const gameNameEl = document.getElementById('game-name');
+const cityOverlayEl = document.getElementById('city-overlay');
+const songOverlayEl = document.getElementById('song-overlay');
+const gameOverlayEl = document.getElementById('game-overlay');
+
+// ========================================
+// Song Audio
+// ========================================
+
+let songAudio = null;
+let songPreviewUrl = null;
+
+// ========================================
+// Fetch Stats from Backend API
+// ========================================
+
+async function fetchStats() {
+  try {
+    const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Update DOM with data
+    locationTextEl.textContent = data.location.toLowerCase();
+    songNameEl.textContent = data.songName.toLowerCase();
+    gameNameEl.textContent = data.game.toLowerCase();
+    songPreviewUrl = data.songURL;
+
+    // Hide loading, show content
+    loadingEl.classList.add('hidden');
+    statContentEl.style.display = 'block';
+    setTimeout(() => {
+      statContentEl.classList.add('visible');
+    }, 100);
+
+    // Start live clock
+    startLiveClock();
+
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+
+    // Show default content even if API fails
+    locationTextEl.textContent = 'hyderabad';
+    songNameEl.textContent = 'your favorite song';
+    gameNameEl.textContent = 'counter-strike 2';
+
+    // Hide loading, show content
+    loadingEl.classList.add('hidden');
+    statContentEl.style.display = 'block';
+    setTimeout(() => {
+      statContentEl.classList.add('visible');
+    }, 100);
+
+    // Start live clock
+    startLiveClock();
+  }
+}
+
+// ========================================
+// Live Clock
+// ========================================
+
+function formatTime(date) {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'pm' : 'am';
+
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 should be 12
+
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+
+  return `${hours}:${minutesStr}${ampm}`;
+}
+
+function updateClock() {
+  const now = new Date();
+  currentTimeEl.textContent = formatTime(now);
+}
+
+function startLiveClock() {
+  updateClock(); // Update immediately
+  setInterval(updateClock, 1000); // Update every second
+}
+
+// ========================================
+// Hover Effects
+// ========================================
+
+// Helper function to hide all overlays
+function hideAllOverlays() {
+  cityOverlayEl.classList.remove('active');
+  songOverlayEl.classList.remove('active');
+  gameOverlayEl.classList.remove('active');
+}
+
+// City hover
+locationTextEl.addEventListener('mouseenter', () => {
+  hideAllOverlays();
+  cityOverlayEl.classList.add('active');
+});
+
+locationTextEl.addEventListener('mouseleave', () => {
+  cityOverlayEl.classList.remove('active');
+});
+
+// Song hover
+songNameEl.addEventListener('mouseenter', () => {
+  hideAllOverlays();
+  songOverlayEl.classList.add('active');
+
+  // Play or resume audio
+  if (songPreviewUrl) {
+    if (!songAudio) {
+      songAudio = new Audio(API_URL.replace('/api/stats', '') + songPreviewUrl);
+      songAudio.volume = 0.5;
+    }
+    songAudio.play().catch(() => {
+      console.log('Click anywhere on the page first to enable audio');
+    });
+  }
+});
+
+songNameEl.addEventListener('mouseleave', () => {
+  songOverlayEl.classList.remove('active');
+
+  // Pause audio (keeps position)
+  if (songAudio) {
+    songAudio.pause();
+  }
+});
+
+// Game hover
+gameNameEl.addEventListener('mouseenter', () => {
+  hideAllOverlays();
+  gameOverlayEl.classList.add('active');
+});
+
+gameNameEl.addEventListener('mouseleave', () => {
+  gameOverlayEl.classList.remove('active');
+});
+
+// ========================================
+// Initialize on Page Load
+// ========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchStats();
+  setupScrollColorTransition();
+  setupFadeInAnimations();
+  setupMobileTouchSupport();
+});
+
+// ========================================
+// Smooth Color Transition on Scroll
+// ========================================
+
+function setupScrollColorTransition() {
+  const sections = [
+    { id: 'hero', color: '#0b24fb' },
+    { id: 'about', color: '#fc0' },
+    { id: 'interests', color: '#ff3838' },
+    { id: 'tracking', color: '#2ed573' },
+    { id: 'footer', color: '#0b24fb' }
+  ];
+
+  // Set initial color
+  document.body.style.backgroundColor = sections[0].color;
+
+  // Intersection Observer to detect which section is visible
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.5 // Trigger when 50% of section is visible
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const sectionId = entry.target.id;
+        const section = sections.find(s => s.id === sectionId);
+        if (section) {
+          document.body.style.backgroundColor = section.color;
+        }
+      }
+    });
+  }, observerOptions);
+
+  // Observe all sections
+  sections.forEach(section => {
+    const element = document.getElementById(section.id);
+    if (element) {
+      observer.observe(element);
+    }
+  });
+}
+
+// ========================================
+// Scroll Fade-In Animations
+// ========================================
+
+function setupFadeInAnimations() {
+  const fadeElements = document.querySelectorAll('.fade-in');
+
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  });
+
+  fadeElements.forEach(el => fadeObserver.observe(el));
+}
+
+// ========================================
+// Mobile Touch Support
+// ========================================
+
+function setupMobileTouchSupport() {
+  // Check if device supports touch
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+  if (isTouchDevice) {
+    // Track active overlay for toggle behavior
+    let activeOverlay = null;
+
+    const handleTap = (element, overlay, playAudio = false) => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        if (activeOverlay === overlay) {
+          // Tapping same element - hide overlay
+          overlay.classList.remove('active');
+          activeOverlay = null;
+          if (playAudio && songAudio) {
+            songAudio.pause();
+          }
+        } else {
+          // Tapping different element - switch overlay
+          hideAllOverlays();
+          if (songAudio) songAudio.pause();
+          overlay.classList.add('active');
+          activeOverlay = overlay;
+
+          if (playAudio && songPreviewUrl) {
+            if (!songAudio) {
+              songAudio = new Audio(API_URL.replace('/api/stats', '') + songPreviewUrl);
+              songAudio.volume = 0.5;
+            }
+            songAudio.play().catch(() => {});
+          }
+        }
+      });
+    };
+
+    handleTap(locationTextEl, cityOverlayEl);
+    handleTap(songNameEl, songOverlayEl, true);
+    handleTap(gameNameEl, gameOverlayEl);
+
+    // Tap anywhere else to close overlay
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.location-hover, .song-hover, .game-hover') && activeOverlay) {
+        activeOverlay.classList.remove('active');
+        activeOverlay = null;
+        if (songAudio) songAudio.pause();
+      }
+    });
+  }
+}

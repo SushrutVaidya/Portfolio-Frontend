@@ -14,9 +14,12 @@ const currentTimeEl = document.getElementById('current-time');
 const locationTextEl = document.getElementById('location-text');
 const songNameEl = document.getElementById('song-name');
 const gameNameEl = document.getElementById('game-name');
+const bookNameEl = document.getElementById('book-name');
 const cityOverlayEl = document.getElementById('city-overlay');
 const songOverlayEl = document.getElementById('song-overlay');
 const gameOverlayEl = document.getElementById('game-overlay');
+const bookOverlayEl = document.getElementById('book-overlay');
+const instagramOverlayEl = document.getElementById('instagram-overlay');
 
 // ========================================
 // Song Audio
@@ -24,6 +27,12 @@ const gameOverlayEl = document.getElementById('game-overlay');
 
 let songAudio = null;
 let songPreviewUrl = null;
+
+// Instagram thud sound
+let instagramThud = null;
+
+// Book audio
+let bookAudio = null;
 
 // ========================================
 // Fetch Stats from Backend API
@@ -43,6 +52,7 @@ async function fetchStats() {
     locationTextEl.textContent = data.location.toLowerCase();
     songNameEl.textContent = data.songName.toLowerCase();
     gameNameEl.textContent = data.game.toLowerCase();
+    bookNameEl.textContent = data.bookName ? data.bookName.toLowerCase() : 'this book';
     songPreviewUrl = data.songURL;
 
     // Hide loading, show content
@@ -62,6 +72,7 @@ async function fetchStats() {
     locationTextEl.textContent = 'hyderabad';
     songNameEl.textContent = 'your favorite song';
     gameNameEl.textContent = 'counter-strike 2';
+    bookNameEl.textContent = 'this book';
 
     // Hide loading, show content
     loadingEl.classList.add('hidden');
@@ -111,6 +122,8 @@ function hideAllOverlays() {
   cityOverlayEl.classList.remove('active');
   songOverlayEl.classList.remove('active');
   gameOverlayEl.classList.remove('active');
+  bookOverlayEl.classList.remove('active');
+  instagramOverlayEl.classList.remove('active');
 }
 
 // City hover
@@ -158,6 +171,73 @@ gameNameEl.addEventListener('mouseenter', () => {
 gameNameEl.addEventListener('mouseleave', () => {
   gameOverlayEl.classList.remove('active');
 });
+
+// Book hover
+bookNameEl.addEventListener('mouseenter', () => {
+  hideAllOverlays();
+  bookOverlayEl.classList.add('active');
+
+  // Play video
+  const bookVideo = bookOverlayEl.querySelector('.media-video');
+  if (bookVideo) {
+    bookVideo.currentTime = 0;
+    bookVideo.play().catch(() => {});
+  }
+
+  // Play cricket audio
+  if (!bookAudio) {
+    bookAudio = new Audio('img/crickets.mp3');
+    bookAudio.volume = 0.3;
+  }
+  bookAudio.currentTime = 0;
+  bookAudio.play().catch(() => {
+    console.log('Click anywhere on the page first to enable audio');
+  });
+});
+
+bookNameEl.addEventListener('mouseleave', () => {
+  bookOverlayEl.classList.remove('active');
+
+  // Pause and reset video
+  const bookVideo = bookOverlayEl.querySelector('.media-video');
+  if (bookVideo) {
+    bookVideo.pause();
+    bookVideo.currentTime = 0;
+  }
+
+  // Pause and reset audio
+  if (bookAudio) {
+    bookAudio.pause();
+    bookAudio.currentTime = 0;
+  }
+});
+
+// Instagram hover
+const instagramHover = document.querySelector('.instagram-hover');
+if (instagramHover) {
+  instagramHover.addEventListener('mouseenter', () => {
+    hideAllOverlays();
+    instagramOverlayEl.classList.add('active');
+
+    // Play thud sound
+    if (!instagramThud) {
+      instagramThud = new Audio('img/thud.mp3');
+      instagramThud.volume = 0.5;
+    }
+    instagramThud.currentTime = 0;
+    instagramThud.play().catch(() => {});
+  });
+
+  instagramHover.addEventListener('mouseleave', () => {
+    instagramOverlayEl.classList.remove('active');
+
+    // Pause and reset audio
+    if (instagramThud) {
+      instagramThud.pause();
+      instagramThud.currentTime = 0;
+    }
+  });
+}
 
 // ========================================
 // Initialize on Page Load
@@ -250,7 +330,7 @@ function setupMobileTouchSupport() {
     // Track active overlay for toggle behavior
     let activeOverlay = null;
 
-    const handleTap = (element, overlay, playAudio = false) => {
+    const handleTap = (element, overlay, mediaType = 'none') => {
       element.addEventListener('click', (e) => {
         e.preventDefault();
 
@@ -258,37 +338,93 @@ function setupMobileTouchSupport() {
           // Tapping same element - hide overlay
           overlay.classList.remove('active');
           activeOverlay = null;
-          if (playAudio && songAudio) {
-            songAudio.pause();
+
+          // Stop all media
+          if (songAudio) songAudio.pause();
+          if (bookAudio) {
+            bookAudio.pause();
+            bookAudio.currentTime = 0;
+          }
+          const video = overlay.querySelector('.media-video');
+          if (video) {
+            video.pause();
+            video.currentTime = 0;
           }
         } else {
           // Tapping different element - switch overlay
           hideAllOverlays();
+
+          // Stop all media
           if (songAudio) songAudio.pause();
+          if (bookAudio) {
+            bookAudio.pause();
+            bookAudio.currentTime = 0;
+          }
+          document.querySelectorAll('.media-video').forEach(v => {
+            v.pause();
+            v.currentTime = 0;
+          });
+
           overlay.classList.add('active');
           activeOverlay = overlay;
 
-          if (playAudio && songPreviewUrl) {
+          // Play appropriate media
+          if (mediaType === 'song' && songPreviewUrl) {
             if (!songAudio) {
               songAudio = new Audio(API_URL.replace('/api/stats', '') + songPreviewUrl);
               songAudio.volume = 0.5;
             }
             songAudio.play().catch(() => {});
+          } else if (mediaType === 'book') {
+            const bookVideo = overlay.querySelector('.media-video');
+            if (bookVideo) {
+              bookVideo.currentTime = 0;
+              bookVideo.play().catch(() => {});
+            }
+            if (!bookAudio) {
+              bookAudio = new Audio('img/crickets.mp3');
+              bookAudio.volume = 0.3;
+            }
+            bookAudio.currentTime = 0;
+            bookAudio.play().catch(() => {});
+          } else if (mediaType === 'instagram') {
+            if (!instagramThud) {
+              instagramThud = new Audio('img/thud.mp3');
+              instagramThud.volume = 0.5;
+            }
+            instagramThud.currentTime = 0;
+            instagramThud.play().catch(() => {});
           }
         }
       });
     };
 
-    handleTap(locationTextEl, cityOverlayEl);
-    handleTap(songNameEl, songOverlayEl, true);
-    handleTap(gameNameEl, gameOverlayEl);
+    handleTap(locationTextEl, cityOverlayEl, 'none');
+    handleTap(songNameEl, songOverlayEl, 'song');
+    handleTap(gameNameEl, gameOverlayEl, 'none');
+    handleTap(bookNameEl, bookOverlayEl, 'book');
+
+    const instagramHover = document.querySelector('.instagram-hover');
+    if (instagramHover) {
+      handleTap(instagramHover, instagramOverlayEl, 'instagram');
+    }
 
     // Tap anywhere else to close overlay
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.location-hover, .song-hover, .game-hover') && activeOverlay) {
+      if (!e.target.closest('.location-hover, .song-hover, .game-hover, .book-hover, .instagram-hover') && activeOverlay) {
         activeOverlay.classList.remove('active');
         activeOverlay = null;
+
+        // Stop all media
         if (songAudio) songAudio.pause();
+        if (bookAudio) {
+          bookAudio.pause();
+          bookAudio.currentTime = 0;
+        }
+        document.querySelectorAll('.media-video').forEach(v => {
+          v.pause();
+          v.currentTime = 0;
+        });
       }
     });
   }

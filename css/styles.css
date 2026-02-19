@@ -155,22 +155,84 @@ strong {
    HERO SECTION - HOVER EFFECTS
    ======================================== */
 
-/* Location, Song, and Game hover styling */
+/* Location, Song, Game, and Book hover styling - Apple style */
 .location-hover,
 .song-hover,
-.game-hover {
+.game-hover,
+.book-hover,
+.instagram-hover {
   cursor: pointer;
   position: relative;
   z-index: 0;
-  text-decoration: underline;
-  text-decoration-style: solid;
-  transition: transform 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle hint underline - hidden until content is visible */
+.location-hover::before,
+.song-hover::before,
+.game-hover::before,
+.book-hover::before,
+.instagram-hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show hint underlines only when content is visible */
+#stat-content.visible .location-hover::before,
+#stat-content.visible .song-hover::before,
+#stat-content.visible .game-hover::before,
+#stat-content.visible .book-hover::before {
+  opacity: 0.3;
+}
+
+/* Animated underline that draws in on hover */
+.location-hover::after,
+.song-hover::after,
+.game-hover::after,
+.book-hover::after,
+.instagram-hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background-color: currentColor;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .location-hover:hover,
 .song-hover:hover,
-.game-hover:hover {
-  transform: scale(1.05);
+.game-hover:hover,
+.book-hover:hover,
+.instagram-hover:hover {
+  transform: scale(1.02);
+}
+
+/* On hover: hide hint, show full underline */
+.location-hover:hover::before,
+.song-hover:hover::before,
+.game-hover:hover::before,
+.book-hover:hover::before,
+.instagram-hover:hover::before {
+  opacity: 0;
+}
+
+.location-hover:hover::after,
+.song-hover:hover::after,
+.game-hover:hover::after,
+.book-hover:hover::after,
+.instagram-hover:hover::after {
+  width: 100%;
 }
 
 /* ========================================
@@ -206,7 +268,7 @@ strong {
 .city-gif {
   width: 100vw;
   height: 100vh;
-  background-image: url('../img/hyderabad.gif');
+  background-image: url('../img/Hyderabad.gif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

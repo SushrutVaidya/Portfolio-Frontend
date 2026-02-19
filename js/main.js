@@ -188,6 +188,7 @@ bookNameEl.addEventListener('mouseenter', () => {
   if (!bookAudio) {
     bookAudio = new Audio('img/crickets.mp3');
     bookAudio.volume = 0.3;
+    bookAudio.loop = true; // Loop the audio
   }
   bookAudio.currentTime = 0;
   bookAudio.play().catch(() => {
@@ -384,6 +385,7 @@ function setupMobileTouchSupport() {
             if (!bookAudio) {
               bookAudio = new Audio('img/crickets.mp3');
               bookAudio.volume = 0.3;
+              bookAudio.loop = true; // Loop the audio
             }
             bookAudio.currentTime = 0;
             bookAudio.play().catch(() => {});

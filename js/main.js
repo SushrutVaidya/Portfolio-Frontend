@@ -47,7 +47,7 @@ async function fetchStats() {
 
     // Hide loading, show content
     loadingEl.classList.add('hidden');
-    statContentEl.classList.remove('hidden');
+    statContentEl.style.display = 'block';
     setTimeout(() => {
       statContentEl.classList.add('visible');
     }, 100);
@@ -65,7 +65,7 @@ async function fetchStats() {
 
     // Hide loading, show content
     loadingEl.classList.add('hidden');
-    statContentEl.classList.remove('hidden');
+    statContentEl.style.display = 'block';
     setTimeout(() => {
       statContentEl.classList.add('visible');
     }, 100);

@@ -275,7 +275,12 @@ strong {
 
 #stat-content {
   opacity: 0;
+  display: none;
   transition: opacity 0.5s ease;
+}
+
+#stat-content.hidden {
+  display: none;
 }
 
 #stat-content.visible {

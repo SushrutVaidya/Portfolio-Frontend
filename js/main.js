@@ -2,7 +2,7 @@
 // API Configuration
 // ========================================
 
-const API_URL = 'http://localhost:8081/api/stats';
+const API_URL = '/api/stats';
 
 // ========================================
 // DOM Elements
@@ -280,7 +280,21 @@ function setupScrollColorTransition() {
         const sectionId = entry.target.id;
         const section = sections.find(s => s.id === sectionId);
         if (section) {
-          document.body.style.backgroundColor = section.color;
+          // Disable transition for hero <-> about to avoid muddy blend
+          const currentBg = document.body.style.backgroundColor;
+          const isHeroToAbout = (currentBg === 'rgb(11, 36, 251)' && section.color === '#fc0') ||
+                               (currentBg === 'rgb(255, 204, 0)' && section.color === '#0b24fb');
+
+          if (isHeroToAbout) {
+            document.body.style.transition = 'none';
+            document.body.style.backgroundColor = section.color;
+            // Re-enable transition after a moment
+            setTimeout(() => {
+              document.body.style.transition = 'background-color 0.8s ease';
+            }, 50);
+          } else {
+            document.body.style.backgroundColor = section.color;
+          }
         }
       }
     });

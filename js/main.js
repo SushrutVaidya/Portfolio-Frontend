@@ -55,9 +55,8 @@ async function fetchStats() {
     bookNameEl.textContent = data.bookName ? data.bookName.toLowerCase() : 'this book';
     songPreviewUrl = data.songURL;
 
-    // Hide loading, show content
-    loadingEl.classList.add('hidden');
-    statContentEl.style.display = 'block';
+    // Show stat content below the animated hello
+    statContentEl.classList.remove('hidden');
     setTimeout(() => {
       statContentEl.classList.add('visible');
     }, 100);
@@ -74,9 +73,8 @@ async function fetchStats() {
     gameNameEl.textContent = 'counter-strike 2';
     bookNameEl.textContent = 'this book';
 
-    // Hide loading, show content
-    loadingEl.classList.add('hidden');
-    statContentEl.style.display = 'block';
+    // Show stat content below the animated hello
+    statContentEl.classList.remove('hidden');
     setTimeout(() => {
       statContentEl.classList.add('visible');
     }, 100);

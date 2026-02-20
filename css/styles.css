@@ -481,6 +481,15 @@ strong {
   .social-links {
     flex-wrap: wrap;
   }
+
+  .loader,
+  .welcome {
+    font-size: 5rem;
+  }
+
+  .loaderWrapper {
+    height: 120px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -498,6 +507,51 @@ strong {
 
   .city-name-shake {
     font-size: 2.5rem;
+  }
+
+  .loader,
+  .welcome {
+    font-size: 14vw !important;
+    text-align: center;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .loaderWrapper {
+    height: 25vw;
+    margin: 0 0 2rem 0;
+    overflow: visible;
+  }
+
+  .section {
+    padding: 2rem 0.5rem;
+  }
+
+  /* Adjust dot drop animation for mobile */
+  .loader .dropping-dot {
+    animation: dotDropMobile 12s ease-in-out infinite;
+  }
+}
+
+@keyframes dotDropMobile {
+  0%, 3% {
+    opacity: 0;
+    transform: translateY(-20vh) rotate(0deg);
+  }
+  8% {
+    opacity: 1;
+    transform: translateY(3px) rotate(360deg);
+  }
+  10% {
+    transform: translateY(-1px) rotate(380deg);
+  }
+  12%, 87% {
+    opacity: 1;
+    transform: translateY(0) rotate(360deg);
+  }
+  88%, 100% {
+    opacity: 0;
+    transform: translateY(0) rotate(360deg);
   }
 }
 
@@ -521,8 +575,8 @@ strong {
    ======================================== */
 
 .loaderWrapper {
-  height: 180px;
-  overflow: hidden;
+  height: 220px;
+  overflow: visible;
   margin: 0 0 2rem 0;
 }
 

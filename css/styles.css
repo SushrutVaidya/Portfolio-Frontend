@@ -747,8 +747,28 @@ strong {
 @media (hover: none) and (pointer: coarse) {
   .location-hover,
   .song-hover,
-  .game-hover {
+  .game-hover,
+  .book-hover {
     cursor: pointer;
+  }
+
+  /* Make hint underlines more subtle on mobile */
+  .location-hover::before,
+  .song-hover::before,
+  .game-hover::before,
+  .book-hover::before {
+    bottom: 0;
+    height: 1px;
+    opacity: 0.5;
+  }
+
+  /* Position animated underline properly on mobile */
+  .location-hover::after,
+  .song-hover::after,
+  .game-hover::after,
+  .book-hover::after {
+    bottom: 0;
+    height: 1px;
   }
 }
 

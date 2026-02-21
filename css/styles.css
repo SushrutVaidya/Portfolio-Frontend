@@ -484,11 +484,11 @@ strong {
 
   .loader,
   .welcome {
-    font-size: 5rem;
+    font-size: 6.5rem;
   }
 
   .loaderWrapper {
-    height: 120px;
+    height: 160px;
   }
 }
 
@@ -511,15 +511,15 @@ strong {
 
   .loader,
   .welcome {
-    font-size: 14vw !important;
+    font-size: 16vw !important;
     text-align: center;
     white-space: nowrap;
     max-width: 100%;
   }
 
   .loaderWrapper {
-    height: 25vw;
-    margin: 0 0 2rem 0;
+    height: 28vw;
+    margin: 0 0 1rem 0;
     overflow: visible;
   }
 
@@ -575,9 +575,9 @@ strong {
    ======================================== */
 
 .loaderWrapper {
-  height: 220px;
+  height: 260px;
   overflow: visible;
-  margin: 0 0 2rem 0;
+  margin: 0 0 1rem 0;
 }
 
 .loaderInner {
@@ -587,7 +587,7 @@ strong {
 .loader,
 .welcome {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 10rem;
+  font-size: 13rem;
   font-weight: 900;
   line-height: 1.2;
   color: white; /* Back to white for blue background */
@@ -752,23 +752,41 @@ strong {
     cursor: pointer;
   }
 
-  /* Make hint underlines more subtle on mobile */
+  /* Remove underlines on mobile - they don't work well with wrapped text */
   .location-hover::before,
   .song-hover::before,
   .game-hover::before,
   .book-hover::before {
-    bottom: 0;
-    height: 1px;
-    opacity: 0.5;
+    display: none !important;
   }
 
-  /* Position animated underline properly on mobile */
   .location-hover::after,
   .song-hover::after,
   .game-hover::after,
   .book-hover::after {
-    bottom: 0;
-    height: 1px;
+    display: none !important;
+  }
+
+  /* Add visual hint with brightness on mobile - Apple style */
+  .location-hover,
+  .song-hover,
+  .game-hover,
+  .book-hover {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 1);
+    animation: subtlePulse 3s ease-in-out infinite;
+  }
+}
+
+/* Very subtle pulse animation for mobile hints */
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 1;
+    color: rgba(255, 255, 255, 1);
+  }
+  50% {
+    opacity: 0.85;
+    color: rgba(200, 230, 255, 1);
   }
 }
 

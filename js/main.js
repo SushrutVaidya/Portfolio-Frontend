@@ -256,12 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupScrollColorTransition() {
   const sections = [
-    { id: 'hero', color: '#0b24fb' },
+    { id: 'hero', color: '#1e90ff' }, // Dodger Blue (lighter, blends better with yellow)
     { id: 'about', color: '#fc0' },
     { id: 'interests', color: '#ff3838' },
     { id: 'tracking', color: '#2ed573' },
     { id: 'patent', color: '#9b59b6' },
-    { id: 'footer', color: '#0b24fb' }
+    { id: 'footer', color: '#1e90ff' } // Match hero
   ];
 
   // Set initial color
@@ -280,21 +280,7 @@ function setupScrollColorTransition() {
         const sectionId = entry.target.id;
         const section = sections.find(s => s.id === sectionId);
         if (section) {
-          // Disable transition for hero <-> about to avoid muddy blend
-          const currentBg = document.body.style.backgroundColor;
-          const isHeroToAbout = (currentBg === 'rgb(11, 36, 251)' && section.color === '#fc0') ||
-                               (currentBg === 'rgb(255, 204, 0)' && section.color === '#0b24fb');
-
-          if (isHeroToAbout) {
-            document.body.style.transition = 'none';
-            document.body.style.backgroundColor = section.color;
-            // Re-enable transition after a moment
-            setTimeout(() => {
-              document.body.style.transition = 'background-color 0.8s ease';
-            }, 50);
-          } else {
-            document.body.style.backgroundColor = section.color;
-          }
+          document.body.style.backgroundColor = section.color;
         }
       }
     });

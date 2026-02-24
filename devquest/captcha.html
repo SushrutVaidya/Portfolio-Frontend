@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevQuest - Captcha</title>
+  <link rel="stylesheet" href="css/captcha.css">
+</head>
+<body>
+
+  <div id="captcha-container">
+
+    <!-- Header -->
+    <div id="captcha-header">
+      <p>Put the shapes in the</p>
+      <p class="correct-holes">correct holes</p>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area">
+
+      <!-- Shapes scattered around -->
+      <div id="shapes-area">
+        <img src="assets/cube sprite.png"         class="shape" id="shape-cube"      alt="cube">
+        <img src="assets/cylinder.png"            class="shape" id="shape-cylinder"  alt="cylinder">
+        <img src="assets/Dome shape.png"          class="shape" id="shape-dome"      alt="dome">
+        <img src="assets/rectangular Bar.png"     class="shape" id="shape-bar"       alt="bar">
+        <img src="assets/rectangular block.png"   class="shape" id="shape-block"     alt="block">
+        <img src="assets/rounded isometric cube.png" class="shape" id="shape-rounded" alt="rounded cube">
+        <img src="assets/TetraHedron.png"         class="shape" id="shape-tetra"     alt="tetrahedron">
+      </div>
+
+      <!-- Drop Zones (holes) -->
+      <div id="holes-area">
+        <div class="hole" id="hole-circle">
+          <div class="hole-silhouette circle-hole"></div>
+        </div>
+        <div class="hole" id="hole-rectangle">
+          <div class="hole-silhouette rectangle-hole"></div>
+        </div>
+        <div class="hole" id="hole-triangle">
+          <div class="hole-silhouette triangle-hole"></div>
+        </div>
+        <div class="hole" id="hole-square">
+          <div class="hole-silhouette square-hole"></div>
+        </div>
+        <div class="hole" id="hole-semicircle">
+          <div class="hole-silhouette semicircle-hole"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div id="captcha-footer">
+      <button id="reset-btn" title="Reset">&#8635;</button>
+      <button id="verify-btn">Verify</button>
+    </div>
+
+  </div>
+
+  <script src="js/captcha.js"></script>
+</body>
+</html>

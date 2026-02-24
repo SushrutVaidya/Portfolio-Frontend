@@ -1,0 +1,337 @@
+/* ========================================
+   DEVQUEST CAPTCHA - Base Styles
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1a1a2e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ========================================
+   CAPTCHA CONTAINER - 3D look
+   ======================================== */
+
+#captcha-container {
+  background-color: #c8c8c8;
+  border: 4px solid #4a90d9;
+  border-radius: 8px;
+  width: 480px;
+  /* 3D depth effect */
+  box-shadow:
+    0 0 30px rgba(74, 144, 217, 0.4),
+    4px 4px 0px #2a6099,
+    8px 8px 0px #1a4070,
+    12px 12px 20px rgba(0,0,0,0.5);
+  transform: perspective(800px) rotateX(2deg);
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+#captcha-header {
+  background-color: #4a90d9;
+  padding: 16px 20px;
+  text-align: center;
+  color: white;
+  /* 3D inset look */
+  border-bottom: 3px solid #2a6099;
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2);
+}
+
+#captcha-header p {
+  font-size: 1rem;
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+
+#captcha-header .correct-holes {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 4px;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+/* ========================================
+   GAME AREA
+   ======================================== */
+
+#game-area {
+  padding: 20px;
+  background-color: #d4d4d4;
+  position: relative;
+  min-height: 320px;
+  /* 3D inset effect */
+  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.2);
+  overflow: visible;
+}
+
+/* ========================================
+   SHAPES AREA
+   ======================================== */
+
+#shapes-area {
+  position: relative;
+  height: 210px;
+  margin-bottom: 16px;
+}
+
+.shape {
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  cursor: grab;
+  user-select: none;
+  mix-blend-mode: multiply;
+  /* Snappy pickup feel */
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+}
+
+.shape:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(3px 6px 6px rgba(0,0,0,0.4));
+}
+
+/* When being dragged */
+.shape.dragging {
+  cursor: grabbing;
+  transform: scale(1.15) rotate(3deg);
+  filter: drop-shadow(6px 10px 10px rgba(0,0,0,0.5));
+  mix-blend-mode: normal;
+  z-index: 1000;
+}
+
+/* Initial scattered positions */
+#shape-cube     { top: 10px;  left: 20px;  }
+#shape-cylinder { top: 10px;  left: 120px; }
+#shape-dome     { top: 10px;  left: 230px; }
+#shape-bar      { top: 10px;  left: 340px; }
+#shape-block    { top: 110px; left: 30px;  }
+#shape-rounded  { top: 110px; left: 150px; }
+#shape-tetra    { top: 110px; left: 270px; }
+
+/* ========================================
+   HOLES AREA - 3D inset tray look
+   ======================================== */
+
+#holes-area {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #aaaaaa;
+  border-radius: 6px;
+  padding: 14px 8px;
+  /* Deep inset 3D tray effect */
+  box-shadow:
+    inset 3px 3px 8px rgba(0,0,0,0.4),
+    inset -2px -2px 5px rgba(255,255,255,0.2),
+    0 2px 4px rgba(0,0,0,0.2);
+  border: 2px solid #888;
+}
+
+.hole {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  background-color: #999;
+  border-radius: 4px;
+  position: relative;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  /* Each hole has inset 3D look */
+  box-shadow:
+    inset 2px 2px 6px rgba(0,0,0,0.4),
+    inset -1px -1px 3px rgba(255,255,255,0.15);
+  border: 2px solid #777;
+}
+
+/* Highlight when shape dragged over */
+.hole.drag-over {
+  background-color: #90b0d0;
+  border-color: #4a90d9;
+  transform: scale(1.05);
+  box-shadow:
+    inset 2px 2px 6px rgba(0,0,0,0.3),
+    0 0 10px rgba(74, 144, 217, 0.5);
+}
+
+/* Wrong hole shake animation */
+.hole.wrong {
+  animation: shakeHole 0.4s ease;
+  background-color: #d09090;
+  border-color: #c05050;
+}
+
+@keyframes shakeHole {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* Hole silhouettes */
+.hole-silhouette {
+  background-color: #4a4a4a;
+  pointer-events: none;
+}
+
+.circle-hole {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.rectangle-hole {
+  width: 44px;
+  height: 26px;
+  border-radius: 2px;
+}
+
+.triangle-hole {
+  width: 0;
+  height: 0;
+  background: none;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 38px solid #4a4a4a;
+}
+
+.square-hole {
+  width: 38px;
+  height: 38px;
+  border-radius: 2px;
+}
+
+.semicircle-hole {
+  width: 38px;
+  height: 19px;
+  border-radius: 38px 38px 0 0;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+#captcha-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #bbb;
+  border-top: 3px solid #999;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+}
+
+#reset-btn {
+  background: #aaa;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #444;
+  transition: all 0.15s ease;
+  box-shadow: 2px 2px 0px #888, 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#reset-btn:hover {
+  background-color: #999;
+  transform: scale(1.05);
+}
+
+#reset-btn:active {
+  transform: scale(0.95);
+  box-shadow: 1px 1px 0px #888;
+}
+
+#verify-btn {
+  background-color: #4a90d9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s ease;
+  box-shadow: 3px 3px 0px #2a6099, 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#verify-btn:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px #2a6099, 0 6px 12px rgba(0,0,0,0.2);
+}
+
+#verify-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px #2a6099;
+}
+
+/* ========================================
+   SHAPE SNAPPED INTO HOLE
+   ======================================== */
+
+.shape.snapped {
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.95;
+  transform: scale(0.85);
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 520px) {
+  #captcha-container {
+    width: 95vw;
+    transform: none;
+    box-shadow:
+      0 0 20px rgba(74, 144, 217, 0.3),
+      3px 3px 0px #2a6099,
+      6px 6px 10px rgba(0,0,0,0.4);
+  }
+
+  .shape {
+    width: 58px;
+    height: 58px;
+  }
+
+  #shape-cube     { top: 10px;  left: 10px;  }
+  #shape-cylinder { top: 10px;  left: 80px;  }
+  #shape-dome     { top: 10px;  left: 155px; }
+  #shape-bar      { top: 10px;  left: 230px; }
+  #shape-block    { top: 90px;  left: 10px;  }
+  #shape-rounded  { top: 90px;  left: 100px; }
+  #shape-tetra    { top: 90px;  left: 200px; }
+
+  .hole {
+    width: 54px;
+    height: 54px;
+  }
+
+  #captcha-header .correct-holes {
+    font-size: 1.3rem;
+  }
+}

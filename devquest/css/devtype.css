@@ -1,0 +1,369 @@
+/* ==========================================
+   DevType — Styles (Catppuccin Mocha palette)
+   ========================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #181825;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ==========================================
+   CONTAINER
+   ========================================== */
+
+#devtype-container {
+  position: relative;
+  background: #1e1e2e;
+  border: 1px solid #313244;
+  border-radius: 10px;
+  width: 720px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+#dt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px;
+  background: #181825;
+  border-bottom: 1px solid #313244;
+}
+
+#dt-logo {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #cdd6f4;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.logo-dot { color: #89b4fa; }
+
+#dt-time-controls { display: flex; gap: 6px; }
+
+.dt-time-btn {
+  background: none;
+  border: 1px solid #313244;
+  border-radius: 4px;
+  padding: 4px 13px;
+  font-size: 0.68rem;
+  font-family: 'Courier New', monospace;
+  color: #6c7086;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.dt-time-btn:hover   { border-color: #89b4fa; color: #cdd6f4; }
+.dt-time-btn.active  { border-color: #89b4fa; color: #89b4fa; background: rgba(137,180,250,0.08); }
+
+/* ==========================================
+   LIVE STATS
+   ========================================== */
+
+#dt-live-stats {
+  display: flex;
+  justify-content: center;
+  gap: 56px;
+  padding: 18px 22px 10px;
+}
+
+.dt-stat       { text-align: center; }
+.dt-stat-val   { font-size: 2rem; color: #cdd6f4; font-weight: bold; line-height: 1; min-width: 3ch; }
+.dt-stat-label { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; }
+
+#dt-timer { color: #89b4fa; transition: color 0.3s ease; }
+#dt-timer.warn   { color: #fab387; }
+#dt-timer.danger { color: #f38ba8; }
+
+/* ==========================================
+   WORDS AREA
+   ========================================== */
+
+#dt-words-wrap {
+  position: relative;
+  padding: 22px 28px 20px;
+  height: 175px;
+  overflow: hidden;
+  cursor: text;
+  border-top: 1px solid #313244;
+  border-bottom: 1px solid #313244;
+}
+
+#dt-words {
+  font-size: 1.35rem;
+  line-height: 2.4;
+  letter-spacing: 0.3px;
+  transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  user-select: none;
+  will-change: transform;
+}
+
+/* ── Word states ── */
+.dt-word {
+  display: inline-block;
+  margin-right: 14px;
+  position: relative;
+}
+
+.dt-char            { transition: color 0.04s ease; }
+.dt-char.pending    { color: #45475a; }
+.dt-char.correct    { color: #a6e3a1; }
+.dt-char.wrong      { color: #f38ba8; }
+.dt-char.extra      { color: #f38ba8; text-decoration: underline wavy; }
+
+/* Current word */
+.dt-word.current .dt-char.pending { color: #6c7086; }
+
+/* Cursor */
+.dt-word.current::before {
+  content: '';
+  position: absolute;
+  left: var(--cur, 0px);
+  top: 6px;
+  width: 2px;
+  height: 1.35em;
+  background: #89b4fa;
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(137, 180, 250, 0.55);
+  animation: dtCursorBlink 0.9s step-end infinite;
+}
+
+@keyframes dtCursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Done words */
+.dt-word.done .dt-char.correct { color: #313244; }
+.dt-word.done .dt-char.wrong   { color: #7d2d3a; }
+
+/* ==========================================
+   FOCUS HINT
+   ========================================== */
+
+#dt-focus-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #313244;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#dt-focus-hint.dt-hidden { opacity: 0; }
+
+/* ==========================================
+   HIDDEN INPUT
+   ========================================== */
+
+#dt-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  top: 0;
+  left: 0;
+}
+
+/* ==========================================
+   QUIRK: AUTOCOMPLETE POPUP
+   ========================================== */
+
+#dt-autocomplete {
+  position: absolute;
+  background: #181825;
+  border: 1px solid #45475a;
+  border-radius: 5px;
+  padding: 5px 11px;
+  font-size: 0.75rem;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#dt-autocomplete.ac-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#dt-autocomplete.dt-hidden { display: none; }
+
+#dt-ac-typed  { color: #89dceb; }
+#dt-ac-rest   { color: #45475a; font-style: italic; }
+
+.dt-ac-key {
+  margin-left: 10px;
+  background: #313244;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 0.58rem;
+  color: #585b70;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   QUIRK: CODE REVIEW COMMENT
+   ========================================== */
+
+#dt-review {
+  position: absolute;
+  font-size: 0.7rem;
+  color: #6c7086;
+  font-style: italic;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+#dt-review.dt-hidden  { display: none; }
+#dt-review.rev-visible { opacity: 1; }
+
+/* ==========================================
+   QUIRK: LEGACY COMMENT
+   ========================================== */
+
+#dt-legacy {
+  position: absolute;
+  bottom: 10px;
+  right: 18px;
+  font-size: 0.67rem;
+  color: #f9e2af;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+#dt-legacy.dt-hidden   { display: none; }
+#dt-legacy.leg-visible { opacity: 0.75; }
+
+/* ==========================================
+   RESULTS OVERLAY
+   ========================================== */
+
+#dt-results {
+  position: absolute;
+  inset: 0;
+  background: #1e1e2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  animation: dtFadeIn 0.3s ease;
+}
+
+#dt-results.dt-hidden { display: none; }
+
+@keyframes dtFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#dt-results-title {
+  font-size: 0.72rem;
+  color: #585b70;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+#dt-results-grid {
+  display: flex;
+  gap: 44px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.dt-res-item   { text-align: center; }
+.dt-res-val    { font-size: 2.6rem; color: #89b4fa; font-weight: bold; line-height: 1; }
+.dt-res-label  { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 6px; text-transform: uppercase; }
+
+#dt-verdict {
+  font-size: 0.88rem;
+  color: #a6e3a1;
+  letter-spacing: 1px;
+  margin-bottom: 28px;
+  min-height: 1.3em;
+}
+
+#dt-restart-btn {
+  background: none;
+  border: 1px solid #313244;
+  border-radius: 5px;
+  padding: 9px 28px;
+  font-size: 0.78rem;
+  font-family: 'Courier New', monospace;
+  color: #6c7086;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+#dt-restart-btn:hover { border-color: #89b4fa; color: #89b4fa; }
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+
+#dt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  background: #181825;
+}
+
+#dt-brand {
+  font-size: 0.6rem;
+  color: #313244;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+#dt-reset-btn {
+  background: none;
+  border: none;
+  font-size: 1.15rem;
+  color: #45475a;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+#dt-reset-btn:hover { color: #89b4fa; }
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 740px) {
+  #devtype-container { width: 96vw; }
+  #dt-words-wrap { padding: 16px; }
+  #dt-words { font-size: 1.1rem; line-height: 2.2; }
+  #dt-live-stats { gap: 28px; }
+  #dt-results-grid { gap: 24px; flex-wrap: wrap; }
+  .dt-res-val { font-size: 2rem; }
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevType — DevQuest</title>
+  <link rel="stylesheet" href="css/devtype.css">
+</head>
+<body>
+
+  <div id="devtype-container">
+
+    <!-- Header -->
+    <div id="dt-header">
+      <div id="dt-logo">DevType<span class="logo-dot">.</span></div>
+      <div id="dt-time-controls">
+        <button class="dt-time-btn active" data-time="30">30s</button>
+        <button class="dt-time-btn" data-time="60">60s</button>
+      </div>
+    </div>
+
+    <!-- Live Stats -->
+    <div id="dt-live-stats">
+      <div class="dt-stat">
+        <div class="dt-stat-val" id="dt-live-wpm">—</div>
+        <div class="dt-stat-label">LOC / hr</div>
+      </div>
+      <div class="dt-stat">
+        <div class="dt-stat-val" id="dt-timer">30</div>
+        <div class="dt-stat-label">seconds</div>
+      </div>
+      <div class="dt-stat">
+        <div class="dt-stat-val" id="dt-live-acc">—</div>
+        <div class="dt-stat-label">coverage</div>
+      </div>
+    </div>
+
+    <!-- Words Area -->
+    <div id="dt-words-wrap">
+      <div id="dt-words"></div>
+
+      <!-- Quirk: Autocomplete popup -->
+      <div id="dt-autocomplete" class="dt-hidden">
+        <span id="dt-ac-typed"></span><span id="dt-ac-rest"></span>
+        <span class="dt-ac-key">Tab</span>
+      </div>
+
+      <!-- Quirk: Code review comment -->
+      <div id="dt-review" class="dt-hidden"></div>
+
+      <!-- Quirk: Legacy comment -->
+      <div id="dt-legacy" class="dt-hidden">// written in 2009, don't touch</div>
+
+      <!-- Focus hint -->
+      <div id="dt-focus-hint">click to start typing</div>
+    </div>
+
+    <!-- Hidden capture input -->
+    <input id="dt-input" type="text"
+      autocomplete="off" autocorrect="off"
+      autocapitalize="off" spellcheck="false">
+
+    <!-- Results overlay -->
+    <div id="dt-results" class="dt-hidden">
+      <div id="dt-results-inner">
+        <div id="dt-results-title">// session terminated</div>
+        <div id="dt-results-grid">
+          <div class="dt-res-item">
+            <div class="dt-res-val" id="r-loc">0</div>
+            <div class="dt-res-label">LOC / hr</div>
+          </div>
+          <div class="dt-res-item">
+            <div class="dt-res-val" id="r-acc">0%</div>
+            <div class="dt-res-label">test coverage</div>
+          </div>
+          <div class="dt-res-item">
+            <div class="dt-res-val" id="r-bugs">0</div>
+            <div class="dt-res-label">bugs shipped</div>
+          </div>
+          <div class="dt-res-item">
+            <div class="dt-res-val" id="r-words">0</div>
+            <div class="dt-res-label">words deployed</div>
+          </div>
+        </div>
+        <div id="dt-verdict"></div>
+        <button id="dt-restart-btn">↻ &nbsp;new session</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="dt-footer">
+      <button id="dt-reset-btn" title="Restart">&#8635;</button>
+      <span id="dt-brand">DevQuest</span>
+    </div>
+
+  </div>
+
+  <script src="js/devtype.js"></script>
+</body>
+</html>

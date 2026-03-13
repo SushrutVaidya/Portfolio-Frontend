@@ -19,42 +19,78 @@
     <!-- Game Area -->
     <div id="game-area">
 
-      <!-- Shapes scattered around -->
-      <div id="shapes-area">
-        <img src="assets/cube sprite.png"         class="shape" id="shape-cube"      alt="cube">
-        <img src="assets/cylinder.png"            class="shape" id="shape-cylinder"  alt="cylinder">
-        <img src="assets/Dome shape.png"          class="shape" id="shape-dome"      alt="dome">
-        <img src="assets/rectangular Bar.png"     class="shape" id="shape-bar"       alt="bar">
-        <img src="assets/rectangular block.png"   class="shape" id="shape-block"     alt="block">
-        <img src="assets/rounded isometric cube.png" class="shape" id="shape-rounded" alt="rounded cube">
-        <img src="assets/TetraHedron.png"         class="shape" id="shape-tetra"     alt="tetrahedron">
+      <!-- Top row: lives + progress -->
+      <div id="top-row">
+        <div id="lives-area">
+          <span class="life" id="life-1">❤️</span>
+          <span class="life" id="life-2">❤️</span>
+          <span class="life" id="life-3">❤️</span>
+        </div>
+        <div id="progress-area">
+          <span id="streak-badge" class="hidden"></span>
+          <span id="progress-text">Shape 1 of 6</span>
+        </div>
       </div>
 
-      <!-- Drop Zones (holes) -->
-      <div id="holes-area">
-        <div class="hole" id="hole-circle">
-          <div class="hole-silhouette circle-hole"></div>
-        </div>
-        <div class="hole" id="hole-rectangle">
-          <div class="hole-silhouette rectangle-hole"></div>
-        </div>
-        <div class="hole" id="hole-triangle">
-          <div class="hole-silhouette triangle-hole"></div>
-        </div>
-        <div class="hole" id="hole-square">
-          <div class="hole-silhouette square-hole"></div>
-        </div>
-        <div class="hole" id="hole-semicircle">
-          <div class="hole-silhouette semicircle-hole"></div>
+      <!-- Prompt text -->
+      <div id="prompt-text" class="prompt hidden"></div>
+
+      <!-- Shape zone (visual background only) -->
+      <div id="shape-zone"></div>
+
+      <!-- Overheating vent (top-right corner) -->
+
+      <!-- Active shape (positioned relative to game-area) -->
+      <img id="active-shape" class="hidden" src="" alt="" draggable="false">
+
+      <!-- 3D Box with holes -->
+      <div id="box-container">
+        <div id="box-3d">
+          <div id="box-top"></div>
+          <div id="box-front">
+            <div class="hole" id="hole-circle">
+              <div class="hole-silhouette circle-hole"></div>
+            </div>
+            <div class="hole" id="hole-rectangle">
+              <div class="hole-silhouette rectangle-hole"></div>
+            </div>
+            <div class="hole" id="hole-triangle">
+              <div class="hole-silhouette triangle-hole"></div>
+            </div>
+            <div class="hole" id="hole-square">
+              <div class="hole-silhouette square-hole"></div>
+            </div>
+            <div class="hole" id="hole-semicircle">
+              <div class="hole-silhouette semicircle-hole"></div>
+            </div>
+          </div>
+          <div id="box-side"></div>
         </div>
       </div>
 
     </div>
 
-    <!-- Bottom Bar -->
+    <!-- Footer -->
     <div id="captcha-footer">
       <button id="reset-btn" title="Reset">&#8635;</button>
-      <button id="verify-btn">Verify</button>
+      <div id="skip-wrap">
+        <button id="skip-btn">
+          <span id="skip-label">Skip Puzzle</span>
+          <div id="terminal-bar">
+            <span class="t-dot" style="background:#ff5f57"></span>
+            <span class="t-dot" style="background:#febc2e"></span>
+            <span class="t-dot" style="background:#28c840"></span>
+            <span class="t-title">bash</span>
+          </div>
+          <div id="terminal-lines">
+            <span class="t-path">~/devquest</span><span class="t-prompt"> $ </span><span id="t-cmd" class="t-cmd"></span><span id="t-cursor"></span>
+            <div id="t-error" style="opacity:0"></div>
+            <div id="t-hint"  style="opacity:0"></div>
+          </div>
+        </button>
+      </div>
+      <span id="footer-brand">DevQuest</span>
+      <button id="verify-btn" class="hidden">Verify</button>
     </div>
 
   </div>

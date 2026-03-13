@@ -1,5 +1,5 @@
 /* ========================================
-   DEVQUEST CAPTCHA - Base Styles
+   DEVQUEST CAPTCHA - Styles
    ======================================== */
 
 * {
@@ -18,21 +18,18 @@ body {
 }
 
 /* ========================================
-   CAPTCHA CONTAINER - 3D look
+   CAPTCHA CONTAINER
    ======================================== */
 
 #captcha-container {
   background-color: #c8c8c8;
   border: 4px solid #4a90d9;
   border-radius: 8px;
-  width: 480px;
-  /* 3D depth effect */
+  width: 620px;
   box-shadow:
-    0 0 30px rgba(74, 144, 217, 0.4),
     4px 4px 0px #2a6099,
     8px 8px 0px #1a4070,
     12px 12px 20px rgba(0,0,0,0.5);
-  transform: perspective(800px) rotateX(2deg);
 }
 
 /* ========================================
@@ -41,26 +38,23 @@ body {
 
 #captcha-header {
   background-color: #4a90d9;
-  padding: 16px 20px;
+  padding: 14px 20px;
   text-align: center;
   color: white;
-  /* 3D inset look */
   border-bottom: 3px solid #2a6099;
-  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2);
 }
 
 #captcha-header p {
-  font-size: 1rem;
-  font-weight: normal;
+  font-size: 0.95rem;
   letter-spacing: 1px;
 }
 
 #captcha-header .correct-holes {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 3px;
-  margin-top: 4px;
+  margin-top: 2px;
   text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
 }
 
@@ -69,161 +63,468 @@ body {
    ======================================== */
 
 #game-area {
-  padding: 20px;
+  padding: 12px 16px 16px;
   background-color: #d4d4d4;
   position: relative;
-  min-height: 320px;
-  /* 3D inset effect */
-  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.2);
+  height: 515px;
+  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.15);
   overflow: visible;
 }
 
 /* ========================================
-   SHAPES AREA
+   TOP ROW - Lives + Progress
    ======================================== */
 
-#shapes-area {
-  position: relative;
-  height: 210px;
-  margin-bottom: 16px;
+#top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.shape {
-  position: absolute;
-  width: 75px;
-  height: 75px;
-  object-fit: contain;
-  cursor: grab;
-  user-select: none;
-  mix-blend-mode: multiply;
-  /* Snappy pickup feel */
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
-  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+#lives-area {
+  display: flex;
+  gap: 4px;
 }
 
-.shape:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(3px 6px 6px rgba(0,0,0,0.4));
+.life {
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
 }
 
-/* When being dragged */
-.shape.dragging {
-  cursor: grabbing;
-  transform: scale(1.15) rotate(3deg);
-  filter: drop-shadow(6px 10px 10px rgba(0,0,0,0.5));
-  mix-blend-mode: normal;
-  z-index: 1000;
+.life.lost {
+  filter: grayscale(1);
+  opacity: 0.35;
 }
 
-/* Initial scattered positions */
-#shape-cube     { top: 10px;  left: 20px;  }
-#shape-cylinder { top: 10px;  left: 120px; }
-#shape-dome     { top: 10px;  left: 230px; }
-#shape-bar      { top: 10px;  left: 340px; }
-#shape-block    { top: 110px; left: 30px;  }
-#shape-rounded  { top: 110px; left: 150px; }
-#shape-tetra    { top: 110px; left: 270px; }
+#progress-area {
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
 
 /* ========================================
-   HOLES AREA - 3D inset tray look
+   SHAPE ZONE
    ======================================== */
 
-#holes-area {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: #aaaaaa;
-  border-radius: 6px;
-  padding: 14px 8px;
-  /* Deep inset 3D tray effect */
-  box-shadow:
-    inset 3px 3px 8px rgba(0,0,0,0.4),
-    inset -2px -2px 5px rgba(255,255,255,0.2),
-    0 2px 4px rgba(0,0,0,0.2);
-  border: 2px solid #888;
-}
-
-.hole {
+#shape-zone {
+  height: 260px;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 70px;
-  height: 70px;
-  background-color: #999;
+  background: white;
+  border-radius: 8px;
+  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.08);
+  overflow: visible;
+}
+
+#active-shape {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+  position: absolute;
   border-radius: 4px;
+}
+
+#active-shape:hover {
+  filter: drop-shadow(3px 6px 8px rgba(0,0,0,0.45));
+}
+
+#active-shape.dragging {
+  cursor: grabbing;
+  mix-blend-mode: normal;
+  filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.55));
+  z-index: 999;
+}
+
+#active-shape.hidden {
+  display: none;
+}
+
+/* ========================================
+   DROP ANIMATION
+   ======================================== */
+
+@keyframes dropIn {
+  0%   { top: -160px; opacity: 0;   transform: scale(0.75); }
+  60%  { top: 15px;   opacity: 1;   transform: scale(1.07); }
+  78%  { top: 5px;                  transform: scale(0.97); }
+  90%  { top: 12px;                 transform: scale(1.02); }
+  100% { top: 8px;                  transform: scale(1);    }
+}
+
+#active-shape.drop-in {
+  left: calc(50% - 80px);
+  animation: dropIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ========================================
+   POP OUT (correct drop)
+   ======================================== */
+
+@keyframes popOut {
+  0%   { transform: scale(1);   opacity: 1; }
+  35%  { transform: scale(1.4); opacity: 0.9; }
+  100% { transform: scale(0);   opacity: 0; }
+}
+
+#active-shape.pop-out {
+  pointer-events: none;
+  animation: popOut 0.28s ease-in forwards;
+}
+
+/* ========================================
+   FLY OUT (game over)
+   ======================================== */
+
+@keyframes flyOut {
+  0%   { transform: scale(1) rotate(0deg);    opacity: 1; }
+  100% { transform: scale(0.3) rotate(540deg) translateY(-200px); opacity: 0; }
+}
+
+#active-shape.fly-out {
+  pointer-events: none;
+  animation: flyOut 0.45s ease-in forwards;
+}
+
+/* ========================================
+   3D BOX - Retro Windows style
+   ======================================== */
+
+#box-container {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 540px;
+}
+
+#box-3d {
+  width: 100%;
+  border: 3px solid #4a90d9;
+  border-radius: 12px;
+  background-color: #d8d8d8;
+  box-shadow:
+    inset 1px 1px 0px rgba(255,255,255,0.8),
+    2px 2px 6px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+/* Top panel - inset recessed area with holes */
+#box-front {
+  background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 12px 16px;
+  box-shadow:
+    inset 2px 2px 5px rgba(0,0,0,0.15),
+    inset -1px -1px 3px rgba(255,255,255,0.7);
+}
+
+/* Bottom section - hidden */
+#box-top {
+  display: none;
+}
+
+/* Hide the side face */
+#box-side {
+  display: none;
+}
+
+/* ========================================
+   HOLES - Pixel art retro style
+   ======================================== */
+
+.hole {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 92px;
+  height: 92px;
+  background: linear-gradient(180deg, #b0b0b0 0%, #c4c4c4 100%);
+  border-radius: 4px;
+  border: 2px solid #888;
+  box-shadow:
+    inset 3px 3px 6px rgba(0,0,0,0.25),
+    inset -1px -1px 3px rgba(255,255,255,0.5);
+  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
   position: relative;
-  transition: background-color 0.15s ease, transform 0.15s ease;
-  /* Each hole has inset 3D look */
-  box-shadow:
-    inset 2px 2px 6px rgba(0,0,0,0.4),
-    inset -1px -1px 3px rgba(255,255,255,0.15);
-  border: 2px solid #777;
 }
 
-/* Highlight when shape dragged over */
+/* Drag over - blue highlight */
 .hole.drag-over {
-  background-color: #90b0d0;
+  background: linear-gradient(145deg, #1a4a7a 0%, #2a70c0 100%);
   border-color: #4a90d9;
-  transform: scale(1.05);
+  transform: scale(1.07);
   box-shadow:
-    inset 2px 2px 6px rgba(0,0,0,0.3),
-    0 0 10px rgba(74, 144, 217, 0.5);
+    inset 3px 3px 6px rgba(0,0,0,0.4),
+    0 0 14px rgba(74, 144, 217, 0.7);
 }
 
-/* Wrong hole shake animation */
+/* Wrong hole - red flash + shake */
 .hole.wrong {
-  animation: shakeHole 0.4s ease;
-  background-color: #d09090;
-  border-color: #c05050;
+  background: linear-gradient(145deg, #5a1a1a 0%, #a03030 100%);
+  border-color: #cc4444;
+  animation: shakeHole 0.35s ease;
 }
 
 @keyframes shakeHole {
-  0%   { transform: translateX(0); }
-  20%  { transform: translateX(-6px); }
-  40%  { transform: translateX(6px); }
-  60%  { transform: translateX(-4px); }
-  80%  { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-5px); }
+  40%     { transform: translateX(5px); }
+  60%     { transform: translateX(-3px); }
+  80%     { transform: translateX(3px); }
 }
 
-/* Hole silhouettes */
+/* Silhouette shapes inside holes */
 .hole-silhouette {
-  background-color: #4a4a4a;
+  background-color: #3a3a3a;
   pointer-events: none;
+  /* Pixel art crisp edges */
+  image-rendering: pixelated;
 }
 
 .circle-hole {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 39px;
   border-radius: 50%;
+  box-shadow:
+    inset 2px 2px 3px rgba(0,0,0,0.5),
+    0 1px 0 rgba(255,255,255,0.3);
 }
 
 .rectangle-hole {
-  width: 44px;
-  height: 26px;
-  border-radius: 2px;
+  width: 24px;
+  height: 51px;
+  border-radius: 1px;
+  box-shadow:
+    inset 2px 2px 3px rgba(0,0,0,0.5),
+    0 1px 0 rgba(255,255,255,0.3);
+}
+
+.semicircle-hole {
+  width: 51px;
+  height: 27px;
+  border-radius: 51px 51px 0 0;
+  box-shadow:
+    inset 2px 2px 3px rgba(0,0,0,0.5),
+    0 1px 0 rgba(255,255,255,0.3);
+}
+
+.square-hole {
+  width: 46px;
+  height: 46px;
+  border-radius: 1px;
+  box-shadow:
+    inset 2px 2px 3px rgba(0,0,0,0.5),
+    0 1px 0 rgba(255,255,255,0.3);
 }
 
 .triangle-hole {
   width: 0;
   height: 0;
   background: none;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-bottom: 38px solid #4a4a4a;
+  box-shadow: none;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-bottom: 44px solid #3a3a3a;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.3));
 }
 
-.square-hole {
-  width: 38px;
-  height: 38px;
+/* ========================================
+   PROMPT TEXT
+   ======================================== */
+
+#prompt-text {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  min-height: 1.4em;
+  padding: 2px 0 4px;
+  transition: opacity 0.2s ease;
+}
+
+#prompt-text.hidden { opacity: 0; pointer-events: none; }
+
+#prompt-text.prompt-name     { color: #2a5a99; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; }
+#prompt-text.prompt-question { color: #555; font-size: 0.85rem; }
+#prompt-text.prompt-correct  { color: #1a7a3a; font-size: 0.95rem; }
+#prompt-text.prompt-wrong    { color: #aa2222; font-size: 0.95rem; }
+
+/* ========================================
+   STREAK BADGE
+   ======================================== */
+
+#streak-badge {
+  display: inline-block;
+  background: #f0a500;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-right: 6px;
+  letter-spacing: 1px;
+  box-shadow: 2px 2px 0px #c07800;
+}
+
+#streak-badge.hidden   { display: none; }
+#streak-badge.pop-in   { animation: streakPop 0.3s cubic-bezier(0.2, 0, 0.2, 1.8) forwards; }
+#streak-badge.fade-out { animation: streakFade 0.4s ease forwards; }
+
+@keyframes streakPop {
+  0%   { transform: scale(0);   opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes streakFade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ========================================
+   PARTICLES
+   ======================================== */
+
+.particle {
+  position: absolute;
   border-radius: 2px;
+  pointer-events: none;
+  z-index: 100;
+  transform: translate(-50%, -50%);
 }
 
-.semicircle-hole {
-  width: 38px;
-  height: 19px;
-  border-radius: 38px 38px 0 0;
+/* ========================================
+   SKIP BUTTON (terminal troll)
+   ======================================== */
+
+#skip-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+
+#skip-btn {
+  position: relative;
+  min-width: 108px;
+  min-height: 34px;
+  background: #aaa;
+  border: 2px solid #999;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-family: 'Courier New', Courier, monospace;
+  color: #555;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 2px 2px 0px #888;
+  overflow: hidden;
+  transition: background 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease, min-height 0.2s ease, min-width 0.2s ease;
+}
+
+#skip-btn:hover { background: #999; }
+
+#skip-btn.terminal-active {
+  background: #0d1117;
+  border-color: #30363d;
+  color: #0d1117;
+  min-width: 268px;
+  min-height: 122px;
+}
+
+#skip-label {
+  display: block;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+  text-align: center;
+}
+
+#skip-btn.terminal-active #skip-label { opacity: 0; }
+
+/* Terminal titlebar */
+#terminal-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 24px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+#skip-btn.terminal-active #terminal-bar { opacity: 1; }
+
+.t-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.t-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.55rem;
+  color: #444;
+  letter-spacing: 2px;
+  padding-right: 29px;
+}
+
+/* Terminal output lines */
+#terminal-lines {
+  position: absolute;
+  top: 32px;
+  left: 10px;
+  right: 10px;
+  font-size: 0.72rem;
+  line-height: 1.65;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+  white-space: nowrap;
+}
+
+#skip-btn.terminal-active #terminal-lines { opacity: 1; }
+
+.t-path   { color: #3fb950; text-shadow: 0 0 6px rgba(63,185,80,0.4); }
+.t-prompt { color: #58a6ff; }
+.t-cmd    { color: #ffffff; }
+
+#t-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 12px;
+  background: #58a6ff;
+  vertical-align: middle;
+  box-shadow: 0 0 5px rgba(88,166,255,0.6);
+  animation: termBlink 0.8s step-end infinite;
+}
+
+@keyframes termBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+#t-error { color: #f85149; text-shadow: 0 0 6px rgba(248,81,73,0.35); transition: opacity 0.25s ease; }
+#t-hint  { color: #3fb950; text-shadow: 0 0 6px rgba(63,185,80,0.35);  transition: opacity 0.25s ease 0.1s; }
 
 /* ========================================
    FOOTER
@@ -233,105 +534,77 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background-color: #bbb;
   border-top: 3px solid #999;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+}
+
+#footer-brand {
+  font-size: 0.7rem;
+  color: #666;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: bold;
+  user-select: none;
 }
 
 #reset-btn {
   background: #aaa;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.3rem;
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
   cursor: pointer;
   color: #444;
-  transition: all 0.15s ease;
-  box-shadow: 2px 2px 0px #888, 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.12s ease;
+  box-shadow: 2px 2px 0px #888;
 }
 
-#reset-btn:hover {
-  background-color: #999;
-  transform: scale(1.05);
-}
-
-#reset-btn:active {
-  transform: scale(0.95);
-  box-shadow: 1px 1px 0px #888;
-}
+#reset-btn:hover  { background: #999; transform: scale(1.05); }
+#reset-btn:active { transform: scale(0.93); box-shadow: 1px 1px 0px #888; }
 
 #verify-btn {
   background-color: #4a90d9;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 10px 28px;
-  font-size: 1rem;
+  padding: 9px 26px;
+  font-size: 0.95rem;
   font-weight: bold;
   cursor: pointer;
   letter-spacing: 1px;
-  transition: all 0.15s ease;
-  box-shadow: 3px 3px 0px #2a6099, 0 4px 8px rgba(0,0,0,0.2);
+  transition: all 0.12s ease;
+  box-shadow: 3px 3px 0px #2a6099;
 }
 
-#verify-btn:hover {
-  background-color: #357abd;
-  transform: translateY(-1px);
-  box-shadow: 4px 4px 0px #2a6099, 0 6px 12px rgba(0,0,0,0.2);
-}
-
-#verify-btn:active {
-  transform: translateY(1px);
-  box-shadow: 1px 1px 0px #2a6099;
-}
+#verify-btn:hover  { background: #357abd; transform: translateY(-1px); box-shadow: 4px 4px 0px #2a6099; }
+#verify-btn:active { transform: translateY(1px); box-shadow: 1px 1px 0px #2a6099; }
+#verify-btn.hidden { display: none; }
 
 /* ========================================
-   SHAPE SNAPPED INTO HOLE
+   MOBILE
    ======================================== */
 
-.shape.snapped {
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  opacity: 0.95;
-  transform: scale(0.85);
-  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
-}
-
-/* ========================================
-   MOBILE RESPONSIVE
-   ======================================== */
-
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   #captcha-container {
-    width: 95vw;
-    transform: none;
-    box-shadow:
-      0 0 20px rgba(74, 144, 217, 0.3),
-      3px 3px 0px #2a6099,
-      6px 6px 10px rgba(0,0,0,0.4);
+    width: 96vw;
+    box-shadow: 3px 3px 0px #2a6099, 6px 6px 12px rgba(0,0,0,0.4);
   }
 
-  .shape {
-    width: 58px;
-    height: 58px;
-  }
+  #game-area { height: 370px; }
 
-  #shape-cube     { top: 10px;  left: 10px;  }
-  #shape-cylinder { top: 10px;  left: 80px;  }
-  #shape-dome     { top: 10px;  left: 155px; }
-  #shape-bar      { top: 10px;  left: 230px; }
-  #shape-block    { top: 90px;  left: 10px;  }
-  #shape-rounded  { top: 90px;  left: 100px; }
-  #shape-tetra    { top: 90px;  left: 200px; }
+  #box-container { width: 94vw; }
 
-  .hole {
-    width: 54px;
-    height: 54px;
-  }
+  .hole            { width: 56px; height: 56px; }
+  .circle-hole     { width: 28px; height: 24px; }
+  .rectangle-hole  { width: 14px; height: 32px; }
+  .square-hole     { width: 28px; height: 28px; }
+  .semicircle-hole { width: 32px; height: 16px; }
+  .triangle-hole   { border-left-width: 14px; border-right-width: 14px; border-bottom-width: 26px; }
 
-  #captcha-header .correct-holes {
-    font-size: 1.3rem;
-  }
+  #active-shape         { width: 110px; height: 110px; }
+  #active-shape.drop-in { left: calc(50% - 55px); }
+
+  #captcha-header .correct-holes { font-size: 1.3rem; }
 }

@@ -497,18 +497,19 @@ function endGame() {
   const proceedBtn = document.getElementById('dt-proceed-btn');
 
   if (passed) {
-    // Pass: only show proceed, hide retry
     retryBtn.classList.add('dt-hidden');
     proceedBtn.classList.remove('dt-hidden');
     proceedBtn.textContent       = 'next challenge →';
     proceedBtn.style.background  = '';
   } else {
-    // Fail: mocking mandatory retry only, no escape
     proceedBtn.classList.add('dt-hidden');
     retryBtn.classList.remove('dt-hidden');
     const taunt = RETRY_TAUNTS.find(([lo, hi]) => acc >= lo && acc < hi);
     retryBtn.textContent = taunt ? taunt[2] : '↻  have you tried being better?';
   }
+
+  resultsEl.classList.remove('dt-hidden');
+}
 }
 
 function resetGame() {

@@ -40,20 +40,21 @@
       <div id="dt-words"></div>
 
       <!-- Quirk: Autocomplete popup -->
-      <div id="dt-autocomplete" class="dt-hidden">
-        <span id="dt-ac-typed"></span><span id="dt-ac-rest"></span>
-        <span class="dt-ac-key">Tab</span>
-      </div>
-
-      <!-- Quirk: Code review comment -->
-      <div id="dt-review" class="dt-hidden"></div>
-
       <!-- Quirk: Legacy comment -->
       <div id="dt-legacy" class="dt-hidden">// written in 2009, don't touch</div>
 
       <!-- Focus hint -->
       <div id="dt-focus-hint">click to start typing</div>
     </div>
+
+    <!-- Quirk: Autocomplete popup (outside words-wrap to avoid overflow clip) -->
+    <div id="dt-autocomplete" class="dt-hidden">
+      <span id="dt-ac-typed"></span><span id="dt-ac-rest"></span>
+      <span class="dt-ac-key">⇥ Tab</span>
+    </div>
+
+    <!-- Quirk: Code review comment (outside words-wrap to avoid overflow clip) -->
+    <div id="dt-review" class="dt-hidden"></div>
 
     <!-- Hidden capture input -->
     <input id="dt-input" type="text"

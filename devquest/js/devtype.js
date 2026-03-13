@@ -360,7 +360,21 @@ inputEl.addEventListener('input', () => {
 });
 
 inputEl.addEventListener('keydown', e => {
-  if (e.key === 'Tab') { e.preventDefault(); return; }
+  // Tab inserts the wrong autocomplete suggestion (troll)
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (acVisible) {
+      const wrong = acTypedEl.textContent + acRestEl.textContent;
+      inputEl.value  = wrong;
+      currentInput   = wrong;
+      colorCurrentWord();
+      hideAutocomplete(false);
+      resetLegacyTimer();
+      updateLiveStats();
+    }
+    return;
+  }
+
   if (e.key === 'Backspace' && currentInput === '' && inputEl.value === '') {
     e.preventDefault();
   }

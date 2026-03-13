@@ -149,6 +149,26 @@ body {
 .dt-word.done .dt-char.correct { color: #313244; }
 .dt-word.done .dt-char.wrong   { color: #7d2d3a; }
 
+/* Option C — rejected word (senior dev crossed it out) */
+.dt-word.rejected .dt-char {
+  text-decoration: line-through;
+  color: #f38ba8 !important;
+  opacity: 0.7;
+}
+
+/* Option C — review-pending word (must retype) */
+.dt-word.review-pending {
+  border-bottom: 1px dashed #f9e2af;
+  padding-bottom: 1px;
+}
+.dt-word.review-pending.current::after {
+  content: ' // re-type';
+  font-size: 0.6rem;
+  color: #f9e2af;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
 /* ==========================================
    FOCUS HINT
    ========================================== */
@@ -195,7 +215,7 @@ body {
   pointer-events: none;
   white-space: nowrap;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  z-index: 20;
+  z-index: 25;
   opacity: 0;
   transform: translateY(-4px);
   transition: opacity 0.18s ease, transform 0.18s ease;
@@ -232,7 +252,7 @@ body {
   font-style: italic;
   pointer-events: none;
   white-space: nowrap;
-  z-index: 20;
+  z-index: 25;
   opacity: 0;
   transition: opacity 0.22s ease;
 }

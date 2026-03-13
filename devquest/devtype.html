@@ -13,10 +13,7 @@
     <!-- Header -->
     <div id="dt-header">
       <div id="dt-logo">DevType<span class="logo-dot">.</span></div>
-      <div id="dt-time-controls">
-        <button class="dt-time-btn active" data-time="30">30s</button>
-        <button class="dt-time-btn" data-time="60">60s</button>
-      </div>
+      <div id="dt-subtitle">type 30 dev words to proceed</div>
     </div>
 
     <!-- Live Stats -->
@@ -26,8 +23,8 @@
         <div class="dt-stat-label">LOC / hr</div>
       </div>
       <div class="dt-stat">
-        <div class="dt-stat-val" id="dt-timer">30</div>
-        <div class="dt-stat-label">seconds</div>
+        <div class="dt-stat-val" id="dt-progress">0 <span class="dt-prog-total">/ 30</span></div>
+        <div class="dt-stat-label">words</div>
       </div>
       <div class="dt-stat">
         <div class="dt-stat-val" id="dt-live-acc">—</div>
@@ -64,11 +61,16 @@
     <!-- Results overlay -->
     <div id="dt-results" class="dt-hidden">
       <div id="dt-results-inner">
-        <div id="dt-results-title">// session terminated</div>
+        <div id="dt-results-title">// session complete</div>
+        <div id="dt-pass-badge"></div>
         <div id="dt-results-grid">
           <div class="dt-res-item">
             <div class="dt-res-val" id="r-loc">0</div>
             <div class="dt-res-label">LOC / hr</div>
+          </div>
+          <div class="dt-res-item">
+            <div class="dt-res-val" id="r-time">0s</div>
+            <div class="dt-res-label">time taken</div>
           </div>
           <div class="dt-res-item">
             <div class="dt-res-val" id="r-acc">0%</div>
@@ -78,13 +80,12 @@
             <div class="dt-res-val" id="r-bugs">0</div>
             <div class="dt-res-label">bugs shipped</div>
           </div>
-          <div class="dt-res-item">
-            <div class="dt-res-val" id="r-words">0</div>
-            <div class="dt-res-label">words deployed</div>
-          </div>
         </div>
         <div id="dt-verdict"></div>
-        <button id="dt-restart-btn">↻ &nbsp;new session</button>
+        <div id="dt-result-actions">
+          <button id="dt-restart-btn">↻ &nbsp;retry</button>
+          <a id="dt-proceed-btn" href="captcha.html">next challenge &nbsp;→</a>
+        </div>
       </div>
     </div>
 

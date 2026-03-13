@@ -40,33 +40,9 @@ body {
   border-bottom: 1px solid #313244;
 }
 
-#dt-logo {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #cdd6f4;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-.logo-dot { color: #89b4fa; }
-
-#dt-time-controls { display: flex; gap: 6px; }
-
-.dt-time-btn {
-  background: none;
-  border: 1px solid #313244;
-  border-radius: 4px;
-  padding: 4px 13px;
-  font-size: 0.68rem;
-  font-family: 'Courier New', monospace;
-  color: #6c7086;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-
-.dt-time-btn:hover   { border-color: #89b4fa; color: #cdd6f4; }
-.dt-time-btn.active  { border-color: #89b4fa; color: #89b4fa; background: rgba(137,180,250,0.08); }
+#dt-logo    { font-size: 1rem; font-weight: bold; color: #cdd6f4; letter-spacing: 3px; text-transform: uppercase; }
+.logo-dot   { color: #89b4fa; }
+#dt-subtitle { font-size: 0.62rem; color: #45475a; letter-spacing: 2px; }
 
 /* ==========================================
    LIVE STATS
@@ -328,7 +304,43 @@ body {
   min-height: 1.3em;
 }
 
-#dt-restart-btn {
+.dt-prog-total { font-size: 1.1rem; color: #45475a; }
+
+#dt-pass-badge {
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  min-height: 1.2em;
+  padding: 4px 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+#dt-pass-badge.pass { background: rgba(166,227,161,0.12); color: #a6e3a1; border: 1px solid rgba(166,227,161,0.3); }
+#dt-pass-badge.fail { background: rgba(243,139,168,0.12); color: #f38ba8; border: 1px solid rgba(243,139,168,0.3); }
+
+#dt-result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+#dt-proceed-btn {
+  background: #89b4fa;
+  color: #1e1e2e;
+  border: none;
+  border-radius: 5px;
+  padding: 9px 22px;
+  font-size: 0.78rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+#dt-proceed-btn:hover { background: #b4d0ff; transform: translateY(-1px); }
   background: none;
   border: 1px solid #313244;
   border-radius: 5px;

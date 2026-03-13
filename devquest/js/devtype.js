@@ -119,6 +119,14 @@ const LEGACY_COMMENTS = [
 ];
 
 // ==========================================
+// Mocking retry labels on fail, picked by accuracy
+const RETRY_TAUNTS = [
+  [0,  50, 'git reset --hard HEAD'],
+  [50, 65, 'sudo apt-get fix-skills'],
+  [65, 75, 'npm run try-harder --force'],
+  [75, 80, '↻  so close. embarrassing really.'],
+];
+
 // RESULT VERDICTS (by real WPM)
 // ==========================================
 
@@ -485,16 +493,22 @@ function endGame() {
   const verdict = VERDICTS.find(([lo, hi]) => wpm >= lo && wpm < hi);
   document.getElementById('dt-verdict').textContent = verdict ? verdict[2] : '// undefined behavior';
 
+  const retryBtn   = document.getElementById('dt-restart-btn');
   const proceedBtn = document.getElementById('dt-proceed-btn');
-  if (!passed) {
-    proceedBtn.textContent       = 'proceed anyway →';
-    proceedBtn.style.background  = '#585b70';
-  } else {
+
+  if (passed) {
+    // Pass: only show proceed, hide retry
+    retryBtn.classList.add('dt-hidden');
+    proceedBtn.classList.remove('dt-hidden');
     proceedBtn.textContent       = 'next challenge →';
     proceedBtn.style.background  = '';
+  } else {
+    // Fail: mocking mandatory retry only, no escape
+    proceedBtn.classList.add('dt-hidden');
+    retryBtn.classList.remove('dt-hidden');
+    const taunt = RETRY_TAUNTS.find(([lo, hi]) => acc >= lo && acc < hi);
+    retryBtn.textContent = taunt ? taunt[2] : '↻  have you tried being better?';
   }
-
-  resultsEl.classList.remove('dt-hidden');
 }
 
 function resetGame() {

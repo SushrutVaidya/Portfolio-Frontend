@@ -133,15 +133,16 @@ body {
 
 /* Option C — review-pending word (must retype) */
 .dt-word.review-pending {
-  border-bottom: 1px dashed #f9e2af;
-  padding-bottom: 1px;
+  border-bottom: 1px dashed rgba(249, 226, 175, 0.4);
+  padding-bottom: 2px;
 }
 .dt-word.review-pending.current::after {
-  content: ' // re-type';
-  font-size: 0.6rem;
-  color: #f9e2af;
+  content: '// re-type';
+  font-size: 0.58rem;
+  color: rgba(249, 226, 175, 0.55);
   letter-spacing: 1px;
-  opacity: 0.8;
+  margin-left: 6px;
+  font-style: italic;
 }
 
 /* ==========================================
@@ -340,19 +341,21 @@ body {
   transition: background 0.15s ease, transform 0.1s ease;
 }
 #dt-proceed-btn:hover { background: #b4d0ff; transform: translateY(-1px); }
-  background: none;
-  border: 1px solid #313244;
+
+#dt-restart-btn {
+  background: rgba(243, 139, 168, 0.08);
+  border: 1px solid #f38ba8;
   border-radius: 5px;
-  padding: 9px 28px;
-  font-size: 0.78rem;
+  padding: 9px 18px;
+  font-size: 0.75rem;
   font-family: 'Courier New', monospace;
-  color: #6c7086;
+  color: #f38ba8;
   cursor: pointer;
   letter-spacing: 1px;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
-
-#dt-restart-btn:hover { border-color: #89b4fa; color: #89b4fa; }
+#dt-restart-btn:hover { background: rgba(243,139,168,0.18); transform: translateY(-1px); }
 
 /* ==========================================
    FOOTER

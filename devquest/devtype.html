@@ -13,8 +13,17 @@
     <!-- Header -->
     <div id="dt-header">
       <div id="dt-logo">DevType<span class="logo-dot">.</span></div>
-      <div id="dt-subtitle">60 seconds · 80% accuracy to pass</div>
+      <!-- Difficulty Slider -->
+      <div id="dt-diff-slider">
+        <div id="dt-diff-thumb"></div>
+        <button class="dt-diff-btn active" data-diff="easy">easy</button>
+        <button class="dt-diff-btn" data-diff="medium">medium</button>
+        <button class="dt-diff-btn" data-diff="hard">hard</button>
+      </div>
     </div>
+
+    <!-- Subtitle -->
+    <div id="dt-subtitle">90 seconds &nbsp;·&nbsp; 70% accuracy to pass</div>
 
     <!-- Live Stats -->
     <div id="dt-live-stats">
@@ -36,7 +45,12 @@
     <div id="dt-words-wrap">
       <div id="dt-words"></div>
 
-      <!-- Quirk: Autocomplete popup -->
+      <!-- Accuracy bar -->
+      <div id="dt-acc-bar-wrap">
+        <div id="dt-acc-bar"></div>
+        <div id="dt-acc-threshold"></div>
+      </div>
+
       <!-- Quirk: Legacy comment -->
       <div id="dt-legacy" class="dt-hidden">// written in 2009, don't touch</div>
 
@@ -44,13 +58,13 @@
       <div id="dt-focus-hint">click to start typing</div>
     </div>
 
-    <!-- Quirk: Autocomplete popup (outside words-wrap to avoid overflow clip) -->
+    <!-- Quirk: Autocomplete popup -->
     <div id="dt-autocomplete" class="dt-hidden">
       <span id="dt-ac-typed"></span><span id="dt-ac-rest"></span>
       <span class="dt-ac-key">⇥ Tab</span>
     </div>
 
-    <!-- Quirk: Code review comment (outside words-wrap to avoid overflow clip) -->
+    <!-- Quirk: Code review comment -->
     <div id="dt-review" class="dt-hidden"></div>
 
     <!-- Hidden capture input -->
@@ -69,8 +83,8 @@
             <div class="dt-res-label">LOC / hr</div>
           </div>
           <div class="dt-res-item">
-            <div class="dt-res-val" id="r-time">0s</div>
-            <div class="dt-res-label">time taken</div>
+            <div class="dt-res-val" id="r-time">0</div>
+            <div class="dt-res-label">words typed</div>
           </div>
           <div class="dt-res-item">
             <div class="dt-res-val" id="r-acc">0%</div>
@@ -81,9 +95,21 @@
             <div class="dt-res-label">bugs shipped</div>
           </div>
         </div>
+
+        <!-- WPM Graph -->
+        <div id="dt-graph-wrap">
+          <div class="dt-graph-label">// wpm over time</div>
+          <svg id="dt-graph-svg" viewBox="0 0 560 80" preserveAspectRatio="none"></svg>
+          <div id="dt-graph-empty" class="dt-hidden">// not enough data</div>
+          <div id="dt-graph-xaxis">
+            <span id="dt-graph-x0">0s</span>
+            <span id="dt-graph-xn"></span>
+          </div>
+        </div>
+
         <div id="dt-verdict"></div>
         <div id="dt-result-actions">
-          <button id="dt-restart-btn" class="dt-hidden">↻ &nbsp;retry</button>
+          <button id="dt-restart-btn" class="dt-hidden">retry</button>
           <a id="dt-proceed-btn" href="captcha.html" class="dt-hidden">next challenge &nbsp;→</a>
         </div>
       </div>
@@ -95,6 +121,22 @@
       <span id="dt-brand">DevQuest</span>
     </div>
 
+  </div>
+
+  <!-- Easy quirk: iMessage bubble (fixed, outside container) -->
+  <div id="dt-imessage" class="dt-hidden">
+    <div id="im-sender"></div>
+    <div id="im-bubble"><span id="im-text"></span></div>
+  </div>
+
+  <!-- Easy quirk: macOS notification (fixed, outside container) -->
+  <div id="dt-notification" class="dt-hidden">
+    <div id="notif-top">
+      <span id="notif-icon"></span>
+      <span id="notif-app"></span>
+      <span id="notif-time">now</span>
+    </div>
+    <div id="notif-msg"></div>
   </div>
 
   <script src="js/devtype.js"></script>

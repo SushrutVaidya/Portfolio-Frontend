@@ -1,5 +1,5 @@
 /* ==========================================
-   DevType — Styles (Catppuccin Mocha palette)
+   DevType — Styles
    ========================================== */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,15 +14,16 @@ body {
 }
 
 /* ==========================================
-   CONTAINER
+   CONTAINER + CSS ACCENT VARIABLE
    ========================================== */
 
 #devtype-container {
+  --accent: #a6e3a1;
   position: relative;
   background: #1e1e2e;
   border: 1px solid #313244;
   border-radius: 10px;
-  width: 720px;
+  width: 920px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   overflow: hidden;
 }
@@ -33,16 +34,72 @@ body {
 
 #dt-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
   padding: 14px 22px;
   background: #181825;
   border-bottom: 1px solid #313244;
 }
 
 #dt-logo    { font-size: 1rem; font-weight: bold; color: #cdd6f4; letter-spacing: 3px; text-transform: uppercase; }
-.logo-dot   { color: #89b4fa; }
-#dt-subtitle { font-size: 0.62rem; color: #45475a; letter-spacing: 2px; }
+.logo-dot   { color: var(--accent); transition: color 0.3s ease; }
+
+/* ==========================================
+   DIFFICULTY SLIDER
+   ========================================== */
+
+#dt-diff-slider {
+  position: relative;
+  display: flex;
+  background: #313244;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 0;
+}
+
+#dt-diff-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(33.33% - 2px);
+  height: calc(100% - 6px);
+  background: var(--accent);
+  border-radius: 4px;
+  transition: left 0.22s cubic-bezier(0.34, 1.2, 0.64, 1), background 0.3s ease;
+  opacity: 0.18;
+}
+
+.dt-diff-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 5px 14px;
+  font-size: 0.68rem;
+  font-family: 'Courier New', monospace;
+  color: #6c7086;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: color 0.2s ease;
+  border-radius: 4px;
+}
+
+.dt-diff-btn.active { color: var(--accent); font-weight: bold; }
+.dt-diff-btn:hover:not(.active) { color: #cdd6f4; }
+
+/* ==========================================
+   SUBTITLE
+   ========================================== */
+
+#dt-subtitle {
+  text-align: center;
+  font-size: 0.62rem;
+  color: #45475a;
+  letter-spacing: 2px;
+  padding: 6px 0 0;
+}
 
 /* ==========================================
    LIVE STATS
@@ -52,15 +109,17 @@ body {
   display: flex;
   justify-content: center;
   gap: 56px;
-  padding: 18px 22px 10px;
+  padding: 14px 22px 10px;
 }
 
 .dt-stat       { text-align: center; }
-.dt-stat-val   { font-size: 2rem; color: #cdd6f4; font-weight: bold; line-height: 1; min-width: 3ch; }
+.dt-stat-val   { font-size: 2rem; color: #cdd6f4; font-weight: bold; line-height: 1; min-width: 3ch; transition: color 0.3s ease; }
 .dt-stat-label { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; }
+.dt-prog-total { font-size: 1.1rem; color: #45475a; }
 
-.dt-stat-val.warn   { color: #fab387; }
-.dt-stat-val.danger { color: #f38ba8; }
+#dt-progress { color: var(--accent); }
+.dt-stat-val.warn   { color: #fab387 !important; }
+.dt-stat-val.danger { color: #f38ba8 !important; }
 
 /* ==========================================
    WORDS AREA
@@ -68,8 +127,8 @@ body {
 
 #dt-words-wrap {
   position: relative;
-  padding: 22px 28px 20px;
-  height: 175px;
+  padding: 24px 32px 22px;
+  height: 210px;
   overflow: hidden;
   cursor: text;
   border-top: 1px solid #313244;
@@ -85,7 +144,6 @@ body {
   will-change: transform;
 }
 
-/* ── Word states ── */
 .dt-word {
   display: inline-block;
   margin-right: 14px;
@@ -98,10 +156,9 @@ body {
 .dt-char.wrong      { color: #f38ba8; }
 .dt-char.extra      { color: #f38ba8; text-decoration: underline wavy; }
 
-/* Current word */
 .dt-word.current .dt-char.pending { color: #6c7086; }
 
-/* Cursor */
+/* Cursor — uses accent color */
 .dt-word.current::before {
   content: '';
   position: absolute;
@@ -109,10 +166,11 @@ body {
   top: 6px;
   width: 2px;
   height: 1.35em;
-  background: #89b4fa;
+  background: var(--accent);
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(137, 180, 250, 0.55);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 55%, transparent);
   animation: dtCursorBlink 0.9s step-end infinite;
+  transition: background 0.3s ease;
 }
 
 @keyframes dtCursorBlink {
@@ -120,29 +178,32 @@ body {
   50%       { opacity: 0; }
 }
 
-/* Done words */
 .dt-word.done .dt-char.correct { color: #313244; }
 .dt-word.done .dt-char.wrong   { color: #7d2d3a; }
 
-/* Option C — rejected word (senior dev crossed it out) */
+/* Option C — rejected word */
 .dt-word.rejected .dt-char {
   text-decoration: line-through;
   color: #f38ba8 !important;
   opacity: 0.7;
 }
 
-/* Option C — review-pending word (must retype) */
-.dt-word.review-pending {
-  border-bottom: 1px dashed rgba(249, 226, 175, 0.4);
-  padding-bottom: 2px;
-}
+/* Option C — review pending */
+.dt-word.review-pending { border-bottom: 1px dashed rgba(249,226,175,0.35); padding-bottom: 2px; }
 .dt-word.review-pending.current::after {
   content: '// re-type';
   font-size: 0.58rem;
-  color: rgba(249, 226, 175, 0.55);
+  color: rgba(249,226,175,0.45);
   letter-spacing: 1px;
   margin-left: 6px;
   font-style: italic;
+}
+
+/* Hard mode — SHA fade */
+.dt-word.sha-fading .dt-char.pending {
+  color: transparent !important;
+  text-shadow: 0 0 10px rgba(243,139,168,0.25);
+  transition: color 0.8s ease, text-shadow 0.8s ease;
 }
 
 /* ==========================================
@@ -160,7 +221,6 @@ body {
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
-
 #dt-focus-hint.dt-hidden { opacity: 0; }
 
 /* ==========================================
@@ -173,12 +233,11 @@ body {
   pointer-events: none;
   width: 1px;
   height: 1px;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
 }
 
 /* ==========================================
-   QUIRK: AUTOCOMPLETE POPUP
+   QUIRK: AUTOCOMPLETE
    ========================================== */
 
 #dt-autocomplete {
@@ -190,35 +249,21 @@ body {
   font-size: 0.75rem;
   pointer-events: none;
   white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
   z-index: 25;
   opacity: 0;
   transform: translateY(-4px);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
-
-#dt-autocomplete.ac-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#dt-autocomplete.dt-hidden { display: none; }
+#dt-autocomplete.ac-visible { opacity: 1; transform: translateY(0); }
+#dt-autocomplete.dt-hidden  { display: none; }
 
 #dt-ac-typed  { color: #89dceb; }
 #dt-ac-rest   { color: #45475a; font-style: italic; }
-
-.dt-ac-key {
-  margin-left: 10px;
-  background: #313244;
-  border-radius: 3px;
-  padding: 1px 6px;
-  font-size: 0.58rem;
-  color: #585b70;
-  letter-spacing: 1px;
-}
+.dt-ac-key    { margin-left: 10px; background: #313244; border-radius: 3px; padding: 1px 6px; font-size: 0.58rem; color: #585b70; letter-spacing: 1px; }
 
 /* ==========================================
-   QUIRK: CODE REVIEW COMMENT
+   QUIRK: CODE REVIEW
    ========================================== */
 
 #dt-review {
@@ -232,12 +277,11 @@ body {
   opacity: 0;
   transition: opacity 0.22s ease;
 }
-
-#dt-review.dt-hidden  { display: none; }
+#dt-review.dt-hidden   { display: none; }
 #dt-review.rev-visible { opacity: 1; }
 
 /* ==========================================
-   QUIRK: LEGACY COMMENT
+   QUIRK: LEGACY PAUSE
    ========================================== */
 
 #dt-legacy {
@@ -251,12 +295,83 @@ body {
   transition: opacity 0.3s ease;
   z-index: 20;
 }
-
 #dt-legacy.dt-hidden   { display: none; }
 #dt-legacy.leg-visible { opacity: 0.75; }
 
 /* ==========================================
-   RESULTS OVERLAY
+   EASY QUIRK: iMESSAGE BUBBLE
+   ========================================== */
+
+#dt-imessage {
+  position: fixed;
+  bottom: 80px;
+  left: -280px;
+  z-index: 9999;
+  transition: left 0.35s cubic-bezier(0.34, 1.1, 0.64, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+#dt-imessage.dt-hidden { display: none; }
+#dt-imessage.im-visible { left: 24px; }
+
+#im-sender {
+  font-size: 0.62rem;
+  color: #6c7086;
+  margin-bottom: 4px;
+  padding-left: 4px;
+  letter-spacing: 0.5px;
+}
+
+#im-bubble {
+  background: #2c2c2e;
+  border-radius: 18px 18px 18px 4px;
+  padding: 9px 14px;
+  max-width: 240px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+#im-text {
+  font-size: 0.82rem;
+  color: #e5e5ea;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   EASY QUIRK: macOS NOTIFICATION
+   ========================================== */
+
+#dt-notification {
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 290px;
+  background: rgba(28, 28, 30, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  z-index: 9999;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+  transition: top 0.38s cubic-bezier(0.34, 1.1, 0.64, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+#dt-notification.dt-hidden  { display: none; }
+#dt-notification.notif-visible { top: 24px; }
+
+#notif-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+#notif-icon { font-size: 0.9rem; }
+#notif-app  { font-size: 0.65rem; color: #8e8e93; font-weight: 600; flex: 1; letter-spacing: 0.3px; }
+#notif-time { font-size: 0.6rem; color: #48484a; }
+#notif-msg  { font-size: 0.78rem; color: #e5e5ea; line-height: 1.4; }
+
+/* ==========================================
+   RESULTS
    ========================================== */
 
 #dt-results {
@@ -269,81 +384,53 @@ body {
   z-index: 30;
   animation: dtFadeIn 0.3s ease;
 }
-
 #dt-results.dt-hidden { display: none; }
 
-@keyframes dtFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+@keyframes dtFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 #dt-results-title {
   font-size: 0.72rem;
   color: #585b70;
   letter-spacing: 4px;
   text-transform: uppercase;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
-
-#dt-results-grid {
-  display: flex;
-  gap: 44px;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.dt-res-item   { text-align: center; }
-.dt-res-val    { font-size: 2.6rem; color: #89b4fa; font-weight: bold; line-height: 1; }
-.dt-res-label  { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 6px; text-transform: uppercase; }
-
-#dt-verdict {
-  font-size: 0.88rem;
-  color: #a6e3a1;
-  letter-spacing: 1px;
-  margin-bottom: 28px;
-  min-height: 1.3em;
-}
-
-.dt-prog-total { font-size: 1.1rem; color: #45475a; }
 
 #dt-pass-badge {
   font-size: 0.72rem;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 20px;
-  min-height: 1.2em;
-  padding: 4px 14px;
+  margin-bottom: 22px;
+  padding: 5px 16px;
   border-radius: 4px;
   display: inline-block;
 }
-#dt-pass-badge.pass { background: rgba(166,227,161,0.12); color: #a6e3a1; border: 1px solid rgba(166,227,161,0.3); }
-#dt-pass-badge.fail { background: rgba(243,139,168,0.12); color: #f38ba8; border: 1px solid rgba(243,139,168,0.3); }
+#dt-pass-badge.pass { background: rgba(166,227,161,0.1); color: #a6e3a1; border: 1px solid rgba(166,227,161,0.3); }
+#dt-pass-badge.fail { background: rgba(243,139,168,0.1); color: #f38ba8; border: 1px solid rgba(243,139,168,0.3); }
 
-#dt-result-actions {
+#dt-results-grid {
   display: flex;
-  gap: 12px;
+  gap: 40px;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 22px;
+}
+.dt-res-item  { text-align: center; }
+.dt-res-val   { font-size: 2.4rem; color: var(--accent); font-weight: bold; line-height: 1; transition: color 0.3s ease; }
+.dt-res-label { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 6px; text-transform: uppercase; }
+
+#dt-verdict {
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-bottom: 26px;
+  min-height: 1.3em;
+  transition: color 0.3s ease;
 }
 
-#dt-proceed-btn {
-  background: #89b4fa;
-  color: #1e1e2e;
-  border: none;
-  border-radius: 5px;
-  padding: 9px 22px;
-  font-size: 0.78rem;
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  cursor: pointer;
-  letter-spacing: 1px;
-  text-decoration: none;
-  transition: background 0.15s ease, transform 0.1s ease;
-}
-#dt-proceed-btn:hover { background: #b4d0ff; transform: translateY(-1px); }
+#dt-result-actions { display: flex; gap: 12px; justify-content: center; align-items: center; }
 
 #dt-restart-btn {
-  background: rgba(243, 139, 168, 0.08);
+  background: rgba(243,139,168,0.08);
   border: 1px solid #f38ba8;
   border-radius: 5px;
   padding: 9px 18px;
@@ -357,6 +444,22 @@ body {
 }
 #dt-restart-btn:hover { background: rgba(243,139,168,0.18); transform: translateY(-1px); }
 
+#dt-proceed-btn {
+  background: var(--accent);
+  color: #1e1e2e;
+  border: none;
+  border-radius: 5px;
+  padding: 9px 22px;
+  font-size: 0.78rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+#dt-proceed-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
 /* ==========================================
    FOOTER
    ========================================== */
@@ -368,36 +471,151 @@ body {
   padding: 10px 18px;
   background: #181825;
 }
+#dt-brand { font-size: 0.6rem; color: #313244; letter-spacing: 3px; text-transform: uppercase; }
+#dt-reset-btn { background: none; border: none; font-size: 1.15rem; color: #45475a; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: color 0.15s ease; }
+#dt-reset-btn:hover { color: var(--accent); }
 
-#dt-brand {
+/* ==========================================
+   PER-CHARACTER HIGHLIGHT
+   ========================================== */
+
+.dt-char.current-char {
+  color: #cdd6f4 !important;
+  border-bottom: 2px solid var(--accent);
+  animation: charPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes charPulse {
+  0%, 100% { border-color: var(--accent);        opacity: 1;   }
+  50%       { border-color: transparent;          opacity: 0.7; }
+}
+
+/* ==========================================
+   ACCURACY BAR
+   ========================================== */
+
+#dt-acc-bar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: visible;
+}
+
+#dt-acc-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background 0.4s ease;
+  position: relative;
+}
+
+#dt-acc-bar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: inherit;
+  box-shadow: 0 0 8px currentColor;
+  transition: background 0.4s ease;
+}
+
+/* Threshold pip */
+#dt-acc-threshold {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 1px;
+  transition: left 0.3s ease;
+}
+
+#dt-acc-threshold::before {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.52rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   WPM GRAPH
+   ========================================== */
+
+#dt-graph-wrap {
+  width: 100%;
+  margin: 4px 0 20px;
+  padding: 0 4px;
+}
+
+.dt-graph-label {
   font-size: 0.6rem;
-  color: #313244;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-#dt-reset-btn {
-  background: none;
-  border: none;
-  font-size: 1.15rem;
   color: #45475a;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 4px;
-  transition: color 0.15s ease;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
 }
 
-#dt-reset-btn:hover { color: #89b4fa; }
+#dt-graph-svg {
+  width: 100%;
+  height: 80px;
+  display: block;
+  overflow: visible;
+}
+
+#dt-graph-empty {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  color: #45475a;
+  letter-spacing: 2px;
+}
+
+#dt-graph-xaxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.55rem;
+  color: #45475a;
+  letter-spacing: 1px;
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes dotPop {
+  0%   { r: 0;   opacity: 0; }
+  60%  { r: 4.5; opacity: 1; }
+  100% { r: 3;   opacity: 1; }
+}
+
+
+
+.dt-hidden { display: none !important; }
 
 /* ==========================================
    MOBILE
    ========================================== */
 
-@media (max-width: 740px) {
+@media (max-width: 940px) {
   #devtype-container { width: 96vw; }
   #dt-words-wrap { padding: 16px; }
   #dt-words { font-size: 1.1rem; line-height: 2.2; }
   #dt-live-stats { gap: 28px; }
-  #dt-results-grid { gap: 24px; flex-wrap: wrap; }
+  #dt-results-grid { gap: 20px; flex-wrap: wrap; }
   .dt-res-val { font-size: 2rem; }
+  #dt-imessage { bottom: 20px; }
 }

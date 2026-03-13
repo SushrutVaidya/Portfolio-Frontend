@@ -9,8 +9,9 @@
 // GAME CONFIG
 // ==========================================
 
-const WORD_COUNT    = 30;  // fixed words per round
-const PASS_ACCURACY = 70;  // % accuracy to "pass"
+const WORD_COUNT    = 120; // enough to fill 60s
+const TIMER_SECONDS = 60;
+const PASS_ACCURACY = 80;
 
 const WORD_POOL = [
   // Terminal / CLI
@@ -140,11 +141,10 @@ let lineHeight   = 0;
 
 let currentWordIdx = 0;
 let currentInput   = '';
-let gameStarted    = false;
-let gameOver       = false;
-let startTime      = null;
-let elapsedSeconds = 0;
-let elapsedInterval = null;
+let gameStarted     = false;
+let gameOver        = false;
+let timeLeft        = TIMER_SECONDS;
+let timerInterval   = null;
 
 // Accuracy tracking (standard: correct chars / total chars)
 let correctChars   = 0;
@@ -174,7 +174,7 @@ const containerEl  = document.getElementById('devtype-container');
 const wordsWrapEl  = document.getElementById('dt-words-wrap');
 const wordsEl      = document.getElementById('dt-words');
 const inputEl      = document.getElementById('dt-input');
-const progressEl   = document.getElementById('dt-progress');
+const timerEl      = document.getElementById('dt-progress');
 const liveWpmEl    = document.getElementById('dt-live-wpm');
 const liveAccEl    = document.getElementById('dt-live-acc');
 const focusHintEl  = document.getElementById('dt-focus-hint');
@@ -425,16 +425,6 @@ function submitWord(typed) {
   currentInput = '';
   inputEl.value = '';
 
-  // Update progress display
-  const originalWordsTyped = Math.min(currentWordIdx, WORD_COUNT);
-  progressEl.innerHTML = `${originalWordsTyped} <span class="dt-prog-total">/ ${WORD_COUNT}</span>`;
-
-  // End game when all original words are done
-  if (wordsCorrect + errorCount >= WORD_COUNT && !reviewPending) {
-    endGame();
-    return;
-  }
-
   // Option B: count down autocomplete cooldown
   if (!isReview) acWordCooldown--;
 
@@ -454,66 +444,68 @@ function submitWord(typed) {
 
 function startGame() {
   gameStarted        = true;
-  startTime          = Date.now();
   acWordCooldown     = rand(5, 9);
   reviewWordCooldown = rand(8, 14);
   focusHintEl.classList.add('dt-hidden');
 
-  elapsedInterval = setInterval(() => {
-    elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.innerHTML = `${timeLeft} <span class="dt-prog-total">s</span>`;
+
+    if (timeLeft <= 5)       timerEl.className = 'dt-stat-val danger';
+    else if (timeLeft <= 10) timerEl.className = 'dt-stat-val warn';
+
     updateLiveStats();
-  }, 500);
+    if (timeLeft <= 0) endGame();
+  }, 1000);
 }
 
 function endGame() {
   gameOver = true;
-  clearInterval(elapsedInterval);
-  elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+  clearInterval(timerInterval);
   hideAutocomplete(true);
   hideLegacy(true);
   reviewEl.classList.add('dt-hidden');
 
-  const minutes  = Math.max(elapsedSeconds / 60, 0.01);
+  const minutes  = TIMER_SECONDS / 60;
   const wpm      = Math.round((correctChars / 5) / minutes);
   const acc      = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
   const locPerHr = Math.round(wpm * 8);
   const passed   = acc >= PASS_ACCURACY;
 
   document.getElementById('r-loc').textContent  = locPerHr;
-  document.getElementById('r-time').textContent = elapsedSeconds + 's';
+  document.getElementById('r-time').textContent = wordsCorrect + ' words';
   document.getElementById('r-acc').textContent  = Math.min(acc, 100) + '%';
   document.getElementById('r-bugs').textContent = errorCount;
 
   const badge = document.getElementById('dt-pass-badge');
-  badge.textContent = passed ? '✓  challenge passed' : '✗  challenge failed';
+  badge.textContent = passed ? '✓  challenge passed' : '✗  need 80% accuracy to pass';
   badge.className   = passed ? 'pass' : 'fail';
 
   const verdict = VERDICTS.find(([lo, hi]) => wpm >= lo && wpm < hi);
   document.getElementById('dt-verdict').textContent = verdict ? verdict[2] : '// undefined behavior';
 
-  // Always allow proceeding — just style the button differently
   const proceedBtn = document.getElementById('dt-proceed-btn');
   if (!passed) {
-    proceedBtn.textContent = 'proceed anyway →';
-    proceedBtn.style.background = '#585b70';
+    proceedBtn.textContent       = 'proceed anyway →';
+    proceedBtn.style.background  = '#585b70';
   } else {
-    proceedBtn.textContent = 'next challenge →';
-    proceedBtn.style.background = '';
+    proceedBtn.textContent       = 'next challenge →';
+    proceedBtn.style.background  = '';
   }
 
   resultsEl.classList.remove('dt-hidden');
 }
 
 function resetGame() {
-  clearInterval(elapsedInterval);
+  clearInterval(timerInterval);
   hideAutocomplete(true);
   hideLegacy(true);
   reviewEl.classList.add('dt-hidden');
 
   gameStarted        = false;
   gameOver           = false;
-  startTime          = null;
-  elapsedSeconds     = 0;
+  timeLeft           = TIMER_SECONDS;
   currentWordIdx     = 0;
   currentInput       = '';
   correctChars       = 0;
@@ -527,12 +519,13 @@ function resetGame() {
   reviewWordCooldown = 0;
   reviewPending      = false;
 
-  progressEl.innerHTML = `0 <span class="dt-prog-total">/ ${WORD_COUNT}</span>`;
+  timerEl.innerHTML = `${TIMER_SECONDS} <span class="dt-prog-total">s</span>`;
+  timerEl.className = 'dt-stat-val';
   liveWpmEl.textContent = '—';
   liveAccEl.textContent = '—';
 
   const proceedBtn = document.getElementById('dt-proceed-btn');
-  proceedBtn.textContent  = 'next challenge →';
+  proceedBtn.textContent      = 'next challenge →';
   proceedBtn.style.background = '';
 
   wordsEl.style.transform = '';
@@ -547,7 +540,8 @@ function resetGame() {
 
 function updateLiveStats() {
   if (!gameStarted) return;
-  const minutes = Math.max(elapsedSeconds / 60, 0.01);
+  const elapsed = Math.max(TIMER_SECONDS - timeLeft, 1);
+  const minutes = elapsed / 60;
   const wpm     = Math.round((correctChars / 5) / minutes);
   const acc     = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
   liveWpmEl.textContent = Math.round(wpm * 8) + '';

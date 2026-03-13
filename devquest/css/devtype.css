@@ -59,9 +59,8 @@ body {
 .dt-stat-val   { font-size: 2rem; color: #cdd6f4; font-weight: bold; line-height: 1; min-width: 3ch; }
 .dt-stat-label { font-size: 0.58rem; color: #585b70; letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; }
 
-#dt-timer { color: #89b4fa; transition: color 0.3s ease; }
-#dt-timer.warn   { color: #fab387; }
-#dt-timer.danger { color: #f38ba8; }
+.dt-stat-val.warn   { color: #fab387; }
+.dt-stat-val.danger { color: #f38ba8; }
 
 /* ==========================================
    WORDS AREA

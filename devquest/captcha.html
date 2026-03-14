@@ -6,6 +6,8 @@
   <title>Captcha — DevQuest</title>
   <link rel="stylesheet" href="css/captcha.css">
   <link rel="stylesheet" href="css/shared.css">
+  <script src="js/theme.js"></script>
+  <script src="js/sounds.js"></script>
 </head>
 <body>
 
@@ -22,12 +24,23 @@
         <span class="dq-step-name">DevType</span>
       </div>
     </div>
-    <span class="dq-nav-right">challenge 1 of 2</span>
+    <div class="dq-nav-right-group">
+      <span class="dq-nav-right">challenge 1 of 2</span>
+      <button class="dq-sound-toggle" id="dq-sound-toggle" title="Toggle sound">
+        <span class="dq-sound-icon">♪</span>
+      </button>
+      <button class="dq-theme-toggle" id="dq-theme-toggle">
+        <span class="dq-toggle-icon">☀</span>
+        <span class="dq-toggle-label">Light</span>
+      </button>
+    </div>
   </nav>
 
   <main class="dq-main">
+    <div class="dq-game-wrap">
+      <div class="dq-game-eyebrow">Challenge 01 — Shape Sorting</div>
 
-  <div id="captcha-container">
+      <div id="captcha-container">
 
     <!-- Header -->
     <div id="captcha-header">
@@ -46,7 +59,6 @@
           <span class="life" id="life-3">❤️</span>
         </div>
         <div id="progress-area">
-          <span id="streak-badge" class="hidden"></span>
           <span id="progress-text">Shape 1 of 6</span>
         </div>
       </div>
@@ -112,7 +124,9 @@
       <button id="verify-btn" class="hidden" onclick="window.location.href='devtype.html'">Next Challenge →</button>
     </div>
 
-  </div>
+    </div>
+
+    </div>
 
   </main>
 
@@ -130,5 +144,8 @@
   </footer>
 
   <script src="js/captcha.js"></script>
+
+  <!-- Background music — <audio> is Safari-safe, no AudioContext needed -->
+  <audio id="dq-music" src="assets/keyboardcat.mp3" loop preload="auto"></audio>
 </body>
 </html>

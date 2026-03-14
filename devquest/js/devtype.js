@@ -13,21 +13,21 @@ const DIFF_CONFIG = {
   easy: {
     timer:    60,
     passAcc:  70,
-    accent:   '#a6e3a1',
+    accent:   '#30d158',
     subtitle: '60 seconds · 70% accuracy to pass',
     quirks:   ['imessage', 'notification'],
   },
   medium: {
     timer:    60,
     passAcc:  80,
-    accent:   '#89b4fa',
+    accent:   '#0a84ff',
     subtitle: '60 seconds · 80% accuracy to pass',
     quirks:   ['autocomplete', 'review', 'legacy'],
   },
   hard: {
     timer:    45,
     passAcc:  95,
-    accent:   '#f38ba8',
+    accent:   '#ff453a',
     subtitle: '45 seconds · 95% accuracy · good luck',
     quirks:   ['autocomplete', 'review', 'legacy', 'sha-fade'],
   },
@@ -572,6 +572,13 @@ inputEl.addEventListener('input', () => {
   colorCurrentWord();
   resetLegacyTimer();
   updateLiveStats();
+  // Key click sound on each character typed
+  if (typeof DQSounds !== 'undefined') {
+    const word    = words[currentWordIdx] || '';
+    const pos     = currentInput.length - 1;
+    const correct = pos >= 0 && currentInput[pos] === word[pos];
+    DQSounds.keyClick(correct);
+  }
 });
 
 inputEl.addEventListener('keydown', e => {
@@ -585,6 +592,7 @@ inputEl.addEventListener('keydown', e => {
       hideAutocomplete(false);
       resetLegacyTimer();
       updateLiveStats();
+      if (typeof DQSounds !== 'undefined') DQSounds.tabWrong();
     }
     return;
   }
@@ -606,9 +614,11 @@ function submitWord(typed) {
       correctStreak++;
       if (correctStreak % 3 === 0) acWordCooldown = Math.max(2, acWordCooldown - 1);
     }
+    if (typeof DQSounds !== 'undefined') DQSounds.wordComplete();
   } else {
     errorCount++;
     correctStreak = 0;
+    if (typeof DQSounds !== 'undefined') DQSounds.wordWrong();
   }
   totalChars += typed.length;
   updateAccBar();
@@ -661,12 +671,19 @@ function startGame() {
   focusHintEl.classList.add('dt-hidden');
   resetAccBar();
   startWpmSampling();
+  // Intro typewriter — fires on first keypress (guaranteed user gesture, works on Safari)
+  if (typeof DQSounds !== 'undefined') DQSounds.introTypewriter();
 
   timerInterval = setInterval(() => {
     timeLeft--;
     timerEl.innerHTML = `${timeLeft} <span class="dt-prog-total">s</span>`;
-    if (timeLeft <= 5)       timerEl.className = 'dt-stat-val danger';
-    else if (timeLeft <= 10) timerEl.className = 'dt-stat-val warn';
+    if (timeLeft <= 5) {
+      timerEl.className = 'dt-stat-val danger';
+      if (typeof DQSounds !== 'undefined') DQSounds.timerDanger();
+    } else if (timeLeft <= 10) {
+      timerEl.className = 'dt-stat-val warn';
+      if (typeof DQSounds !== 'undefined' && timeLeft === 10) DQSounds.timerWarning();
+    }
     updateLiveStats();
     if (timeLeft <= 0) endGame();
   }, 1000);
@@ -711,11 +728,13 @@ function endGame() {
   if (passed) {
     retryBtn.classList.add('dt-hidden');
     proceedBtn.classList.remove('dt-hidden');
+    if (typeof DQSounds !== 'undefined') DQSounds.gamePass();
   } else {
     proceedBtn.classList.add('dt-hidden');
     retryBtn.classList.remove('dt-hidden');
     const taunt = RETRY_TAUNTS.find(([lo, hi]) => acc >= lo && acc < hi);
     retryBtn.textContent = taunt ? taunt[2] : '↻  have you tried being better?';
+    if (typeof DQSounds !== 'undefined') DQSounds.gameFail();
   }
 
   resultsEl.classList.remove('dt-hidden');
@@ -807,6 +826,7 @@ function showAutocomplete(typed, rest) {
   void acEl.offsetWidth;
   acEl.classList.add('ac-visible');
   acVisible = true;
+  if (typeof DQSounds !== 'undefined') DQSounds.autocompleteAppear();
   clearTimeout(acTimer);
   acTimer = setTimeout(() => hideAutocomplete(false), Math.max(1400, 2600 - correctStreak * 80));
   acWordCooldown = Math.max(2, 7 - Math.floor(correctStreak / 4));

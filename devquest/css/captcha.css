@@ -9,7 +9,7 @@
 }
 
 body {
-  background-color: #1a1a2e;
+  background: transparent;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -23,14 +23,16 @@ body {
    ======================================== */
 
 #captcha-container {
-  background-color: #c8c8c8;
-  border: 4px solid #4a90d9;
-  border-radius: 8px;
+  background: rgba(28, 28, 30, 0.75);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
   width: 620px;
   box-shadow:
-    4px 4px 0px #2a6099,
-    8px 8px 0px #1a4070,
-    12px 12px 20px rgba(0,0,0,0.5);
+    0 0 0 0.5px rgba(255,255,255,0.06) inset,
+    0 40px 100px rgba(0, 0, 0, 0.7),
+    0 0 80px rgba(10, 132, 255, 0.04);
 }
 
 /* ========================================
@@ -38,11 +40,24 @@ body {
    ======================================== */
 
 #captcha-header {
-  background-color: #4a90d9;
+  background: rgba(10, 132, 255, 0.1);
   padding: 14px 20px;
   text-align: center;
-  color: white;
-  border-bottom: 3px solid #2a6099;
+  color: rgba(255,255,255,0.9);
+  border-bottom: 0.5px solid rgba(10, 132, 255, 0.2);
+  border-radius: 17px 17px 0 0;
+}
+
+#captcha-header p { font-size: 0.95rem; letter-spacing: 0.3px; color: rgba(255,255,255,0.5); }
+
+#captcha-header .correct-holes {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 2px;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 0 30px rgba(10,132,255,0.3);
 }
 
 #captcha-header p {
@@ -65,10 +80,10 @@ body {
 
 #game-area {
   padding: 12px 16px 16px;
-  background-color: #d4d4d4;
+  background: rgba(255, 255, 255, 0.02);
   position: relative;
   height: 515px;
-  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.15);
+  box-shadow: inset 0 2px 12px rgba(0,0,0,0.2);
   overflow: visible;
 }
 
@@ -115,9 +130,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white;
-  border-radius: 8px;
-  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
   overflow: visible;
 }
 
@@ -154,16 +169,16 @@ body {
    ======================================== */
 
 @keyframes dropIn {
-  0%   { top: -160px; opacity: 0;   transform: scale(0.75); }
-  60%  { top: 15px;   opacity: 1;   transform: scale(1.07); }
-  78%  { top: 5px;                  transform: scale(0.97); }
-  90%  { top: 12px;                 transform: scale(1.02); }
-  100% { top: 8px;                  transform: scale(1);    }
+  0%   { top: -160px; opacity: 0;   transform: scale(0.7) rotate(-8deg); }
+  60%  { top: 18px;   opacity: 1;   transform: scale(1.12) rotate(4deg); }
+  75%  { top: 3px;                  transform: scale(0.94) rotate(-2deg); }
+  88%  { top: 14px;                 transform: scale(1.04) rotate(1deg); }
+  100% { top: 8px;                  transform: scale(1)    rotate(0deg); }
 }
 
 #active-shape.drop-in {
   left: calc(50% - 80px);
-  animation: dropIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: dropIn 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 /* ========================================
@@ -171,14 +186,16 @@ body {
    ======================================== */
 
 @keyframes popOut {
-  0%   { transform: scale(1);   opacity: 1; }
-  35%  { transform: scale(1.4); opacity: 0.9; }
-  100% { transform: scale(0);   opacity: 0; }
+  0%   { transform: scale(1)    rotate(0deg);  opacity: 1; }
+  30%  { transform: scale(1.35) rotate(-8deg); opacity: 1; }
+  55%  { transform: scale(0.75) rotate(5deg);  opacity: 0.8; }
+  80%  { transform: scale(1.1)  rotate(-2deg); opacity: 0.4; }
+  100% { transform: scale(0)    rotate(10deg); opacity: 0; }
 }
 
 #active-shape.pop-out {
   pointer-events: none;
-  animation: popOut 0.28s ease-in forwards;
+  animation: popOut 0.38s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
 /* ========================================
@@ -186,13 +203,14 @@ body {
    ======================================== */
 
 @keyframes flyOut {
-  0%   { transform: scale(1) rotate(0deg);    opacity: 1; }
-  100% { transform: scale(0.3) rotate(540deg) translateY(-200px); opacity: 0; }
+  0%   { transform: scale(1)    rotate(0deg)   translateY(0);     opacity: 1; }
+  20%  { transform: scale(1.15) rotate(-20deg) translateY(-15px); opacity: 1; }
+  100% { transform: scale(0.2)  rotate(600deg) translateY(-280px); opacity: 0; }
 }
 
 #active-shape.fly-out {
   pointer-events: none;
-  animation: flyOut 0.45s ease-in forwards;
+  animation: flyOut 0.55s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 /* ========================================
@@ -205,30 +223,30 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 540px;
+  z-index: 15;
 }
 
 #box-3d {
   width: 100%;
-  border: 3px solid #4a90d9;
+  border: 1px solid rgba(56, 189, 248, 0.2);
   border-radius: 12px;
-  background-color: #d8d8d8;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
   box-shadow:
-    inset 1px 1px 0px rgba(255,255,255,0.8),
-    2px 2px 6px rgba(0,0,0,0.2);
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 4px 20px rgba(0,0,0,0.3);
   overflow: hidden;
 }
 
 /* Top panel - inset recessed area with holes */
 #box-front {
-  background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 12px 16px;
-  box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.15),
-    inset -1px -1px 3px rgba(255,255,255,0.7);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 /* Bottom section - hidden */
@@ -253,31 +271,55 @@ body {
   gap: 6px;
   width: 92px;
   height: 92px;
-  background: linear-gradient(180deg, #b0b0b0 0%, #c4c4c4 100%);
+  background: linear-gradient(155deg,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.22) 100%);
   border-radius: 4px;
-  border: 2px solid #888;
+  border: 1px solid rgba(0, 0, 0, 0.5);
   box-shadow:
-    inset 3px 3px 6px rgba(0,0,0,0.25),
-    inset -1px -1px 3px rgba(255,255,255,0.5);
-  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    inset 0 5px 16px rgba(0, 0, 0, 0.55),
+    inset 0 2px 5px rgba(0, 0, 0, 0.35),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1.5px rgba(0, 0, 0, 0.3);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+  transition: background 0.15s ease, transform 0.15s ease,
+              filter 0.15s ease, box-shadow 0.15s ease;
   position: relative;
 }
 
 /* Drag over - blue highlight */
 .hole.drag-over {
-  background: linear-gradient(145deg, #1a4a7a 0%, #2a70c0 100%);
-  border-color: #4a90d9;
-  transform: scale(1.07);
+  background: linear-gradient(155deg,
+    rgba(10, 100, 220, 0.55) 0%,
+    rgba(10, 80, 180, 0.35) 100%);
+  border-color: rgba(74, 144, 217, 0.7);
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 14px rgba(74, 144, 217, 0.7));
   box-shadow:
-    inset 3px 3px 6px rgba(0,0,0,0.4),
-    0 0 14px rgba(74, 144, 217, 0.7);
+    inset 0 4px 14px rgba(0, 0, 0, 0.4),
+    inset 0 0 8px rgba(74, 144, 217, 0.3),
+    0 0 0 2px rgba(74, 144, 217, 0.4);
 }
 
 /* Wrong hole - red flash + shake */
 .hole.wrong {
-  background: linear-gradient(145deg, #5a1a1a 0%, #a03030 100%);
-  border-color: #cc4444;
-  animation: shakeHole 0.35s ease;
+  background: linear-gradient(155deg, rgba(180,30,30,0.6) 0%, rgba(140,20,20,0.4) 100%);
+  border-color: rgba(220, 60, 60, 0.7);
+  filter: drop-shadow(0 0 10px rgba(220, 60, 60, 0.5));
+  animation: shakeHole 0.38s ease;
+}
+
+/* Accepted — brief spring pulse */
+.hole.accepted {
+  animation: holeAccept 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes holeAccept {
+  0%   { transform: scale(1);    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
+  40%  { transform: scale(1.2);  filter: drop-shadow(0 0 20px rgba(74,144,217,0.85)); }
+  70%  { transform: scale(0.95); filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4)); }
+  100% { transform: scale(1);    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
 }
 
 @keyframes shakeHole {
@@ -288,11 +330,50 @@ body {
   80%     { transform: translateX(3px); }
 }
 
+/* ── Per-hole shape clipping ── */
+
+/* Circle hole → round disc */
+#hole-circle {
+  border-radius: 50%;
+  width: 88px;
+  height: 88px;
+}
+
+/* Rectangle hole → tall narrow pill */
+#hole-rectangle {
+  clip-path: inset(0 22px round 4px);
+}
+
+/* Triangle hole → triangular clip */
+#hole-triangle {
+  clip-path: polygon(50% 6%, 4% 96%, 96% 96%);
+  border-radius: 0;
+}
+
+/* Square hole → container IS the shape, hide inner silhouette */
+#hole-square {
+  border-radius: 8px;
+}
+
+/* Semicircle hole → D-shape */
+#hole-semicircle {
+  clip-path: ellipse(50% 50% at 50% 100%);
+  border-radius: 0;
+}
+
+/* Hide inner silhouettes where container IS the shape */
+#hole-circle .hole-silhouette,
+#hole-rectangle .hole-silhouette,
+#hole-triangle .hole-silhouette,
+#hole-square .hole-silhouette,
+#hole-semicircle .hole-silhouette {
+  display: none;
+}
+
 /* Silhouette shapes inside holes */
 .hole-silhouette {
-  background-color: #3a3a3a;
+  background-color: rgba(255,255,255,0.15);
   pointer-events: none;
-  /* Pixel art crisp edges */
   image-rendering: pixelated;
 }
 
@@ -339,8 +420,8 @@ body {
   box-shadow: none;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-bottom: 44px solid #3a3a3a;
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.3));
+  border-bottom: 44px solid rgba(255,255,255,0.15);
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.1));
 }
 
 /* ========================================
@@ -367,33 +448,6 @@ body {
 /* ========================================
    STREAK BADGE
    ======================================== */
-
-#streak-badge {
-  display: inline-block;
-  background: #f0a500;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-right: 6px;
-  letter-spacing: 1px;
-  box-shadow: 2px 2px 0px #c07800;
-}
-
-#streak-badge.hidden   { display: none; }
-#streak-badge.pop-in   { animation: streakPop 0.3s cubic-bezier(0.2, 0, 0.2, 1.8) forwards; }
-#streak-badge.fade-out { animation: streakFade 0.4s ease forwards; }
-
-@keyframes streakPop {
-  0%   { transform: scale(0);   opacity: 0; }
-  100% { transform: scale(1);   opacity: 1; }
-}
-
-@keyframes streakFade {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
-}
 
 /* ========================================
    PARTICLES
@@ -536,39 +590,48 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background-color: #bbb;
-  border-top: 3px solid #999;
+  background: rgba(255, 255, 255, 0.025);
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 0 0 17px 17px;
 }
 
 #footer-brand {
-  font-size: 0.7rem;
-  color: #666;
-  letter-spacing: 2px;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 1px;
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: 600;
   user-select: none;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+}
+
+#progress-area {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
 }
 
 #reset-btn {
-  background: #aaa;
-  border: none;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 50%;
   width: 38px;
   height: 38px;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #444;
+  color: #94a3b8;
   transition: all 0.12s ease;
-  box-shadow: 2px 2px 0px #888;
 }
 
-#reset-btn:hover  { background: #999; transform: scale(1.05); }
-#reset-btn:active { transform: scale(0.93); box-shadow: 1px 1px 0px #888; }
+#reset-btn:hover  { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+#reset-btn:active { transform: scale(0.93); }
 
 #verify-btn {
-  background-color: #4a90d9;
-  color: white;
-  border: none;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 4px;
   padding: 9px 26px;
   font-size: 0.95rem;
@@ -576,12 +639,64 @@ body {
   cursor: pointer;
   letter-spacing: 1px;
   transition: all 0.12s ease;
-  box-shadow: 3px 3px 0px #2a6099;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
 }
 
-#verify-btn:hover  { background: #357abd; transform: translateY(-1px); box-shadow: 4px 4px 0px #2a6099; }
-#verify-btn:active { transform: translateY(1px); box-shadow: 1px 1px 0px #2a6099; }
+#verify-btn:hover  { background: rgba(56,189,248,0.25); transform: translateY(-1px); box-shadow: 0 0 28px rgba(56,189,248,0.2); }
+#verify-btn:active { transform: translateY(1px); }
 #verify-btn.hidden { display: none; }
+
+/* ========================================
+   LIGHT MODE
+   ======================================== */
+
+[data-theme="light"] #captcha-container {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+[data-theme="light"] #captcha-header {
+  background: rgba(0, 122, 255, 0.07);
+  border-color: rgba(0, 122, 255, 0.12);
+}
+[data-theme="light"] #captcha-header p            { color: rgba(0,0,0,0.45); }
+[data-theme="light"] #captcha-header .correct-holes { color: rgba(0,0,0,0.85); text-shadow: none; }
+[data-theme="light"] #active-shape {
+  mix-blend-mode: normal;
+}
+[data-theme="light"] #shape-zone    { background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.07); }
+[data-theme="light"] #box-3d        { background: rgba(215,215,224,0.9); border-color: rgba(0,0,0,0.08); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+[data-theme="light"] #box-front     { background: rgba(210,210,220,0.85); }
+[data-theme="light"] .hole          {
+  background: rgba(180, 180, 190, 0.55);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.18),
+    inset 0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+[data-theme="light"] .hole.drag-over {
+  background: rgba(0, 122, 255, 0.1);
+  border-color: rgba(0, 122, 255, 0.35);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08), 0 0 16px rgba(0,122,255,0.2);
+}
+[data-theme="light"] .hole.wrong    { background: rgba(255,59,48,0.08); border-color: rgba(255,59,48,0.3); }
+[data-theme="light"] .hole-silhouette { background-color: rgba(0, 0, 0, 0.2); }
+[data-theme="light"] .triangle-hole  { border-bottom-color: rgba(0, 0, 0, 0.2); }
+[data-theme="light"] #captcha-footer { background: rgba(235,235,240,0.85); border-color: rgba(0,0,0,0.07); }
+[data-theme="light"] #footer-brand   { color: rgba(0,0,0,0.28); }
+[data-theme="light"] #progress-area  { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .life.lost      { filter: grayscale(1); opacity: 0.2; }
+[data-theme="light"] #reset-btn      { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.5); box-shadow: none; }
+[data-theme="light"] #reset-btn:hover { background: rgba(0,0,0,0.09); }
+[data-theme="light"] #verify-btn     { background: rgba(0,122,255,0.1); color: #007aff; border-color: rgba(0,122,255,0.25); box-shadow: 0 0 14px rgba(0,122,255,0.08); }
+[data-theme="light"] #verify-btn:hover { background: rgba(0,122,255,0.18); }
+[data-theme="light"] #skip-btn       { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.5); box-shadow: none; }
+[data-theme="light"] #prompt-text.prompt-name    { color: #007aff; }
+[data-theme="light"] #prompt-text.prompt-correct { color: #248a3d; }
+[data-theme="light"] #prompt-text.prompt-wrong   { color: #d70015; }
+[data-theme="light"] #prompt-text.prompt-question { color: rgba(0,0,0,0.45); }
+[data-theme="light"] #skip-btn.terminal-active   { background: #1c1c1e; border-color: rgba(255,255,255,0.12); }
 
 /* ========================================
    MOBILE

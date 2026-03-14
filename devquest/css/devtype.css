@@ -7,7 +7,8 @@
 body {
   background: #181825;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
   font-family: 'Courier New', Courier, monospace;
@@ -199,11 +200,18 @@ body {
   font-style: italic;
 }
 
-/* Hard mode — SHA fade */
+/* Hard mode — SHA fade (invisible until revealed) */
 .dt-word.sha-fading .dt-char.pending {
   color: transparent !important;
-  text-shadow: 0 0 10px rgba(243,139,168,0.25);
+  text-shadow: 0 0 10px rgba(243,139,168,0.2);
   transition: color 0.8s ease, text-shadow 0.8s ease;
+}
+
+/* SHA revealed on hover (-3s penalty) */
+.dt-word.sha-fading { cursor: help; }
+.dt-word.sha-revealed .dt-char.pending {
+  color: #f38ba8 !important;
+  transition: color 0.15s ease;
 }
 
 /* ==========================================

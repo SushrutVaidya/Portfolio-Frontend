@@ -155,14 +155,29 @@ const RETRY_TAUNTS = [
   [80, 95, '↻  so close. embarrassing really.'],
 ];
 
-const VERDICTS = [
-  [0,   15, '// still in tutorial mode'],
-  [15,  30, '// compiling at runtime'],
-  [30,  50, '// acceptable. barely.'],
-  [50,  70, '// merge approved (with 12 comments)'],
-  [70,  90, '// senior dev energy'],
-  [90, 999, '// git blame shows only your name'],
-];
+const VERDICTS = {
+  easy: [
+    [0,   20, '// still learning the stack'],
+    [20,  35, '// junior dev vibes'],
+    [35,  50, '// passing code reviews'],
+    [50,  70, '// above average human'],
+    [70, 999, '// you actually read the docs'],
+  ],
+  medium: [
+    [0,   20, '// still in tutorial mode'],
+    [20,  35, '// compiling at runtime'],
+    [35,  55, '// merge approved (with comments)'],
+    [55,  75, '// senior dev energy'],
+    [75, 999, '// git blame shows only your name'],
+  ],
+  hard: [
+    [0,   20, '// have you tried a different career?'],
+    [20,  35, '// cryptography is not for everyone'],
+    [35,  55, '// decent. for a human.'],
+    [55,  75, '// you might actually belong here'],
+    [75, 999, '// are you even human?'],
+  ],
+};
 
 // ==========================================
 // STATE
@@ -686,7 +701,8 @@ function endGame() {
     : `✗  need ${config.passAcc}% accuracy to pass`;
   badge.className = passed ? 'pass' : 'fail';
 
-  const verdict = VERDICTS.find(([lo, hi]) => wpm >= lo && wpm < hi);
+  const verdictPool = VERDICTS[currentDifficulty] || VERDICTS.medium;
+  const verdict = verdictPool.find(([lo, hi]) => wpm >= lo && wpm < hi);
   document.getElementById('dt-verdict').textContent = verdict ? verdict[2] : '// undefined behavior';
 
   const retryBtn   = document.getElementById('dt-restart-btn');
@@ -873,9 +889,31 @@ function startSHAFade() {
   clearTimeout(shaFadeTimer);
   const wordEl = wordEls[currentWordIdx];
   if (!wordEl) return;
-  wordEl.classList.remove('sha-fading');
+  wordEl.classList.remove('sha-fading', 'sha-revealed');
+
+  // Fade out after 2s
   shaFadeTimer = setTimeout(() => {
-    if (wordEls[currentWordIdx] === wordEl) wordEl.classList.add('sha-fading');
+    if (wordEls[currentWordIdx] === wordEl) {
+      wordEl.classList.add('sha-fading');
+
+      // Hover to reveal (costs 3 seconds)
+      wordEl.addEventListener('mouseenter', function revealSHA() {
+        if (!wordEl.classList.contains('sha-fading')) return;
+        wordEl.classList.remove('sha-fading');
+        wordEl.classList.add('sha-revealed');
+        // Deduct 3 seconds as penalty
+        timeLeft = Math.max(0, timeLeft - 3);
+        timerEl.innerHTML = `${timeLeft} <span class="dt-prog-total">s</span>`;
+        wordEl.removeEventListener('mouseenter', revealSHA);
+        // Re-fade after 1.5s
+        setTimeout(() => {
+          if (wordEls[currentWordIdx] === wordEl) {
+            wordEl.classList.remove('sha-revealed');
+            wordEl.classList.add('sha-fading');
+          }
+        }, 1500);
+      });
+    }
   }, 2000);
 }
 

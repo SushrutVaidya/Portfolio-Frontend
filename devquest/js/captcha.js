@@ -481,7 +481,7 @@ resetBtn.addEventListener('click', () => {
 });
 
 verifyBtn.addEventListener('click', () => {
-  alert('✅ Verified! You passed the vibe check.');
+  window.location.href = 'devtype.html';
 });
 
 // ========================================

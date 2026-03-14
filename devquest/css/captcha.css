@@ -11,7 +11,8 @@
 body {
   background-color: #1a1a2e;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
   font-family: 'Courier New', Courier, monospace;

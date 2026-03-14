@@ -35,9 +35,37 @@ const skipBtn      = document.getElementById('skip-btn');
 const gameArea     = document.getElementById('game-area');
 const promptText   = document.getElementById('prompt-text');
 
-// ========================================
-// Helpers
-// ========================================
+// ── Background music helpers ──
+function getMusicEl() { return document.getElementById('dq-music'); }
+
+function startMusic() {
+  const el = getMusicEl();
+  if (!el) return;
+  if (typeof DQSounds !== 'undefined' && DQSounds.isMuted()) return;
+  if (!el.paused) return; // already playing
+  // Register with sounds.js for auto-duck
+  if (typeof DQSounds !== 'undefined') DQSounds.setMusicEl(el);
+  el.volume = 0;
+  el.play().catch(() => {});
+  // Fade in to 0.2 — ambient background level
+  let vol = 0;
+  const fade = setInterval(() => {
+    vol = Math.min(vol + 0.02, 0.2);
+    el.volume = vol;
+    if (vol >= 0.2) clearInterval(fade);
+  }, 60);
+}
+
+function stopMusic(fast = false) {
+  const el = getMusicEl();
+  if (!el || el.paused) return;
+  if (fast) { el.pause(); el.currentTime = 0; return; }
+  // Fade out
+  const fade = setInterval(() => {
+    el.volume = Math.max(el.volume - 0.04, 0);
+    if (el.volume <= 0) { el.pause(); el.currentTime = 0; clearInterval(fade); }
+  }, 60);
+}
 
 function centerX() {
   return (gameArea.offsetWidth / 2) - (SHAPE_SIZE / 2);
@@ -75,20 +103,7 @@ function hidePrompt() {
 // Streak
 // ========================================
 
-const STREAK_MESSAGES = ['', '', '2 in a row!', '3 in a row!', 'On fire! 🔥', 'Unstoppable!', 'Legendary!'];
 
-function showStreakBadge(n) {
-  if (n < 2) return;
-  const badge = document.getElementById('streak-badge');
-  badge.textContent = STREAK_MESSAGES[Math.min(n, STREAK_MESSAGES.length - 1)];
-  badge.classList.remove('hidden', 'fade-out');
-  void badge.offsetWidth;
-  badge.classList.add('pop-in');
-  setTimeout(() => {
-    badge.classList.add('fade-out');
-    setTimeout(() => badge.classList.add('hidden'), 400);
-  }, 1200);
-}
 
 // ========================================
 // Particles
@@ -196,13 +211,16 @@ function initSkipTroll() {
       if (!termActive) return;
       if (i < CMD.length) {
         tCmd.textContent += CMD[i++];
+        if (typeof DQSounds !== 'undefined') DQSounds.terminalClick();
         termTimer = setTimeout(typeCmd, 65 + Math.random() * 45);
       } else {
         tCursor.style.display = 'none';
+        if (typeof DQSounds !== 'undefined') DQSounds.terminalDing();
         setTimeout(() => {
           if (!termActive) return;
           tError.textContent   = 'bash: skip: command not found';
           tError.style.opacity = '1';
+          if (typeof DQSounds !== 'undefined') DQSounds.terminalError();
           setTimeout(() => {
             if (!termActive) return;
             tHint.textContent   = 'Did you mean: solve?';
@@ -266,7 +284,8 @@ function loadNextShape() {
   activeShape.style.zIndex      = '10';
   activeShape.style.cursor      = 'grab';
   activeShape.style.transform   = '';
-  activeShape.style.mixBlendMode = 'multiply';
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  activeShape.style.mixBlendMode = isLight ? 'normal' : 'multiply';
   activeShape.style.filter      = 'drop-shadow(2px 4px 6px rgba(0,0,0,0.35))';
 
   void activeShape.offsetWidth;
@@ -287,8 +306,10 @@ function handleCorrectDrop(hole) {
   setPrompt("That's right, into the square hole!", 'prompt-correct');
 
   streak++;
-  showStreakBadge(streak);
   spawnParticles(hole);
+  if (typeof DQSounds !== 'undefined') DQSounds.correctDrop();
+  hole.classList.add('accepted');
+  setTimeout(() => hole.classList.remove('accepted'), 500);
 
   setTimeout(() => {
     activeShape.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
@@ -309,7 +330,9 @@ function handleWrongDrop(hole) {
   streak = 0;
   lives--;
   updateLives();
+  if (typeof DQSounds !== 'undefined') DQSounds.wrongHole();
   setPrompt(lives === 0 ? 'Game over!' : 'Not that one...', 'prompt-wrong');
+  if (lives > 0 && typeof DQSounds !== 'undefined') DQSounds.lifeLost();
 
   if (lives === 0) {
     activeShape.style.transition = 'transform 0.45s ease, opacity 0.45s ease';
@@ -334,8 +357,11 @@ function showSuccess() {
   activeShape.style.display = 'none';
   setPrompt('You passed the vibe check ✓', 'prompt-correct');
   verifyBtn.classList.remove('hidden');
+  if (typeof DQSounds !== 'undefined') {
+    stopMusic(0.8);
+    DQSounds.allSorted();
+  }
 }
-
 function updateLives() {
   for (let i = 1; i <= 3; i++) {
     document.getElementById(`life-${i}`).classList.toggle('lost', i > lives);
@@ -397,6 +423,7 @@ function startDrag(e) {
   activeShape.style.cursor     = 'grabbing';
   activeShape.style.transform  = 'scale(1.12) rotate(3deg)';
   activeShape.style.filter     = 'drop-shadow(4px 8px 12px rgba(0,0,0,0.5))';
+  if (typeof DQSounds !== 'undefined') DQSounds.shapePickup();
 }
 
 document.addEventListener('mousemove', onDrag);
@@ -477,6 +504,7 @@ function getCoords(e) {
 
 resetBtn.addEventListener('click', () => {
   disableDrag();
+  stopMusic(true);
   startGame();
 });
 
@@ -491,4 +519,28 @@ verifyBtn.addEventListener('click', () => {
 window.addEventListener('load', () => {
   initSkipTroll();
   startGame();
+
+  // Start music on first click/tap anywhere
+  const startOnFirstClick = () => {
+    startMusic();
+    document.removeEventListener('mousedown', startOnFirstClick);
+    document.removeEventListener('touchstart', startOnFirstClick);
+  };
+  document.addEventListener('mousedown', startOnFirstClick);
+  document.addEventListener('touchstart', startOnFirstClick, { passive: true });
+
+  // Mute button controls music only — SFX always play
+  const soundBtn = document.getElementById('dq-sound-toggle');
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      const el = getMusicEl();
+      if (!el) return;
+      const nowMuted = typeof DQSounds !== 'undefined' && DQSounds.isMuted();
+      if (nowMuted) {
+        stopMusic(0.4);
+      } else {
+        startMusic();
+      }
+    });
+  }
 });

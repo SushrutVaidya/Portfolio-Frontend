@@ -6,6 +6,8 @@
   <title>DevType — DevQuest</title>
   <link rel="stylesheet" href="css/devtype.css">
   <link rel="stylesheet" href="css/shared.css">
+  <script src="js/theme.js"></script>
+  <script src="js/sounds.js"></script>
 </head>
 <body>
 
@@ -22,12 +24,23 @@
         <span class="dq-step-name">DevType</span>
       </div>
     </div>
-    <span class="dq-nav-right">challenge 2 of 2</span>
+    <div class="dq-nav-right-group">
+      <span class="dq-nav-right">challenge 2 of 2</span>
+      <button class="dq-sound-toggle" id="dq-sound-toggle" title="Toggle sound">
+        <span class="dq-sound-icon">♪</span>
+      </button>
+      <button class="dq-theme-toggle" id="dq-theme-toggle">
+        <span class="dq-toggle-icon">☀</span>
+        <span class="dq-toggle-label">Light</span>
+      </button>
+    </div>
   </nav>
 
   <main class="dq-main">
+    <div class="dq-game-wrap">
+      <div class="dq-game-eyebrow">Challenge 02 — Dev Typing</div>
 
-    <div id="devtype-container">
+      <div id="devtype-container">
 
       <!-- Header -->
       <div id="dt-header">
@@ -139,6 +152,8 @@
         <button id="dt-reset-btn" title="Restart">&#8635;</button>
         <span id="dt-brand">DevQuest</span>
       </div>
+
+    </div>
 
     </div>
 

@@ -3,10 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevQuest - Captcha</title>
+  <title>Captcha — DevQuest</title>
   <link rel="stylesheet" href="css/captcha.css">
+  <link rel="stylesheet" href="css/shared.css">
 </head>
 <body>
+
+  <nav class="dq-nav">
+    <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+    <div class="dq-steps">
+      <div class="dq-step active">
+        <span class="dq-step-num">01</span>
+        <span class="dq-step-name">Captcha</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step">
+        <span class="dq-step-num">02</span>
+        <span class="dq-step-name">DevType</span>
+      </div>
+    </div>
+    <span class="dq-nav-right">challenge 1 of 2</span>
+  </nav>
+
+  <main class="dq-main">
 
   <div id="captcha-container">
 
@@ -90,10 +109,25 @@
         </button>
       </div>
       <span id="footer-brand">DevQuest</span>
-      <button id="verify-btn" class="hidden">Verify</button>
+      <button id="verify-btn" class="hidden" onclick="window.location.href='devtype.html'">Next Challenge →</button>
     </div>
 
   </div>
+
+  </main>
+
+  <footer class="dq-footer">
+    <div class="dq-footer-row1">
+      <span class="dq-footer-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-author">built by Sushrut</span>
+    </div>
+    <div class="dq-footer-row2">
+      <span>© 2026 DevQuest · All rights reserved</span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-ai">Made with AI <span>(Actual Intelligence)</span></span>
+    </div>
+  </footer>
 
   <script src="js/captcha.js"></script>
 </body>

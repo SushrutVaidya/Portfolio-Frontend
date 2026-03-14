@@ -1,0 +1,206 @@
+/* ==========================================
+   DevQuest — Shared Nav + Footer
+   ========================================== */
+
+/* Override body for nav/footer column layout */
+body {
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.dq-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 32px 24px;
+}
+
+/* ==========================================
+   NAV
+   ========================================== */
+
+.dq-nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 52px;
+  background: #0d0d18;
+  border-bottom: 1px solid #1e1e2e;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dq-nav-brand {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #cdd6f4;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.dq-brand-dot { color: #4a90d9; }
+
+/* Steps */
+.dq-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.dq-step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.dq-step-num {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: #6c7086;
+  letter-spacing: 1px;
+}
+
+.dq-step-name {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.72rem;
+  color: #6c7086;
+  letter-spacing: 1px;
+}
+
+/* Done step */
+.dq-step.done .dq-step-num,
+.dq-step.done .dq-step-name {
+  color: #7c7f93;
+}
+
+.dq-step.done .dq-step-name::before {
+  content: '✓ ';
+  color: #a6e3a1;
+  font-size: 0.65rem;
+}
+
+/* Active step */
+.dq-step.active .dq-step-num { color: #4a90d9; }
+.dq-step.active .dq-step-name {
+  color: #cdd6f4;
+  font-weight: bold;
+}
+
+/* Connector line between steps */
+.dq-step-line {
+  width: 28px;
+  height: 1px;
+  background: #45475a;
+  margin: 0 2px;
+  position: relative;
+}
+
+.dq-step-line::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid #45475a;
+  border-right: 1px solid #45475a;
+  transform: rotate(45deg);
+}
+
+/* Nav right label */
+.dq-nav-right {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: #6c7086;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+
+.dq-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 32px;
+  background: #0d0d18;
+  border-top: 1px solid #1e1e2e;
+  flex-shrink: 0;
+}
+
+.dq-footer-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.dq-footer-brand {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #cdd6f4;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.dq-footer-author {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.65rem;
+  color: #6c7086;
+  letter-spacing: 1px;
+}
+
+.dq-footer-divider {
+  color: #313244;
+  font-size: 0.65rem;
+}
+
+.dq-footer-row2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: #45475a;
+  letter-spacing: 1px;
+}
+
+.dq-footer-ai {
+  color: #6c7086;
+}
+
+.dq-footer-ai span {
+  color: #a6e3a1;
+  font-style: italic;
+}
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 600px) {
+  .dq-nav        { padding: 0 16px; }
+  .dq-nav-right  { display: none; }
+  .dq-main       { padding: 16px; }
+  .dq-footer     { padding: 0 16px; }
+  .dq-step-name  { display: none; }
+}

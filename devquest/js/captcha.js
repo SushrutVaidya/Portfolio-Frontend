@@ -1,7 +1,3 @@
-// ========================================
-// DevQuest Captcha
-// ========================================
-
 const SHAPES = [
   { src: 'assets/cube sprite.png',       name: 'Cube' },
   { src: 'assets/cylinder.png',          name: 'Cylinder' },
@@ -12,20 +8,18 @@ const SHAPES = [
 
 const CORRECT_HOLE   = 'hole-square';
 const SHAPE_SIZE     = 160;
-const REPEL_RADIUS   = 90;   // px from wrong hole center to start repelling
-const REPEL_STRENGTH = 55;   // max px offset applied to shape
+const REPEL_RADIUS   = 90;
+const REPEL_STRENGTH = 55;
 
-// Game state
-let currentIndex  = 0;
-let lives         = 3;
-let streak        = 0;
-let isDragging    = false;
-let dragOffsetX   = 0;
-let dragOffsetY   = 0;
-let shapePlaced   = false;
+let currentIndex   = 0;
+let lives          = 3;
+let streak         = 0;
+let isDragging     = false;
+let dragOffsetX    = 0;
+let dragOffsetY    = 0;
+let shapePlaced    = false;
 let shuffledShapes = [];
 
-// DOM
 const activeShape  = document.getElementById('active-shape');
 const holes        = document.querySelectorAll('.hole');
 const progressText = document.getElementById('progress-text');
@@ -35,19 +29,16 @@ const skipBtn      = document.getElementById('skip-btn');
 const gameArea     = document.getElementById('game-area');
 const promptText   = document.getElementById('prompt-text');
 
-// ── Background music helpers ──
 function getMusicEl() { return document.getElementById('dq-music'); }
 
 function startMusic() {
   const el = getMusicEl();
   if (!el) return;
   if (typeof DQSounds !== 'undefined' && DQSounds.isMuted()) return;
-  if (!el.paused) return; // already playing
-  // Register with sounds.js for auto-duck
+  if (!el.paused) return;
   if (typeof DQSounds !== 'undefined') DQSounds.setMusicEl(el);
   el.volume = 0;
   el.play().catch(() => {});
-  // Fade in to 0.2 — ambient background level
   let vol = 0;
   const fade = setInterval(() => {
     vol = Math.min(vol + 0.02, 0.2);
@@ -60,7 +51,6 @@ function stopMusic(fast = false) {
   const el = getMusicEl();
   if (!el || el.paused) return;
   if (fast) { el.pause(); el.currentTime = 0; return; }
-  // Fade out
   const fade = setInterval(() => {
     el.volume = Math.max(el.volume - 0.04, 0);
     if (el.volume <= 0) { el.pause(); el.currentTime = 0; clearInterval(fade); }
@@ -85,10 +75,6 @@ function shuffle(arr) {
   return a;
 }
 
-// ========================================
-// Prompt text
-// ========================================
-
 function setPrompt(text, cls) {
   promptText.textContent = text;
   promptText.className   = 'prompt ' + (cls || '');
@@ -99,50 +85,28 @@ function hidePrompt() {
   promptText.classList.add('hidden');
 }
 
-// ========================================
-// Streak
-// ========================================
-
-
-
-// ========================================
-// Particles
-// ========================================
-
 function spawnParticles(hole) {
   const hr = hole.getBoundingClientRect();
   const gr = gameArea.getBoundingClientRect();
-
   const cx = hr.left - gr.left + hr.width  / 2;
   const cy = hr.top  - gr.top  + hr.height / 2;
 
   for (let i = 0; i < 16; i++) {
-    const p = document.createElement('div');
+    const p    = document.createElement('div');
     p.className = 'particle';
-
-    // Random size between 4–9px
     const size = 4 + Math.random() * 5;
     p.style.width  = size + 'px';
     p.style.height = size + 'px';
     p.style.left   = cx + 'px';
     p.style.top    = cy + 'px';
-
-    // Random blue/white palette
     const palette = ['#4a90d9', '#ffffff', '#2a6099', '#7bb8f0', '#1a4070'];
     p.style.background = palette[Math.floor(Math.random() * palette.length)];
-
     gameArea.appendChild(p);
-
-    // Random angle and distance
     const angle    = Math.random() * 2 * Math.PI;
     const distance = 40 + Math.random() * 60;
-    const tx       = Math.cos(angle) * distance;
-    const ty       = Math.sin(angle) * distance;
-
-    // Trigger animation via inline keyframe
     p.animate([
       { transform: 'translate(-50%,-50%) scale(1)',   opacity: 1 },
-      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 },
+      { transform: `translate(calc(-50% + ${Math.cos(angle) * distance}px), calc(-50% + ${Math.sin(angle) * distance}px)) scale(0)`, opacity: 0 },
     ], {
       duration: 450 + Math.random() * 200,
       easing:   'cubic-bezier(0.2, 0, 0.8, 1)',
@@ -151,29 +115,21 @@ function spawnParticles(hole) {
   }
 }
 
-// ========================================
-// Repulsion
-// ========================================
-
 let repelOffsetX = 0;
 let repelOffsetY = 0;
 
 function applyRepulsion(shapeX, shapeY) {
-  // shapeX/Y = center of shape in client coords
   let totalRx = 0;
   let totalRy = 0;
 
   holes.forEach(hole => {
-    if (hole.id === CORRECT_HOLE) return; // no repulsion from correct hole
-
-    const r  = hole.getBoundingClientRect();
-    const hx = r.left + r.width  / 2;
-    const hy = r.top  + r.height / 2;
-
+    if (hole.id === CORRECT_HOLE) return;
+    const r    = hole.getBoundingClientRect();
+    const hx   = r.left + r.width  / 2;
+    const hy   = r.top  + r.height / 2;
     const dx   = shapeX - hx;
     const dy   = shapeY - hy;
     const dist = Math.sqrt(dx * dx + dy * dy);
-
     if (dist < REPEL_RADIUS && dist > 0) {
       const force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
       totalRx += (dx / dist) * force;
@@ -185,25 +141,24 @@ function applyRepulsion(shapeX, shapeY) {
   repelOffsetY = totalRy;
 }
 
-// ========================================
-// Skip button troll
-// ========================================
-
 function initSkipTroll() {
-  const tCmd   = document.getElementById('t-cmd');
+  const tCmd    = document.getElementById('t-cmd');
   const tCursor = document.getElementById('t-cursor');
-  const tError = document.getElementById('t-error');
-  const tHint  = document.getElementById('t-hint');
-  const CMD    = 'skip --force';
+  const tError  = document.getElementById('t-error');
+  const tHint   = document.getElementById('t-hint');
+  const CMD     = 'skip --force';
   let termTimer  = null;
   let termActive = false;
 
-  skipBtn.addEventListener('mouseenter', () => {
+  const isTouchDevice = 'ontouchstart' in window;
+
+  function activateTroll() {
+    if (termActive) return;
     termActive = true;
     skipBtn.classList.add('terminal-active');
-    tCmd.textContent     = '';
-    tError.style.opacity = '0';
-    tHint.style.opacity  = '0';
+    tCmd.textContent      = '';
+    tError.style.opacity  = '0';
+    tHint.style.opacity   = '0';
     tCursor.style.display = 'inline-block';
 
     let i = 0;
@@ -225,14 +180,18 @@ function initSkipTroll() {
             if (!termActive) return;
             tHint.textContent   = 'Did you mean: solve?';
             tHint.style.opacity = '1';
+            // Auto-reset on mobile after showing hint
+            if (isTouchDevice) {
+              setTimeout(deactivateTroll, 2000);
+            }
           }, 380);
         }, 320);
       }
     }
     setTimeout(typeCmd, 140);
-  });
+  }
 
-  skipBtn.addEventListener('mouseleave', () => {
+  function deactivateTroll() {
     termActive = false;
     clearTimeout(termTimer);
     skipBtn.classList.remove('terminal-active');
@@ -240,12 +199,18 @@ function initSkipTroll() {
     tError.style.opacity  = '0';
     tHint.style.opacity   = '0';
     tCursor.style.display = 'inline-block';
-  });
-}
+  }
 
-// ========================================
-// Game Logic
-// ========================================
+  if (isTouchDevice) {
+    skipBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      activateTroll();
+    }, { passive: false });
+  } else {
+    skipBtn.addEventListener('mouseenter', activateTroll);
+    skipBtn.addEventListener('mouseleave', deactivateTroll);
+  }
+}
 
 function startGame() {
   currentIndex   = 0;
@@ -268,25 +233,22 @@ function loadNextShape() {
   progressText.textContent = `Shape ${currentIndex + 1} of ${shuffledShapes.length}`;
   setPrompt(shape.name, 'prompt-name');
 
-  // Set image
   activeShape.src    = shape.src;
   activeShape.alt    = shape.name;
 
-  // Position above game area
-  activeShape.style.transition  = 'none';
-  activeShape.style.position    = 'absolute';
-  activeShape.style.width       = SHAPE_SIZE + 'px';
-  activeShape.style.height      = SHAPE_SIZE + 'px';
-  activeShape.style.left        = centerX() + 'px';
-  activeShape.style.top         = (-SHAPE_SIZE - 20) + 'px';
-  activeShape.style.opacity     = '1';
-  activeShape.style.display     = 'block';
-  activeShape.style.zIndex      = '10';
-  activeShape.style.cursor      = 'grab';
-  activeShape.style.transform   = '';
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  activeShape.style.mixBlendMode = isLight ? 'normal' : 'multiply';
-  activeShape.style.filter      = 'drop-shadow(2px 4px 6px rgba(0,0,0,0.35))';
+  activeShape.style.transition   = 'none';
+  activeShape.style.position     = 'absolute';
+  activeShape.style.width        = SHAPE_SIZE + 'px';
+  activeShape.style.height       = SHAPE_SIZE + 'px';
+  activeShape.style.left         = centerX() + 'px';
+  activeShape.style.top          = (-SHAPE_SIZE - 20) + 'px';
+  activeShape.style.opacity      = '1';
+  activeShape.style.display      = 'block';
+  activeShape.style.zIndex       = '10';
+  activeShape.style.cursor       = 'grab';
+  activeShape.style.transform    = '';
+  activeShape.style.mixBlendMode = document.documentElement.getAttribute('data-theme') === 'light' ? 'normal' : 'multiply';
+  activeShape.style.filter       = 'drop-shadow(2px 4px 6px rgba(0,0,0,0.35))';
 
   void activeShape.offsetWidth;
 
@@ -304,7 +266,6 @@ function handleCorrectDrop(hole) {
   disableDrag();
   snapToHole(hole);
   setPrompt("That's right, into the square hole!", 'prompt-correct');
-
   streak++;
   spawnParticles(hole);
   if (typeof DQSounds !== 'undefined') DQSounds.correctDrop();
@@ -326,7 +287,6 @@ function handleCorrectDrop(hole) {
 function handleWrongDrop(hole) {
   hole.classList.add('wrong');
   setTimeout(() => hole.classList.remove('wrong'), 400);
-
   streak = 0;
   lives--;
   updateLives();
@@ -362,20 +322,16 @@ function showSuccess() {
     DQSounds.allSorted();
   }
 }
+
 function updateLives() {
   for (let i = 1; i <= 3; i++) {
     document.getElementById(`life-${i}`).classList.toggle('lost', i > lives);
   }
 }
 
-// ========================================
-// Snap / Return
-// ========================================
-
 function snapToHole(hole) {
   const gr = gameArea.getBoundingClientRect();
   const hr = hole.getBoundingClientRect();
-
   activeShape.style.transition = 'left 0.15s cubic-bezier(0.2,0,0.2,1.5), top 0.15s cubic-bezier(0.2,0,0.2,1.5)';
   activeShape.style.left       = (hr.left - gr.left + hr.width  / 2 - SHAPE_SIZE / 2) + 'px';
   activeShape.style.top        = (hr.top  - gr.top  + hr.height / 2 - SHAPE_SIZE / 2) + 'px';
@@ -387,10 +343,6 @@ function returnToCenter() {
   activeShape.style.top        = centerY() + 'px';
 }
 
-// ========================================
-// Enable / Disable Drag
-// ========================================
-
 function enableDrag() {
   activeShape.addEventListener('mousedown',  startDrag);
   activeShape.addEventListener('touchstart', startDrag, { passive: false });
@@ -400,10 +352,6 @@ function disableDrag() {
   activeShape.removeEventListener('mousedown',  startDrag);
   activeShape.removeEventListener('touchstart', startDrag);
 }
-
-// ========================================
-// Drag
-// ========================================
 
 function startDrag(e) {
   e.preventDefault();
@@ -433,14 +381,10 @@ function onDrag(e) {
   if (!isDragging) return;
   e.preventDefault();
 
-  const coords = getCoords(e);
-  const gr     = gameArea.getBoundingClientRect();
-
-  // Base position from cursor
-  const baseX = coords.x - gr.left - dragOffsetX;
-  const baseY = coords.y - gr.top  - dragOffsetY;
-
-  // Shape center in client coords
+  const coords  = getCoords(e);
+  const gr      = gameArea.getBoundingClientRect();
+  const baseX   = coords.x - gr.left - dragOffsetX;
+  const baseY   = coords.y - gr.top  - dragOffsetY;
   const shapeCX = coords.x - dragOffsetX + SHAPE_SIZE / 2;
   const shapeCY = coords.y - dragOffsetY + SHAPE_SIZE / 2;
 
@@ -498,10 +442,6 @@ function getCoords(e) {
   return { x: e.clientX, y: e.clientY };
 }
 
-// ========================================
-// Buttons
-// ========================================
-
 resetBtn.addEventListener('click', () => {
   disableDrag();
   stopMusic(true);
@@ -512,15 +452,10 @@ verifyBtn.addEventListener('click', () => {
   window.location.href = 'devtype.html';
 });
 
-// ========================================
-// Start
-// ========================================
-
 window.addEventListener('load', () => {
   initSkipTroll();
   startGame();
 
-  // Start music on first click/tap anywhere
   const startOnFirstClick = () => {
     startMusic();
     document.removeEventListener('mousedown', startOnFirstClick);
@@ -529,18 +464,13 @@ window.addEventListener('load', () => {
   document.addEventListener('mousedown', startOnFirstClick);
   document.addEventListener('touchstart', startOnFirstClick, { passive: true });
 
-  // Mute button controls music only — SFX always play
   const soundBtn = document.getElementById('dq-sound-toggle');
   if (soundBtn) {
     soundBtn.addEventListener('click', () => {
-      const el = getMusicEl();
-      if (!el) return;
+      const el      = getMusicEl();
       const nowMuted = typeof DQSounds !== 'undefined' && DQSounds.isMuted();
-      if (nowMuted) {
-        stopMusic(0.4);
-      } else {
-        startMusic();
-      }
+      if (!el) return;
+      nowMuted ? stopMusic(0.4) : startMusic();
     });
   }
 });

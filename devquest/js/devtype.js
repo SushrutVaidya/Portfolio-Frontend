@@ -253,6 +253,16 @@ let sampleInterval = null;
 const accBarEl      = document.getElementById('dt-acc-bar');
 const accThreshEl   = document.getElementById('dt-acc-threshold');
 
+// Cache result screen elements — queried once, reused every game
+const rLocEl    = document.getElementById('r-loc');
+const rTimeEl   = document.getElementById('r-time');
+const rAccEl    = document.getElementById('r-acc');
+const rBugsEl   = document.getElementById('r-bugs');
+const passBadge = document.getElementById('dt-pass-badge');
+const verdictEl = document.getElementById('dt-verdict');
+const retryBtn  = document.getElementById('dt-restart-btn');
+const proceedBtn = document.getElementById('dt-proceed-btn');
+
 // ==========================================
 // STREAK BADGE
 // ==========================================
@@ -261,15 +271,18 @@ const accThreshEl   = document.getElementById('dt-acc-threshold');
 // PER-CHARACTER HIGHLIGHT
 // ==========================================
 
-function highlightCurrentChar() {
-  document.querySelectorAll('.dt-char.current-char')
-    .forEach(el => el.classList.remove('current-char'));
+let lastHighlightedChar = null;
 
+function highlightCurrentChar() {
+  if (lastHighlightedChar) {
+    lastHighlightedChar.classList.remove('current-char');
+    lastHighlightedChar = null;
+  }
   const wordEl = wordEls[currentWordIdx];
   if (!wordEl) return;
   const chars = wordEl.querySelectorAll('.dt-char:not(.extra)');
-  const pos   = currentInput.length;
-  if (chars[pos]) chars[pos].classList.add('current-char');
+  const next  = chars[currentInput.length];
+  if (next) { next.classList.add('current-char'); lastHighlightedChar = next; }
 }
 
 // ==========================================
@@ -707,23 +720,17 @@ function endGame() {
   const locPerHr = Math.round(wpm * 8);
   const passed   = acc >= config.passAcc;
 
-  document.getElementById('r-loc').textContent  = locPerHr;
-  document.getElementById('r-time').textContent = wordsCorrect;
-  document.getElementById('r-acc').textContent  = Math.min(acc, 100) + '%';
-  document.getElementById('r-bugs').textContent = errorCount;
+  rLocEl.textContent  = locPerHr;
+  rTimeEl.textContent = wordsCorrect;
+  rAccEl.textContent  = Math.min(acc, 100) + '%';
+  rBugsEl.textContent = errorCount;
 
-  const badge = document.getElementById('dt-pass-badge');
-  badge.textContent = passed
-    ? '✓  challenge passed'
-    : `✗  need ${config.passAcc}% accuracy to pass`;
-  badge.className = passed ? 'pass' : 'fail';
+  passBadge.textContent = passed ? '✓  challenge passed' : `✗  need ${config.passAcc}% accuracy to pass`;
+  passBadge.className   = passed ? 'pass' : 'fail';
 
   const verdictPool = VERDICTS[currentDifficulty] || VERDICTS.medium;
   const verdict = verdictPool.find(([lo, hi]) => wpm >= lo && wpm < hi);
-  document.getElementById('dt-verdict').textContent = verdict ? verdict[2] : '// undefined behavior';
-
-  const retryBtn   = document.getElementById('dt-restart-btn');
-  const proceedBtn = document.getElementById('dt-proceed-btn');
+  verdictEl.textContent = verdict ? verdict[2] : '// undefined behavior';
 
   if (passed) {
     retryBtn.classList.add('dt-hidden');
@@ -775,8 +782,8 @@ function resetGame() {
   liveWpmEl.textContent = '—';
   liveAccEl.textContent = '—';
 
-  document.getElementById('dt-restart-btn').classList.add('dt-hidden');
-  document.getElementById('dt-proceed-btn').classList.add('dt-hidden');
+  retryBtn.classList.add('dt-hidden');
+  proceedBtn.classList.add('dt-hidden');
 
   wordsEl.style.transform = '';
   focusHintEl.classList.remove('dt-hidden');
@@ -991,6 +998,7 @@ function hideNotification(instant) {
 // ==========================================
 
 wordsWrapEl.addEventListener('click', () => { inputEl.focus(); focusHintEl.classList.add('dt-hidden'); });
+if ('ontouchstart' in window) focusHintEl.textContent = 'tap to start typing';
 inputEl.addEventListener('focus', () => focusHintEl.classList.add('dt-hidden'));
 inputEl.addEventListener('blur',  () => { if (!gameStarted) focusHintEl.classList.remove('dt-hidden'); });
 

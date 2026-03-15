@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevType — a dev-themed typing challenge. Part of the DevQuest portfolio gatekeeping experience.">
+  <meta name="theme-color" content="#000000">
   <title>DevType — DevQuest</title>
   <link rel="stylesheet" href="css/devtype.css">
   <link rel="stylesheet" href="css/shared.css">
-  <script src="js/theme.js"></script>
-  <script src="js/sounds.js"></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/sounds.js" defer></script>
 </head>
 <body>
+
+  <div class="dq-desktop-note">⌘ Best experienced on a computer — some features are desktop only</div>
 
   <nav class="dq-nav">
     <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
@@ -77,17 +81,17 @@
       <div id="dt-words-wrap">
         <div id="dt-words"></div>
 
-        <!-- Accuracy bar -->
-        <div id="dt-acc-bar-wrap">
-          <div id="dt-acc-bar"></div>
-          <div id="dt-acc-threshold"></div>
-        </div>
-
         <!-- Quirk: Legacy comment -->
         <div id="dt-legacy" class="dt-hidden">// written in 2009, don't touch</div>
 
         <!-- Focus hint -->
         <div id="dt-focus-hint">click to start typing</div>
+      </div>
+
+      <!-- Accuracy bar — outside words wrap to avoid text overlap -->
+      <div id="dt-acc-bar-wrap">
+        <div id="dt-acc-bar"></div>
+        <div id="dt-acc-threshold"></div>
       </div>
 
       <!-- Quirk: Autocomplete popup -->
@@ -188,6 +192,6 @@
     <div id="notif-msg"></div>
   </div>
 
-  <script src="js/devtype.js"></script>
+  <script src="js/devtype.js" defer></script>
 </body>
 </html>

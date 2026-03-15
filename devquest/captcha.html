@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevQuest Captcha — sort the shapes into the correct holes. Challenge 01 of the DevQuest experience.">
+  <meta name="theme-color" content="#000000">
   <title>Captcha — DevQuest</title>
   <link rel="stylesheet" href="css/captcha.css">
   <link rel="stylesheet" href="css/shared.css">
@@ -10,6 +12,8 @@
   <script src="js/sounds.js"></script>
 </head>
 <body>
+
+  <div class="dq-desktop-note">⌘ Best experienced on a computer — some features are desktop only</div>
 
   <nav class="dq-nav">
     <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
@@ -143,7 +147,7 @@
     </div>
   </footer>
 
-  <script src="js/captcha.js"></script>
+  <script src="js/captcha.js" defer></script>
 
   <!-- Background music — <audio> is Safari-safe, no AudioContext needed -->
   <audio id="dq-music" src="assets/keyboardcat.mp3" loop preload="auto"></audio>

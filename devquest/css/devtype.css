@@ -145,7 +145,7 @@ body {
 
 #dt-words-wrap {
   position: relative;
-  padding: 28px 40px 24px;
+  padding: 48px 40px 24px;
   height: 260px;
   overflow: hidden;
   cursor: text;
@@ -529,13 +529,11 @@ body {
    ========================================== */
 
 #dt-acc-bar-wrap {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.04);
-  overflow: visible;
+  position: relative;
+  flex-shrink: 0;
 }
 
 #dt-acc-bar {
@@ -726,3 +724,68 @@ body {
   .dt-res-val { font-size: 2rem; }
   #dt-imessage { bottom: 20px; }
 }
+
+/* ── Tablet ── */
+@media (max-width: 768px) {
+  #devtype-container { width: 98vw; border-radius: 12px; }
+
+  #dt-header { padding: 12px 16px; gap: 10px; }
+  #dt-logo   { font-size: 1rem; }
+
+  #dt-diff-slider { width: 100%; max-width: 280px; }
+  .dt-diff-btn    { padding: 5px 10px; font-size: 0.72rem; }
+
+  #dt-subtitle    { font-size: 0.65rem; padding: 4px 12px 0; text-align: center; }
+
+  #dt-live-stats  { gap: 16px; padding: 12px 16px 8px; }
+  .dt-stat-val    { font-size: 1.6rem; }
+  .dt-stat-label  { font-size: 0.55rem; }
+
+  #dt-words-wrap  { padding: 20px 16px 16px; height: 220px; }
+  #dt-words       { font-size: 1.1rem; line-height: 2.1; }
+
+  #dt-results-grid { gap: 16px; }
+  .dt-res-val      { font-size: 1.8rem; }
+  .dt-res-label    { font-size: 0.55rem; }
+  #dt-verdict      { font-size: 0.8rem; }
+
+  #dt-graph-wrap  { padding: 0; }
+  #dt-graph-svg   { height: 60px; }
+
+  #dt-imessage    { bottom: 16px; left: 12px; }
+  #dt-notification { width: 260px; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  #devtype-container { border-radius: 10px; }
+
+  #dt-header { flex-direction: column; gap: 10px; padding: 12px; }
+  #dt-diff-slider { max-width: 100%; }
+
+  #dt-live-stats { gap: 8px; padding: 10px 12px 6px; }
+  .dt-stat-val   { font-size: 1.4rem; }
+
+  #dt-words-wrap  { padding: 16px 12px; height: 200px; }
+  #dt-words       { font-size: 1rem; line-height: 2; margin-right: 10px; }
+
+  #dt-focus-hint  { font-size: 0.75rem; }
+
+  #dt-results-grid { gap: 12px; }
+  .dt-res-val      { font-size: 1.5rem; }
+
+  #dt-autocomplete { font-size: 0.7rem; max-width: 90vw; }
+
+  #dt-footer { padding: 8px 12px; }
+
+  /* Stack result actions vertically on small screens */
+  #dt-result-actions { flex-direction: column; gap: 10px; }
+  #dt-proceed-btn,
+  #dt-restart-btn    { width: 100%; text-align: center; }
+
+  /* Notifications full width on mobile */
+  #dt-notification { width: calc(100vw - 32px); left: 16px; right: 16px; top: 16px; }
+  #dt-imessage     { bottom: 12px; left: 50%; transform: translateX(-50%) translateX(-200px); }
+  #dt-imessage.im-visible { left: 50%; transform: translateX(-50%); }
+}
+

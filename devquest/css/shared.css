@@ -83,6 +83,31 @@ body::after { display: none; }
   }
 }
 
+/* ── Desktop recommendation banner (mobile only) ── */
+.dq-desktop-note {
+  display: none;
+  width: 100%;
+  background: rgba(255, 159, 10, 0.12);
+  border-bottom: 0.5px solid rgba(255, 159, 10, 0.25);
+  padding: 8px 16px;
+  text-align: center;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.68rem;
+  color: rgba(255, 159, 10, 0.9);
+  letter-spacing: 0.2px;
+  z-index: 101;
+}
+
+[data-theme="light"] .dq-desktop-note {
+  background: rgba(255, 149, 0, 0.08);
+  color: #b25000;
+  border-color: rgba(255, 149, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .dq-desktop-note { display: block; }
+}
+
 /* ==========================================
    NAV
    ========================================== */

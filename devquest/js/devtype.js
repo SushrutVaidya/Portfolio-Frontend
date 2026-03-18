@@ -679,8 +679,8 @@ function startGame() {
   const config       = DIFF_CONFIG[currentDifficulty];
   acWordCooldown     = rand(5, 9);
   reviewWordCooldown = rand(8, 14);
-  imessageCountdown  = rand(8, 14);
-  notifCountdown     = rand(12, 18);
+  imessageCountdown  = rand(5, 9);
+  notifCountdown     = rand(5, 9);
   focusHintEl.classList.add('dt-hidden');
   resetAccBar();
   startWpmSampling();
@@ -959,7 +959,7 @@ function triggerIMessage() {
 
   clearTimeout(imTimer);
   imTimer = setTimeout(() => hideIMessage(false), 2800);
-  imessageCountdown = rand(10, 16);
+  imessageCountdown = rand(5, 9);
 }
 
 function hideIMessage(instant) {
@@ -984,7 +984,7 @@ function triggerNotification() {
 
   clearTimeout(notifTimer);
   notifTimer = setTimeout(() => hideNotification(false), 3200);
-  notifCountdown = rand(12, 20);
+  notifCountdown = rand(5, 9);
 }
 
 function hideNotification(instant) {

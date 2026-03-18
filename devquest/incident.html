@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Production Incident — find the bug before the system crashes. Challenge 03 of DevQuest.">
+  <meta name="theme-color" content="#000000">
+  <title>Production Incident — DevQuest</title>
+  <link rel="stylesheet" href="css/incident.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <script src="js/theme.js"></script>
+  <script src="js/sounds.js"></script>
+</head>
+<body>
+
+  <div class="dq-desktop-note">⌘ Best experienced on a computer — some features are desktop only</div>
+
+  <nav class="dq-nav">
+    <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+    <div class="dq-steps">
+      <div class="dq-step done">
+        <span class="dq-step-num">01</span>
+        <span class="dq-step-name">Captcha</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step done">
+        <span class="dq-step-num">02</span>
+        <span class="dq-step-name">DevType</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step active">
+        <span class="dq-step-num">03</span>
+        <span class="dq-step-name">Incident</span>
+      </div>
+    </div>
+    <div class="dq-nav-right-group">
+      <span class="dq-nav-right">challenge 3 of 3</span>
+      <button class="dq-sound-toggle" id="dq-sound-toggle">
+        <span class="dq-sound-icon">♫</span>
+      </button>
+      <button class="dq-theme-toggle" id="dq-theme-toggle">
+        <span class="dq-toggle-icon">☀</span>
+        <span class="dq-toggle-label">Light</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="dq-main">
+    <div class="dq-game-wrap">
+      <div class="dq-game-eyebrow">Challenge 03 — Production Incident</div>
+
+      <div id="incident-container">
+
+        <!-- Language selector -->
+        <div id="lang-screen">
+          <div id="lang-header">
+            <div id="lang-title">🚨 Production is down.</div>
+            <div id="lang-sub">Find the bug. Fast.</div>
+          </div>
+          <div id="lang-grid">
+            <button class="lang-btn" data-lang="javascript">
+              <span class="lang-icon">JS</span>
+              <span class="lang-name">JavaScript</span>
+            </button>
+            <button class="lang-btn" data-lang="java">
+              <span class="lang-icon">☕</span>
+              <span class="lang-name">Java</span>
+            </button>
+            <button class="lang-btn" data-lang="python">
+              <span class="lang-icon">🐍</span>
+              <span class="lang-name">Python</span>
+            </button>
+            <button class="lang-btn" data-lang="cpp">
+              <span class="lang-icon">C++</span>
+              <span class="lang-name">C++</span>
+            </button>
+          </div>
+          <div id="lang-rules">
+            <span>5 rounds</span>
+            <span>·</span>
+            <span>45s each</span>
+            <span>·</span>
+            <span>3 lives</span>
+            <span>·</span>
+            <span>click the buggy line</span>
+          </div>
+        </div>
+
+        <!-- Game area -->
+        <div id="game-screen" class="inc-hidden">
+
+          <!-- Top bar -->
+          <div id="inc-topbar">
+            <div id="inc-lives">
+              <span class="inc-life" id="inc-life-1">❤️</span>
+              <span class="inc-life" id="inc-life-2">❤️</span>
+              <span class="inc-life" id="inc-life-3">❤️</span>
+            </div>
+            <div id="inc-round-info">
+              <span id="inc-round-label">Round 1 of 5</span>
+              <span id="inc-title"></span>
+            </div>
+            <div id="inc-timer-wrap">
+              <svg id="inc-timer-ring" viewBox="0 0 36 36">
+                <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
+                <circle class="ring-fill" id="ring-fill" cx="18" cy="18" r="15.9"/>
+              </svg>
+              <span id="inc-timer">45</span>
+            </div>
+          </div>
+
+          <!-- Incident description -->
+          <div id="inc-description">
+            <span class="inc-badge">🔴 P0 INCIDENT</span>
+            <span id="inc-desc-text"></span>
+          </div>
+
+          <!-- Code editor -->
+          <div id="inc-editor">
+            <div id="inc-editor-titlebar">
+              <span class="editor-dot" style="background:#ff5f57"></span>
+              <span class="editor-dot" style="background:#febc2e"></span>
+              <span class="editor-dot" style="background:#28c840"></span>
+              <span id="inc-filename"></span>
+            </div>
+            <div id="inc-code"></div>
+          </div>
+
+          <!-- Status message -->
+          <div id="inc-status"></div>
+
+          <!-- Ghost cursor quirk -->
+          <div id="ghost-cursor" class="inc-hidden">
+            <div class="ghost-cursor-line"></div>
+          </div>
+
+          <!-- Senior dev comment quirk -->
+          <div id="senior-comment" class="inc-hidden"></div>
+
+          <!-- Stack Overflow popup quirk -->
+          <div id="so-popup" class="inc-hidden">
+            <div id="so-inner">
+              <div id="so-header">
+                <span id="so-logo">stack<b>overflow</b></span>
+                <button id="so-close">✕</button>
+              </div>
+              <div id="so-question"></div>
+              <div id="so-answer">
+                <span class="so-accepted">✓ Accepted Answer</span>
+                <span class="so-votes">2,847 votes</span>
+                <div id="so-answer-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results screen -->
+        <div id="results-screen" class="inc-hidden">
+          <div id="inc-results-title">// incident resolved</div>
+          <div id="inc-pass-badge"></div>
+          <div id="inc-results-grid">
+            <div class="inc-res-item">
+              <div class="inc-res-val" id="r-correct">0/5</div>
+              <div class="inc-res-label">bugs found</div>
+            </div>
+            <div class="inc-res-item">
+              <div class="inc-res-val" id="r-time">0s</div>
+              <div class="inc-res-label">avg response</div>
+            </div>
+            <div class="inc-res-item">
+              <div class="inc-res-val" id="r-lives">0</div>
+              <div class="inc-res-label">lives left</div>
+            </div>
+          </div>
+          <div id="inc-verdict"></div>
+          <div id="inc-result-actions">
+            <button id="inc-retry-btn" class="inc-hidden">retry</button>
+            <a id="inc-proceed-btn" href="../index.html" class="inc-hidden">enter portfolio →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Quirk: iMessage -->
+  <div id="inc-imessage" class="inc-hidden">
+    <div id="inc-im-sender"></div>
+    <div id="inc-im-bubble"><span id="inc-im-text"></span></div>
+  </div>
+
+  <!-- Quirk: Notification -->
+  <div id="inc-notification" class="inc-hidden">
+    <div id="inc-notif-top">
+      <span id="inc-notif-icon"></span>
+      <span id="inc-notif-app"></span>
+      <span id="inc-notif-time">now</span>
+    </div>
+    <div id="inc-notif-msg"></div>
+  </div>
+
+  <script src="js/incident.js" defer></script>
+</body>
+</html>

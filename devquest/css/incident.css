@@ -621,9 +621,40 @@ body {
 #inc-notif-time { font-size: 0.6rem; color: #48484a; }
 #inc-notif-msg  { font-size: 0.78rem; color: #e5e5ea; line-height: 1.4; }
 
-/* ==========================================
-   LIGHT MODE
-   ========================================== */
+/* fix 5: reveal correct line after wrong/timeout */
+.code-line.reveal {
+  background: rgba(48, 209, 88, 0.12) !important;
+  border-left: 3px solid rgba(48, 209, 88, 0.6);
+  transition: background 0.2s ease;
+}
+
+/* fix 4: editor flash on timeout */
+@keyframes editorFlash {
+  0%, 100% { background: #1e1e1e; }
+  25%, 75%  { background: rgba(255, 69, 58, 0.14); }
+}
+#inc-editor.time-up { animation: editorFlash 0.45s ease; }
+
+/* fix 3: round breakdown */
+#inc-round-breakdown {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.rd {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.rd-pass { background: rgba(48,209,88,0.12); color: #30d158; border: 1px solid rgba(48,209,88,0.3); }
+.rd-fail { background: rgba(255,69,58,0.12); color: #ff453a; border: 1px solid rgba(255,69,58,0.3); }
 
 [data-theme="light"] #incident-container {
   background: rgba(255,255,255,0.88);

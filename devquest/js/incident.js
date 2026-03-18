@@ -162,7 +162,7 @@ const SNIPPETS = {
       title: 'Null Handler',
       file: 'UserService.java',
       desc: 'getUsername() throws NullPointerException — 500 errors on 30% of requests',
-      bugLine: 3,
+      bugLine: 2,
       decoyLine: 1,
       soQ: 'NullPointerException when calling method on returned object',
       soA: 'The null check on line 1 is redundant — the issue is actually the return type.',
@@ -176,19 +176,23 @@ const SNIPPETS = {
       ]
     },
     {
-      title: 'Factorial',
-      file: 'MathService.java',
-      desc: 'factorial() never terminates — server threads are deadlocked',
+      title: 'Palindrome Check',
+      file: 'StringUtils.java',
+      desc: 'isPalindrome() throws StringIndexOutOfBoundsException — search service down',
       bugLine: 2,
       decoyLine: 4,
-      soQ: 'Java recursive factorial causing stack overflow',
-      soA: 'Line 4 is calling the wrong method — it should call itself not the parent class.',
-      seniorHint: '// line 4, wrong method call in recursion',
+      soQ: 'Java StringIndexOutOfBoundsException in palindrome checker',
+      soA: 'The charAt call on line 4 is using the wrong index — should use left not i.',
+      seniorHint: '// line 4, charAt index looks off',
       code: [
-        'public int factorial(int n) {',
-        '  if (n == 0) return 1;',
-        '  if (n == 1) return 1;',
-        '  return n * factorial(n - 1);',
+        'public boolean isPalindrome(String s) {',
+        '  int left = 0;',
+        '  int right = s.length();',
+        '  while (left < right) {',
+        '    if (s.charAt(left) != s.charAt(right)) return false;',
+        '    left++; right--;',
+        '  }',
+        '  return true;',
         '}'
       ]
     }
@@ -476,9 +480,9 @@ let lives          = 3;
 let correctCount   = 0;
 let timerInterval  = null;
 let timeLeft       = 45;
-let gameStartTime  = null;
-let roundTimes     = [];
+let roundResults   = [];  // fix 3: track per-round pass/fail
 let gameOver       = false;
+let currentLineEls = []; // fix 2: cache line elements
 
 // Quirk state
 let quirksActive   = false;
@@ -514,6 +518,19 @@ const imEl          = document.getElementById('inc-imessage');
 const notifEl       = document.getElementById('inc-notification');
 
 // ==========================================
+// PRE-PROCESS SNIPPETS (fix 1)
+// Run highlight() once at load, cache in round.highlighted
+// ==========================================
+
+function preprocessSnippets() {
+  Object.entries(SNIPPETS).forEach(([lang, langRounds]) => {
+    langRounds.forEach(round => {
+      round.highlighted = round.code.map(line => highlight(line, lang));
+    });
+  });
+}
+
+// ==========================================
 // RENDER ROUND
 // ==========================================
 
@@ -527,6 +544,7 @@ function renderRound() {
   incStatus.className       = '';
 
   incCode.innerHTML = '';
+  currentLineEls    = []; // fix 2: reset cache
 
   round.code.forEach((line, i) => {
     const div     = document.createElement('div');
@@ -540,12 +558,14 @@ function renderRound() {
 
     const codeSpan = document.createElement('span');
     codeSpan.className = 'line-content';
-    codeSpan.innerHTML = highlight(line, currentLang);
+    // fix 1: use pre-highlighted HTML
+    codeSpan.innerHTML = round.highlighted ? round.highlighted[i] : highlight(line, currentLang);
 
     div.appendChild(numSpan);
     div.appendChild(codeSpan);
     div.addEventListener('click', () => handleLineClick(i));
     incCode.appendChild(div);
+    currentLineEls.push(div); // fix 2: cache
   });
 }
 
@@ -553,36 +573,48 @@ function renderRound() {
 // LINE CLICK
 // ==========================================
 
+function revealCorrectLine(callback) {
+  const round  = rounds[roundIdx];
+  const lineEl = currentLineEls[round.bugLine];
+  if (lineEl) lineEl.classList.add('reveal');
+  setTimeout(() => {
+    if (lineEl) lineEl.classList.remove('reveal');
+    callback();
+  }, 1400);
+}
+
 function handleLineClick(lineIdx) {
   if (gameOver) return;
   const round   = rounds[roundIdx];
   const correct = lineIdx === round.bugLine;
-  const lineEl  = incCode.querySelectorAll('.code-line')[lineIdx];
+  const lineEl  = currentLineEls[lineIdx];
 
   clearQuirks();
 
   if (correct) {
     lineEl.classList.add('correct');
-    incStatus.textContent = '✓ Bug found — ' + round.soQ.slice(0, 40) + '...';
+    incStatus.textContent = '✓ Bug found — ' + round.title;
     incStatus.className   = 'correct';
     correctCount++;
-    roundTimes.push(45 - timeLeft);
+    roundResults.push(true);
     clearInterval(timerInterval);
     setTimeout(nextRound, 1200);
   } else {
     lineEl.classList.add('wrong');
-    incStatus.textContent = '✗ Wrong line — keep looking';
+    incStatus.textContent = '✗ Wrong line — check again';
     incStatus.className   = 'wrong';
     lives--;
     updateLives();
     setTimeout(() => {
       lineEl.classList.remove('wrong');
-      incStatus.textContent = 'click the line containing the bug';
-      incStatus.className   = '';
       if (lives <= 0) {
-        roundTimes.push(45);
         clearInterval(timerInterval);
-        setTimeout(nextRound, 600);
+        roundResults.push(false);
+        incStatus.textContent = '✗ Out of lives — showing the bug...';
+        revealCorrectLine(nextRound);
+      } else {
+        incStatus.textContent = 'click the line containing the bug';
+        incStatus.className   = '';
       }
     }, 600);
   }
@@ -606,13 +638,16 @@ function startRound() {
     updateTimer();
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      roundTimes.push(45);
       clearQuirks();
-      incStatus.textContent = '⏱ Time\'s up — moving on';
+      roundResults.push(false);
+      incStatus.textContent = '⏱ Time\'s up — showing the bug...';
       incStatus.className   = 'wrong';
       lives--;
       updateLives();
-      setTimeout(nextRound, 1000);
+      // fix 4: flash editor red + fix 5: reveal correct line
+      document.getElementById('inc-editor').classList.add('time-up');
+      setTimeout(() => document.getElementById('inc-editor').classList.remove('time-up'), 400);
+      revealCorrectLine(nextRound);
     }
   }, 1000);
 
@@ -660,14 +695,22 @@ function endGame() {
   gameScreen.classList.add('inc-hidden');
   resultsScreen.classList.remove('inc-hidden');
 
-  const avgTime = roundTimes.length
-    ? Math.round(roundTimes.reduce((a,b) => a+b, 0) / roundTimes.length)
-    : 45;
-  const passed  = correctCount >= 3;
+  const passed = correctCount >= 3;
 
   document.getElementById('r-correct').textContent = `${correctCount}/5`;
-  document.getElementById('r-time').textContent    = avgTime + 's';
+  document.getElementById('r-time').textContent    = lives;
   document.getElementById('r-lives').textContent   = lives;
+
+  // fix 3: round-by-round breakdown
+  let breakdown = document.getElementById('inc-round-breakdown');
+  if (!breakdown) {
+    breakdown = document.createElement('div');
+    breakdown.id = 'inc-round-breakdown';
+    document.getElementById('inc-results-grid').after(breakdown);
+  }
+  breakdown.innerHTML = roundResults.map((r, i) =>
+    `<span class="rd ${r ? 'rd-pass' : 'rd-fail'}" title="Round ${i+1}">${r ? '✓' : '✗'}</span>`
+  ).join('');
 
   const badge = document.getElementById('inc-pass-badge');
   badge.textContent = passed ? '✓  incident resolved' : '✗  need 3/5 bugs found to pass';
@@ -694,11 +737,12 @@ function endGame() {
 }
 
 function resetGame() {
-  roundIdx     = 0;
-  lives        = 3;
-  correctCount = 0;
-  roundTimes   = [];
-  gameOver     = false;
+  roundIdx      = 0;
+  lives         = 3;
+  correctCount  = 0;
+  roundResults  = [];
+  currentLineEls = [];
+  gameOver      = false;
 
   updateLives();
   resultsScreen.classList.add('inc-hidden');
@@ -747,6 +791,7 @@ function scheduleQuirks() {
 }
 
 function clearQuirks() {
+  quirksActive = false; // fix 7: set false FIRST so any firing timeout exits early
   clearTimeout(notifTimer);
   clearTimeout(imsgTimer);
   clearTimeout(seniorTimer);
@@ -754,7 +799,6 @@ function clearQuirks() {
   clearTimeout(ghostTimer);
   clearTimeout(squiggleTimer);
   clearTimeout(scrambleTimer);
-  quirksActive = false;
 
   hideImsg(true);
   hideNotif(true);
@@ -808,21 +852,18 @@ function hideImsg(instant) {
 function triggerSenior() {
   if (!quirksActive) return;
   const round  = rounds[roundIdx];
-  const lines  = incCode.querySelectorAll('.code-line');
-  const target = lines[round.decoyLine];
+  const target = currentLineEls[round.decoyLine]; // fix 2
   if (!target) return;
 
-  const rect = target.getBoundingClientRect();
+  const rect  = target.getBoundingClientRect();
   const cRect = document.getElementById('inc-editor').getBoundingClientRect();
 
   seniorComment.textContent = round.seniorHint;
   seniorComment.style.top   = (rect.top - cRect.top + 4) + 'px';
   seniorComment.classList.remove('inc-hidden');
-
   setTimeout(() => seniorComment.classList.add('inc-hidden'), 4000);
 }
 
-// Stack Overflow popup
 function triggerSO() {
   if (!quirksActive) return;
   const round = rounds[roundIdx];
@@ -835,12 +876,10 @@ document.getElementById('so-close').addEventListener('click', () => {
   soPopup.classList.add('inc-hidden');
 });
 
-// Ghost cursor
 function triggerGhost() {
   if (!quirksActive) return;
   const round  = rounds[roundIdx];
-  const lines  = incCode.querySelectorAll('.code-line');
-  const target = lines[round.decoyLine];
+  const target = currentLineEls[round.decoyLine]; // fix 2
   if (!target) return;
 
   const rect  = target.getBoundingClientRect();
@@ -850,19 +889,18 @@ function triggerGhost() {
   setTimeout(() => ghostCursor.classList.add('inc-hidden'), 3500);
 }
 
-// Squiggly underlines on wrong lines
 function triggerSquiggles() {
   if (!quirksActive) return;
   const round = rounds[roundIdx];
-  const lines = incCode.querySelectorAll('.code-line');
-  lines.forEach((line, i) => {
+  currentLineEls.forEach((line, i) => { // fix 2
     if (i !== round.bugLine && Math.random() < 0.4) {
       line.querySelector('.line-content').classList.add('squiggly');
     }
   });
   setTimeout(() => {
-    document.querySelectorAll('.line-content.squiggly')
-      .forEach(el => el.classList.remove('squiggly'));
+    currentLineEls.forEach(line => {
+      line.querySelector('.line-content')?.classList.remove('squiggly');
+    });
   }, 3000);
 }
 
@@ -877,6 +915,9 @@ function triggerScramble() {
 // ==========================================
 // LANGUAGE SELECTION
 // ==========================================
+
+// fix 1: pre-highlight all snippets once at load
+preprocessSnippets();
 
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => {

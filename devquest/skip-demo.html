@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skip Effects Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Courier New', monospace;
+      gap: 48px;
+      padding: 48px 24px;
+    }
+
+    h1 {
+      color: #4a90d9;
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .section-label {
+      color: #333;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      align-self: center;
+    }
+
+    .divider {
+      width: 320px;
+      height: 1px;
+      background: #2a2a40;
+    }
+
+    .row {
+      display: flex;
+      gap: 44px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .label {
+      color: #555;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── Base button ── */
+    .skip-btn {
+      position: relative;
+      min-width: 200px;
+      min-height: 56px;
+      background: #aaa;
+      border: 2px solid #999;
+      border-radius: 6px;
+      padding: 16px 28px;
+      font-size: 1rem;
+      font-family: 'Courier New', monospace;
+      color: #555;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 3px 3px 0px #888;
+      overflow: hidden;
+      text-align: left;
+      transition: background 0.12s ease, border-color 0.12s ease,
+                  color 0.12s ease, min-height 0.18s ease;
+    }
+
+    .skip-label {
+      display: block;
+      transition: opacity 0.12s ease;
+      pointer-events: none;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════
+       1. macOS BEACHBALL
+    ══════════════════════════════ */
+    .btn-beach .beachball {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #ff3b30   0deg  60deg,
+        #ff9500  60deg 120deg,
+        #ffcc00 120deg 180deg,
+        #34c759 180deg 240deg,
+        #007aff 240deg 300deg,
+        #af52de 300deg 360deg
+      );
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    .btn-beach:hover { background: #999; }
+    .btn-beach:hover .skip-label { opacity: 0; }
+    .btn-beach:hover .beachball {
+      transform: translate(-50%, -50%) scale(1);
+      animation: beachSpin 0.7s linear infinite;
+    }
+
+    @keyframes beachSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg);   }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ══════════════════════════════
+       2. GLITCH TEXT
+    ══════════════════════════════ */
+    .btn-glitch:hover {
+      background: #111;
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+
+    /* ══════════════════════════════
+       3. PROGRESS BAR
+    ══════════════════════════════ */
+    .btn-progress .progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      background: white;
+      border-radius: 0 2px 0 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+
+    .btn-progress .progress-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.9rem;
+      color: white;
+      letter-spacing: 1px;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-progress:hover { background: #222; border-color: #555; }
+    .btn-progress:hover .skip-label   { opacity: 0; }
+    .btn-progress:hover .progress-bar {
+      opacity: 1;
+      animation: fillBar 1.8s ease-in-out infinite;
+    }
+    .btn-progress:hover .progress-label { opacity: 1; }
+
+    @keyframes fillBar {
+      0%   { width: 0%;  }
+      84%  { width: 99%; }
+      85%  { width: 0%;  }
+      100% { width: 0%;  }
+    }
+
+    /* ══════════════════════════════
+       4. ARE YOU SURE CASCADE
+    ══════════════════════════════ */
+    .btn-sure:hover {
+      background: #cc4444;
+      border-color: #aa2222;
+      color: white;
+    }
+
+    .ghost-btn {
+      position: fixed;
+      background: rgba(180, 40, 40, 0.9);
+      border: 1.5px solid #aa2222;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 0.6rem;
+      font-family: 'Courier New', monospace;
+      color: white;
+      letter-spacing: 1px;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 2px 2px 0 #7a1111;
+      animation: ghostFloat 0.9s ease forwards;
+      z-index: 9999;
+    }
+
+    @keyframes ghostFloat {
+      0%   { opacity: 0; transform: scale(0.6) translateY(0);    }
+      25%  { opacity: 1; transform: scale(1)   translateY(0);    }
+      100% { opacity: 0; transform: scale(0.9) translateY(-28px);}
+    }
+
+    /* ══════════════════════════════
+       5. MELT
+    ══════════════════════════════ */
+    .btn-melt:hover {
+      background: #cc4444;
+      border-color: #aa2222;
+      color: white;
+      filter: url(#melter);
+    }
+
+    /* ══════════════════════════════
+       6. TERMINAL
+    ══════════════════════════════ */
+    .btn-terminal:hover {
+      background: #0d1117;
+      border-color: #30363d;
+      color: #0d1117;
+      min-height: 152px;
+    }
+    .btn-terminal:hover .skip-label { opacity: 0; }
+
+    .terminal-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 28px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    .btn-terminal:hover .terminal-bar { opacity: 1; }
+
+    .t-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .t-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.6rem;
+      color: #444;
+      letter-spacing: 2px;
+      padding-right: 29px; /* balance dot widths */
+    }
+
+    .terminal-lines {
+      position: absolute;
+      top: 38px;
+      left: 14px;
+      right: 14px;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    .btn-terminal:hover .terminal-lines { opacity: 1; }
+
+    .t-path   { color: #3fb950; text-shadow: 0 0 8px rgba(63, 185, 80, 0.45); }
+    .t-prompt { color: #58a6ff; }
+    .t-cmd    { color: #e6edf3; }
+    .t-cursor {
+      display: inline-block;
+      width: 9px; height: 16px;
+      background: #58a6ff;
+      vertical-align: middle;
+      animation: blink 0.8s step-end infinite;
+      box-shadow: 0 0 6px rgba(88, 166, 255, 0.6);
+    }
+    .t-error  { color: #f85149; text-shadow: 0 0 8px rgba(248, 81, 73, 0.4); transition: opacity 0.3s ease; }
+    .t-hint   { color: #3fb950; text-shadow: 0 0 8px rgba(63, 185, 80, 0.4); transition: opacity 0.35s ease 0.1s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ══════════════════════════════
+       7. NPM INSTALL
+    ══════════════════════════════ */
+    .btn-npm:hover {
+      background: #0f0f0f;
+      border-color: #cb3837;
+      color: #0f0f0f;
+      min-height: 116px;
+    }
+    .btn-npm:hover .skip-label { opacity: 0; }
+
+    .npm-output {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    .btn-npm:hover .npm-output { opacity: 1; }
+
+    .npm-spinner { color: #cb3837; }
+    .npm-pkg     { color: #aaa; }
+    .npm-warn    { color: #e4b830; }
+    .npm-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .npm-bar {
+      flex: 1;
+      height: 6px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .npm-bar-fill {
+      height: 100%;
+      background: #cb3837;
+      border-radius: 2px;
+      animation: npmStall 2s ease-in-out infinite;
+    }
+    .npm-pct { color: #555; font-size: 0.75rem; min-width: 36px; }
+
+    @keyframes npmStall {
+      0%  { width: 0%;  }
+      70% { width: 97%; }
+      100%{ width: 97%; }
+    }
+
+    /* ══════════════════════════════
+       8. MATRIX RAIN
+    ══════════════════════════════ */
+    .btn-matrix:hover {
+      background: #000;
+      border-color: #00ff41;
+      color: #000;
+    }
+    .btn-matrix:hover .skip-label { opacity: 0; }
+
+    .matrix-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .btn-matrix:hover .matrix-canvas { opacity: 1; }
+
+    /* ══════════════════════════════
+       9. MERGE CONFLICT
+    ══════════════════════════════ */
+    .btn-merge:hover {
+      background: #1c1c1c;
+      border-color: #e3b341;
+      color: #1c1c1c;
+      min-height: 120px;
+    }
+    .btn-merge:hover .skip-label { opacity: 0; }
+
+    .merge-lines {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    .btn-merge:hover .merge-lines { opacity: 1; }
+
+    .m-head   { color: #f85149; }
+    .m-ours   { color: #e6edf3; font-weight: bold; }
+    .m-sep    { color: #e3b341; }
+    .m-theirs { color: #3fb950; }
+    .m-end    { color: #58a6ff; }
+
+    /* ══════════════════════════════
+       10. STACK OVERFLOW
+    ══════════════════════════════ */
+    .btn-stack:hover {
+      background: #1a0000;
+      border-color: #f85149;
+      color: #1a0000;
+      min-height: 126px;
+    }
+    .btn-stack:hover .skip-label { opacity: 0; }
+
+    .stack-lines {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    .btn-stack:hover .stack-lines { opacity: 1; }
+
+    .s-err  { color: #f85149; font-weight: bold; }
+    .s-at   { color: #8b949e; }
+    .s-fn   { color: #d2a8ff; }
+    .s-loc  { color: #555; }
+    .s-more { color: #e3b341; font-size: 0.7rem; animation: moreFlash 1s step-end infinite; }
+
+    @keyframes moreFlash {
+      0%, 100% { opacity: 1;   }
+      50%       { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SVG filter for melt -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <filter id="melter" x="-20%" y="-20%" width="140%" height="160%">
+      <feTurbulence type="turbulence" baseFrequency="0.03 0.06"
+                    numOctaves="3" result="noise" seed="5">
+        <animate attributeName="baseFrequency"
+                 values="0.02 0.04; 0.05 0.09; 0.02 0.04"
+                 dur="0.5s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise"
+                         scale="8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<h1>Skip Button — All Effects</h1>
+
+<!-- Row 1 -->
+<div class="section-label">Classic</div>
+<div class="row">
+
+  <div class="item">
+    <div class="label">1 · Beachball</div>
+    <button class="skip-btn btn-beach">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="beachball"></div>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">2 · Glitch</div>
+    <button class="skip-btn btn-glitch" id="glitch-btn">
+      <span class="skip-label" id="glitch-label">Skip Puzzle</span>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">3 · Progress Bar</div>
+    <button class="skip-btn btn-progress">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="progress-bar"></div>
+      <span class="progress-label">Skipping…</span>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">4 · Are You Sure?</div>
+    <button class="skip-btn btn-sure" id="sure-btn">Skip Puzzle</button>
+  </div>
+
+  <div class="item">
+    <div class="label">5 · Melt</div>
+    <button class="skip-btn btn-melt">Skip Puzzle</button>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- Row 2 -->
+<div class="section-label">Dev Edition</div>
+<div class="row">
+
+  <div class="item">
+    <div class="label">6 · Terminal</div>
+    <button class="skip-btn btn-terminal" id="terminal-btn">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="terminal-bar">
+        <span class="t-dot" style="background:#ff5f57"></span>
+        <span class="t-dot" style="background:#febc2e"></span>
+        <span class="t-dot" style="background:#28c840"></span>
+        <span class="t-title">bash</span>
+      </div>
+      <div class="terminal-lines" id="terminal-lines">
+        <span class="t-path">~/devquest</span><span class="t-prompt"> $ </span><span class="t-cmd" id="t-cmd"></span><span class="t-cursor" id="t-cursor"></span>
+        <div class="t-error" id="t-error" style="opacity:0"></div>
+        <div class="t-hint"  id="t-hint"  style="opacity:0"></div>
+      </div>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">7 · npm install</div>
+    <button class="skip-btn btn-npm">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="npm-output">
+        <div><span class="npm-spinner" id="npm-spin">⠸</span> <span class="npm-pkg">installing skip-puzzle@1.0.0</span></div>
+        <div class="npm-warn">⚠  deprecated: don't skip captchas</div>
+        <div class="npm-bar-wrap">
+          <div class="npm-bar"><div class="npm-bar-fill"></div></div>
+          <span class="npm-pct" id="npm-pct">0%</span>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">8 · Matrix Rain</div>
+    <button class="skip-btn btn-matrix" id="matrix-btn">
+      <span class="skip-label">Skip Puzzle</span>
+      <canvas class="matrix-canvas" id="matrix-canvas"></canvas>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">9 · Merge Conflict</div>
+    <button class="skip-btn btn-merge">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="merge-lines">
+        <div class="m-head">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</div>
+        <div class="m-ours">&nbsp;&nbsp;Skip Puzzle</div>
+        <div class="m-sep">=======</div>
+        <div class="m-theirs">&nbsp;&nbsp;Don't you dare</div>
+        <div class="m-end">&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="item">
+    <div class="label">10 · Stack Overflow</div>
+    <button class="skip-btn btn-stack">
+      <span class="skip-label">Skip Puzzle</span>
+      <div class="stack-lines">
+        <div class="s-err">RangeError: Max call stack exceeded</div>
+        <div class="s-at">&nbsp;at <span class="s-fn">skip</span> <span class="s-loc">(captcha.js:1)</span></div>
+        <div class="s-at">&nbsp;at <span class="s-fn">skip</span> <span class="s-loc">(captcha.js:1)</span></div>
+        <div class="s-at">&nbsp;at <span class="s-fn">skip</span> <span class="s-loc">(captcha.js:1)</span></div>
+        <div class="s-more">... 14,823 more frames</div>
+      </div>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ── 2. Glitch ──
+  const glitchBtn   = document.getElementById('glitch-btn');
+  const glitchLabel = document.getElementById('glitch-label');
+  const ORIGINAL    = 'Skip Puzzle';
+  const CHARS       = '!@#$%^&*<>?/|[]{}~X0';
+  let glitchTimer   = null;
+
+  glitchBtn.addEventListener('mouseenter', () => {
+    let iter = 0;
+    glitchTimer = setInterval(() => {
+      glitchLabel.textContent = ORIGINAL
+        .split('')
+        .map((ch, i) => {
+          if (ch === ' ') return ' ';
+          if (i < iter)  return ORIGINAL[i];
+          return CHARS[Math.floor(Math.random() * CHARS.length)];
+        })
+        .join('');
+      iter += 0.5;
+      if (iter > ORIGINAL.length) iter = 0;
+    }, 45);
+  });
+
+  glitchBtn.addEventListener('mouseleave', () => {
+    clearInterval(glitchTimer);
+    glitchLabel.textContent = ORIGINAL;
+  });
+
+  // ── 4. Are You Sure cascade ──
+  const sureBtn = document.getElementById('sure-btn');
+  let sureTimer = null;
+
+  sureBtn.addEventListener('mouseenter', () => {
+    sureTimer = setInterval(() => {
+      const r     = sureBtn.getBoundingClientRect();
+      const ghost = document.createElement('div');
+      ghost.className   = 'ghost-btn';
+      ghost.textContent = 'Are you sure?';
+      ghost.style.left  = (r.left + r.width / 2 - 44 + (Math.random() - 0.5) * 140) + 'px';
+      ghost.style.top   = (r.top  + r.height / 2     + (Math.random() - 0.5) *  60) + 'px';
+      document.body.appendChild(ghost);
+      setTimeout(() => ghost.remove(), 900);
+    }, 260);
+  });
+
+  sureBtn.addEventListener('mouseleave', () => clearInterval(sureTimer));
+
+  // ── 6. Terminal typing ──
+  const terminalBtn = document.getElementById('terminal-btn');
+  const tCmd        = document.getElementById('t-cmd');
+  const tCursor     = document.getElementById('t-cursor');
+  const tError      = document.getElementById('t-error');
+  const tHint       = document.getElementById('t-hint');
+  const CMD         = 'skip --force';
+  let termTimer     = null;
+  let termActive    = false;
+
+  terminalBtn.addEventListener('mouseenter', () => {
+    termActive = true;
+    tCmd.textContent     = '';
+    tError.style.opacity = '0';
+    tHint.style.opacity  = '0';
+    tCursor.style.display = 'inline-block';
+    let i = 0;
+    function typeCmd() {
+      if (!termActive) return;
+      if (i < CMD.length) {
+        tCmd.textContent += CMD[i++];
+        termTimer = setTimeout(typeCmd, 60 + Math.random() * 40);
+      } else {
+        tCursor.style.display = 'none';
+        setTimeout(() => {
+          if (!termActive) return;
+          tError.textContent   = 'bash: skip: command not found';
+          tError.style.opacity = '1';
+          setTimeout(() => {
+            if (!termActive) return;
+            tHint.textContent   = 'Did you mean: solve?';
+            tHint.style.opacity = '1';
+          }, 350);
+        }, 300);
+      }
+    }
+    setTimeout(typeCmd, 120);
+  });
+
+  terminalBtn.addEventListener('mouseleave', () => {
+    termActive = false;
+    clearTimeout(termTimer);
+    tCmd.textContent      = '';
+    tError.style.opacity  = '0';
+    tHint.style.opacity   = '0';
+    tCursor.style.display = 'inline-block';
+  });
+
+  // ── 7. npm spinner + percent ──
+  const npmSpin  = document.getElementById('npm-spin');
+  const npmPct   = document.getElementById('npm-pct');
+  const FRAMES   = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
+  let npmFrame   = 0, npmPctVal = 0;
+  let npmSpinTimer = null, npmPctTimer = null;
+
+  document.querySelector('.btn-npm').addEventListener('mouseenter', () => {
+    npmFrame = 0; npmPctVal = 0;
+    npmSpinTimer = setInterval(() => {
+      npmSpin.textContent = FRAMES[npmFrame++ % FRAMES.length];
+    }, 80);
+    npmPctTimer = setInterval(() => {
+      if (npmPctVal < 97) npmPctVal = Math.min(97, npmPctVal + Math.random() * 4);
+      npmPct.textContent = Math.floor(npmPctVal) + '%';
+    }, 120);
+  });
+
+  document.querySelector('.btn-npm').addEventListener('mouseleave', () => {
+    clearInterval(npmSpinTimer);
+    clearInterval(npmPctTimer);
+    npmPct.textContent  = '0%';
+    npmSpin.textContent = '⠸';
+  });
+
+  // ── 8. Matrix rain ──
+  const matrixBtn    = document.getElementById('matrix-btn');
+  const matrixCanvas = document.getElementById('matrix-canvas');
+  const mCtx         = matrixCanvas.getContext('2d');
+  const MATRIX_CHARS = 'アイウエオカキクケコサシスセソ01';
+  let matrixRAF = null;
+  let drops     = [];
+
+  matrixBtn.addEventListener('mouseenter', () => {
+    matrixCanvas.width  = matrixBtn.offsetWidth;
+    matrixCanvas.height = matrixBtn.offsetHeight;
+    const cols = Math.floor(matrixCanvas.width / 13);
+    drops = Array(cols).fill(1);
+    function draw() {
+      mCtx.fillStyle = 'rgba(0,0,0,0.1)';
+      mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      mCtx.fillStyle = '#00ff41';
+      mCtx.font = '12px Courier New';
+      drops.forEach((y, i) => {
+        const ch = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+        mCtx.fillText(ch, i * 13, y * 13);
+        if (y * 13 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+      matrixRAF = requestAnimationFrame(draw);
+    }
+    draw();
+  });
+
+  matrixBtn.addEventListener('mouseleave', () => {
+    cancelAnimationFrame(matrixRAF);
+    mCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevType — a dev-themed typing challenge. Part of the DevQuest portfolio gatekeeping experience.">
+  <meta name="theme-color" content="#000000">
+  <title>DevType — DevQuest</title>
+  <link rel="stylesheet" href="css/devtype.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/sounds.js" defer></script>
+</head>
+<body>
+
+  <div class="dq-desktop-note">⌘ Best experienced on a computer — some features are desktop only</div>
+
+  <nav class="dq-nav">
+    <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+    <div class="dq-steps">
+      <div class="dq-step done">
+        <span class="dq-step-num">01</span>
+        <span class="dq-step-name">Captcha</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step active">
+        <span class="dq-step-num">02</span>
+        <span class="dq-step-name">DevType</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step">
+        <span class="dq-step-num">03</span>
+        <span class="dq-step-name">Incident</span>
+      </div>
+    </div>
+    <div class="dq-nav-right-group">
+      <span class="dq-nav-right">challenge 2 of 3</span>
+      <button class="dq-sound-toggle" id="dq-sound-toggle" title="Toggle sound">
+        <span class="dq-sound-icon">♪</span>
+      </button>
+      <button class="dq-theme-toggle" id="dq-theme-toggle">
+        <span class="dq-toggle-icon">☀</span>
+        <span class="dq-toggle-label">Light</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="dq-main">
+    <div class="dq-game-wrap">
+      <div class="dq-game-eyebrow">Challenge 02 — Dev Typing</div>
+
+      <div id="devtype-container">
+
+      <!-- Header -->
+      <div id="dt-header">
+        <div id="dt-logo">DevType<span class="logo-dot">.</span></div>
+        <!-- Difficulty Slider -->
+        <div id="dt-diff-slider">
+          <div id="dt-diff-thumb"></div>
+          <button class="dt-diff-btn active" data-diff="easy">easy</button>
+          <button class="dt-diff-btn" data-diff="medium">medium</button>
+          <button class="dt-diff-btn" data-diff="hard">hard</button>
+        </div>
+      </div>
+
+      <!-- Subtitle -->
+      <div id="dt-subtitle">60 seconds &nbsp;·&nbsp; 70% accuracy to pass</div>
+
+      <!-- Live Stats -->
+      <div id="dt-live-stats">
+        <div class="dt-stat">
+          <div class="dt-stat-val" id="dt-live-wpm">—</div>
+          <div class="dt-stat-label">LOC / hr</div>
+        </div>
+        <div class="dt-stat">
+          <div class="dt-stat-val" id="dt-progress">60 <span class="dt-prog-total">s</span></div>
+          <div class="dt-stat-label">seconds left</div>
+        </div>
+        <div class="dt-stat">
+          <div class="dt-stat-val" id="dt-live-acc">—</div>
+          <div class="dt-stat-label">coverage</div>
+        </div>
+      </div>
+
+      <!-- Words Area -->
+      <div id="dt-words-wrap">
+        <div id="dt-words"></div>
+
+        <!-- Quirk: Legacy comment -->
+        <div id="dt-legacy" class="dt-hidden">// written in 2009, don't touch</div>
+
+        <!-- Focus hint -->
+        <div id="dt-focus-hint">click to start typing</div>
+      </div>
+
+      <!-- Accuracy bar — outside words wrap to avoid text overlap -->
+      <div id="dt-acc-bar-wrap">
+        <div id="dt-acc-bar"></div>
+        <div id="dt-acc-threshold"></div>
+      </div>
+
+      <!-- Quirk: Autocomplete popup -->
+      <div id="dt-autocomplete" class="dt-hidden">
+        <span id="dt-ac-typed"></span><span id="dt-ac-rest"></span>
+        <span class="dt-ac-key">⇥ Tab</span>
+      </div>
+
+      <!-- Quirk: Code review comment -->
+      <div id="dt-review" class="dt-hidden"></div>
+
+      <!-- Hidden capture input -->
+      <input id="dt-input" type="text"
+        autocomplete="off" autocorrect="off"
+        autocapitalize="off" spellcheck="false">
+
+      <!-- Results overlay -->
+      <div id="dt-results" class="dt-hidden">
+        <div id="dt-results-inner">
+          <div id="dt-results-title">// session complete</div>
+          <div id="dt-pass-badge"></div>
+          <div id="dt-results-grid">
+            <div class="dt-res-item">
+              <div class="dt-res-val" id="r-loc">0</div>
+              <div class="dt-res-label">LOC / hr</div>
+            </div>
+            <div class="dt-res-item">
+              <div class="dt-res-val" id="r-time">0</div>
+              <div class="dt-res-label">words typed</div>
+            </div>
+            <div class="dt-res-item">
+              <div class="dt-res-val" id="r-acc">0%</div>
+              <div class="dt-res-label">test coverage</div>
+            </div>
+            <div class="dt-res-item">
+              <div class="dt-res-val" id="r-bugs">0</div>
+              <div class="dt-res-label">bugs shipped</div>
+            </div>
+          </div>
+
+          <!-- WPM Graph -->
+          <div id="dt-graph-wrap">
+            <div class="dt-graph-label">// wpm over time</div>
+            <svg id="dt-graph-svg" viewBox="0 0 560 80" preserveAspectRatio="none"></svg>
+            <div id="dt-graph-empty" class="dt-hidden">// not enough data</div>
+            <div id="dt-graph-xaxis">
+              <span id="dt-graph-x0">0s</span>
+              <span id="dt-graph-xn"></span>
+            </div>
+          </div>
+
+          <div id="dt-verdict"></div>
+          <div id="dt-result-actions">
+            <button id="dt-restart-btn" class="dt-hidden">retry</button>
+            <a id="dt-proceed-btn" href="incident.html" class="dt-hidden">next challenge &nbsp;→</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div id="dt-footer">
+        <button id="dt-reset-btn" title="Restart">&#8635;</button>
+        <span id="dt-brand">DevQuest</span>
+      </div>
+
+    </div>
+
+    </div>
+
+  </main>
+
+  <footer class="dq-footer">
+    <div class="dq-footer-row1">
+      <span class="dq-footer-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-author">built by Sushrut</span>
+    </div>
+    <div class="dq-footer-row2">
+      <span>© 2026 DevQuest · All rights reserved</span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-ai">Made with AI <span>(Actual Intelligence)</span></span>
+    </div>
+  </footer>
+
+  <!-- Easy quirk: iMessage bubble (fixed, outside container) -->
+  <div id="dt-imessage" class="dt-hidden">
+    <div id="im-sender"></div>
+    <div id="im-bubble"><span id="im-text"></span></div>
+  </div>
+
+  <!-- Easy quirk: macOS notification (fixed, outside container) -->
+  <div id="dt-notification" class="dt-hidden">
+    <div id="notif-top">
+      <span id="notif-icon"></span>
+      <span id="notif-app"></span>
+      <span id="notif-time">now</span>
+    </div>
+    <div id="notif-msg"></div>
+  </div>
+
+  <script src="js/devtype.js" defer></script>
+</body>
+</html>

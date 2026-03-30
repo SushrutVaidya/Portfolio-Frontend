@@ -456,18 +456,35 @@ window.addEventListener('load', () => {
   initSkipTroll();
   startGame();
 
-  const startOnFirstClick = () => {
+  // Try auto-play on load (works if user navigated here via a click — e.g. from landing page)
+  // If blocked by autoplay policy, fall back to first click
+  const tryAutoPlay = () => {
     startMusic();
-    document.removeEventListener('mousedown', startOnFirstClick);
-    document.removeEventListener('touchstart', startOnFirstClick);
+    document.removeEventListener('mousedown', tryAutoPlay);
+    document.removeEventListener('touchstart', tryAutoPlay);
   };
-  document.addEventListener('mousedown', startOnFirstClick);
-  document.addEventListener('touchstart', startOnFirstClick, { passive: true });
 
+  const audioEl = getMusicEl();
+  if (audioEl) {
+    audioEl.volume = 0;
+    audioEl.play()
+      .then(() => {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        startMusic(); // autoplay allowed — start with fade
+      })
+      .catch(() => {
+        // Autoplay blocked — wait for first interaction
+        document.addEventListener('mousedown', tryAutoPlay);
+        document.addEventListener('touchstart', tryAutoPlay, { passive: true });
+      });
+  }
+
+  // Mute button controls music only
   const soundBtn = document.getElementById('dq-sound-toggle');
   if (soundBtn) {
     soundBtn.addEventListener('click', () => {
-      const el      = getMusicEl();
+      const el = getMusicEl();
       const nowMuted = typeof DQSounds !== 'undefined' && DQSounds.isMuted();
       if (!el) return;
       nowMuted ? stopMusic(0.4) : startMusic();

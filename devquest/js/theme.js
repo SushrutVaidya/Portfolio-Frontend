@@ -1,7 +1,7 @@
 // DevQuest — Theme Toggle + Sound Toggle
 (function () {
   const html  = document.documentElement;
-  const saved = localStorage.getItem('dq-theme') || 'dark';
+  const saved = localStorage.getItem('dq-theme') || 'light';
   html.setAttribute('data-theme', saved);
 })();
 

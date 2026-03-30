@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevQuest — a portfolio gatekeeping experience for developers. Three challenges. Prove you belong.">
+  <meta name="theme-color" content="#000000">
+  <title>DevQuest — by Sushrut</title>
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/sprites.css">
+  <script src="js/theme.js" defer></script>
+</head>
+<body class="landing-page">
+
+  <!-- Flowing background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Grain overlay -->
+  <div class="grain"></div>
+
+  <!-- Top bar -->
+  <header class="landing-header">
+    <span class="landing-brand">DevQuest<span class="brand-dot">.</span></span>
+  </header>
+
+  <!-- Hero -->
+  <main class="landing-main">
+    <div class="hero" id="hero">
+
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Hi, I'm
+      </div>
+
+      <h1 class="hero-name">
+        <span class="name-word">Sushrut</span>
+        <span class="name-period">.</span>
+      </h1>
+
+      <p class="hero-role">Backend Developer &nbsp;·&nbsp; Hyderabad</p>
+
+      <p class="hero-desc">
+        I build things with Java, Spring Boot and questionable decisions.<br>
+        This portfolio has a <em>gatekeeping system</em> — if you're a dev, earn it.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-primary" id="enter-devquest">
+          <span>Enter DevQuest</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <a href="../index.html" class="btn-secondary">View Portfolio</a>
+      </div>
+
+      <div class="hero-footer-note">
+        3 challenges &nbsp;·&nbsp; shape sorting &nbsp;·&nbsp; typing test &nbsp;·&nbsp; bug hunt
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Gintama pixel sprites — canvas injected by sprites.js -->
+
+  <!-- Footer — shared style -->
+  <footer class="dq-footer">
+    <div class="dq-footer-row1">
+      <span class="dq-footer-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-author">built by Sushrut</span>
+    </div>
+    <div class="dq-footer-row2">
+      <span>© 2026 DevQuest · All rights reserved</span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-ai">Made with AI <span>(Actual Intelligence)</span></span>
+    </div>
+  </footer>
+
+  <!-- Name input modal -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <span class="modal-icon">👾</span>
+        <h2 class="modal-title">Before you begin</h2>
+        <p class="modal-sub">Enter your name for the leaderboard</p>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          id="name-input"
+          class="name-input"
+          placeholder="your name or handle"
+          maxlength="24"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <p class="name-hint" id="name-hint"></p>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="modal-cancel">Cancel</button>
+        <button class="modal-start" id="modal-start">Start Challenge →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/landing.js" defer></script>
+  <script src="js/sprites.js" defer></script>
+</body>
+</html>

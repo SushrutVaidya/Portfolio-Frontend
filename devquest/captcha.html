@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevQuest Captcha — sort the shapes into the correct holes. Challenge 01 of the DevQuest experience.">
+  <meta name="theme-color" content="#000000">
+  <title>Captcha — DevQuest</title>
+  <link rel="stylesheet" href="css/captcha.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <script src="js/theme.js"></script>
+  <script src="js/sounds.js"></script>
+</head>
+<body>
+
+  <div class="dq-desktop-note">⌘ Best experienced on a computer — some features are desktop only</div>
+
+  <nav class="dq-nav">
+    <span class="dq-nav-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+    <div class="dq-steps">
+      <div class="dq-step active">
+        <span class="dq-step-num">01</span>
+        <span class="dq-step-name">Captcha</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step">
+        <span class="dq-step-num">02</span>
+        <span class="dq-step-name">DevType</span>
+      </div>
+      <div class="dq-step-line"></div>
+      <div class="dq-step">
+        <span class="dq-step-num">03</span>
+        <span class="dq-step-name">Incident</span>
+      </div>
+    </div>
+    <div class="dq-nav-right-group">
+      <span class="dq-nav-right">challenge 1 of 3</span>
+      <button class="dq-sound-toggle" id="dq-sound-toggle" title="Toggle sound">
+        <span class="dq-sound-icon">♪</span>
+      </button>
+      <button class="dq-theme-toggle" id="dq-theme-toggle">
+        <span class="dq-toggle-icon">☀</span>
+        <span class="dq-toggle-label">Light</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="dq-main">
+    <div class="dq-game-wrap">
+      <div class="dq-game-eyebrow">Challenge 01 — Shape Sorting</div>
+
+      <div id="captcha-container">
+
+    <!-- Header -->
+    <div id="captcha-header">
+      <p>Put the shapes in the</p>
+      <p class="correct-holes">correct holes</p>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area">
+
+      <!-- Top row: lives + progress -->
+      <div id="top-row">
+        <div id="lives-area">
+          <span class="life" id="life-1">❤️</span>
+          <span class="life" id="life-2">❤️</span>
+          <span class="life" id="life-3">❤️</span>
+        </div>
+        <div id="progress-area">
+          <span id="progress-text">Shape 1 of 6</span>
+        </div>
+      </div>
+
+      <!-- Prompt text -->
+      <div id="prompt-text" class="prompt hidden"></div>
+
+      <!-- Shape zone (visual background only) -->
+      <div id="shape-zone"></div>
+
+      <!-- Overheating vent (top-right corner) -->
+
+      <!-- Active shape (positioned relative to game-area) -->
+      <img id="active-shape" class="hidden" src="" alt="" draggable="false">
+
+      <!-- 3D Box with holes -->
+      <div id="box-container">
+        <div id="box-3d">
+          <div id="box-top"></div>
+          <div id="box-front">
+            <div class="hole" id="hole-circle">
+              <div class="hole-silhouette circle-hole"></div>
+            </div>
+            <div class="hole" id="hole-rectangle">
+              <div class="hole-silhouette rectangle-hole"></div>
+            </div>
+            <div class="hole" id="hole-triangle">
+              <div class="hole-silhouette triangle-hole"></div>
+            </div>
+            <div class="hole" id="hole-square">
+              <div class="hole-silhouette square-hole"></div>
+            </div>
+            <div class="hole" id="hole-semicircle">
+              <div class="hole-silhouette semicircle-hole"></div>
+            </div>
+          </div>
+          <div id="box-side"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div id="captcha-footer">
+      <button id="reset-btn" title="Reset">&#8635;</button>
+      <div id="skip-wrap">
+        <button id="skip-btn">
+          <span id="skip-label">Skip Puzzle</span>
+          <div id="terminal-bar">
+            <span class="t-dot" style="background:#ff5f57"></span>
+            <span class="t-dot" style="background:#febc2e"></span>
+            <span class="t-dot" style="background:#28c840"></span>
+            <span class="t-title">bash</span>
+          </div>
+          <div id="terminal-lines">
+            <span class="t-path">~/devquest</span><span class="t-prompt"> $ </span><span id="t-cmd" class="t-cmd"></span><span id="t-cursor"></span>
+            <div id="t-error" style="opacity:0"></div>
+            <div id="t-hint"  style="opacity:0"></div>
+          </div>
+        </button>
+      </div>
+      <span id="footer-brand">DevQuest</span>
+      <button id="verify-btn" class="hidden" onclick="window.location.href='devtype.html'">Next Challenge →</button>
+    </div>
+
+    </div>
+
+    </div>
+
+  </main>
+
+  <footer class="dq-footer">
+    <div class="dq-footer-row1">
+      <span class="dq-footer-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-author">built by Sushrut</span>
+    </div>
+    <div class="dq-footer-row2">
+      <span>© 2026 DevQuest · All rights reserved</span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-ai">Made with AI <span>(Actual Intelligence)</span></span>
+    </div>
+  </footer>
+
+  <script src="js/captcha.js" defer></script>
+
+  <!-- Background music — <audio> is Safari-safe, no AudioContext needed -->
+  <audio id="dq-music" src="assets/keyboardcat.mp3" loop preload="auto"></audio>
+</body>
+</html>

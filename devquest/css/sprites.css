@@ -1,0 +1,15 @@
+/* Sprite scene — canvas injected by sprites.js */
+.sprite-scene {
+  position: fixed;
+  bottom: 52px;
+  left: 0;
+  right: 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .sprite-scene { display: none; }
+}

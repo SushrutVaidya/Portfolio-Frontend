@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Side Quest: About Me — the non-tech side of Sushrut.">
+  <meta name="theme-color" content="#000000">
+  <title>Side Quest: About Me — DevQuest</title>
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/aboutme.css">
+  <script src="js/theme.js" defer></script>
+</head>
+<body class="aboutme-page">
+
+  <!-- ══ HERO — Interactive Terminal ══ -->
+  <section class="am-hero" id="hero">
+    <div class="am-terminal">
+      <div class="am-term-bar">
+        <span class="am-term-dots"><i></i><i></i><i></i></span>
+        <span class="am-term-title">sushrut@devquest ~ /about-me</span>
+      </div>
+      <div class="am-term-body">
+        <div class="am-term-line" data-delay="0"><span class="am-t-prompt">$</span> <span class="am-t-cmd">whoami</span></div>
+        <div class="am-term-line" data-delay="400"><span class="am-t-out">Sushrut Vaidya</span></div>
+        <div class="am-term-line" data-delay="800"><span class="am-t-prompt">$</span> <span class="am-t-cmd">cat stats.json</span></div>
+        <div class="am-term-line" data-delay="1200"><span class="am-t-out">{ "class": "Backend Dev", "level": 24, "hp": "420/420", "location": "Hyderabad" }</span></div>
+        <div class="am-term-line" data-delay="1600"><span class="am-t-prompt">$</span> <span class="am-t-cmd">echo "scroll down to explore"</span></div>
+        <div class="am-term-line" data-delay="2000"><span class="am-t-out am-t-highlight">▼ scroll down to explore ▼</span></div>
+        <div class="am-term-cursor" data-delay="2400"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TAB NAV BAR ══ -->
+  <nav class="am-tab-bar" id="tab-bar">
+    <div class="am-tab-bar-inner">
+      <button class="am-tab active" data-tab="me">Me</button>
+      <button class="am-tab" data-tab="gaming">Gaming Corner</button>
+      <div class="am-tab-indicator"></div>
+    </div>
+  </nav>
+
+  <!-- ══ PANEL: ME ══ -->
+  <div class="am-panel am-panel-active" id="panel-me">
+
+    <!-- ── Character Stats ── -->
+    <section class="am-band am-band-1" id="stats">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">01</span> Character Stats</h2>
+        <div class="am-stats-row reveal">
+          <div class="am-stats-card">
+            <div class="am-stats-top">
+              <h3>SUSHRUT VAIDYA</h3>
+              <div class="am-chips">
+                <span class="am-chip am-chip-blue">Backend Dev</span>
+                <span class="am-chip am-chip-purple">Level 24</span>
+                <span class="am-chip am-chip-green">HP 420/420</span>
+              </div>
+            </div>
+            <div class="am-stats-bars">
+              <div class="am-bar-row"><span class="am-bar-name">Curiosity</span><div class="am-bar"><div class="am-bar-fill am-bar-blue" data-val="88"></div></div><span class="am-bar-num">88</span></div>
+              <div class="am-bar-row"><span class="am-bar-name">Humor</span><div class="am-bar"><div class="am-bar-fill am-bar-purple" data-val="92"></div></div><span class="am-bar-num">92</span></div>
+              <div class="am-bar-row"><span class="am-bar-name">Creativity</span><div class="am-bar"><div class="am-bar-fill am-bar-pink" data-val="85"></div></div><span class="am-bar-num">85</span></div>
+              <div class="am-bar-row"><span class="am-bar-name">Discipline</span><div class="am-bar"><div class="am-bar-fill am-bar-green" data-val="70"></div></div><span class="am-bar-num">70</span></div>
+              <div class="am-bar-row"><span class="am-bar-name">Adventure</span><div class="am-bar"><div class="am-bar-fill am-bar-orange" data-val="78"></div></div><span class="am-bar-num">78</span></div>
+            </div>
+          </div>
+          <div class="am-radar-wrap">
+            <canvas id="radar-chart" width="260" height="260"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Inventory ── -->
+    <section class="am-band am-band-3" id="inventory">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">02</span> Inventory</h2>
+        <div class="am-inv-grid">
+          <button class="am-inv-slot reveal" data-name="Anime" data-desc="Gintama, Naruto, AOT, and counting... 367 episodes of Gintama alone." data-rarity="legendary">
+            <div class="am-inv-icon">🎌</div>
+            <span class="am-inv-name">Anime</span>
+            <span class="am-inv-rarity">LEGENDARY</span>
+          </button>
+          <button class="am-inv-slot reveal" data-name="Gaming" data-desc="Steam library growing faster than my backlog. Send help." data-rarity="epic">
+            <div class="am-inv-icon">🎮</div>
+            <span class="am-inv-name">Gaming</span>
+            <span class="am-inv-rarity">EPIC</span>
+          </button>
+          <button class="am-inv-slot reveal" data-name="Music" data-desc="Lo-fi beats for coding, Bollywood bangers for everything else." data-rarity="rare">
+            <div class="am-inv-icon">🎵</div>
+            <span class="am-inv-name">Music</span>
+            <span class="am-inv-rarity">RARE</span>
+          </button>
+          <button class="am-inv-slot reveal" data-name="Travel" data-desc="Next destination: always planning. Passport collecting dust though." data-rarity="epic">
+            <div class="am-inv-icon">✈️</div>
+            <span class="am-inv-name">Travel</span>
+            <span class="am-inv-rarity">EPIC</span>
+          </button>
+          <button class="am-inv-slot reveal" data-name="Food" data-desc="Biryani is a love language. Hyderabadi, of course. Don't start a debate." data-rarity="legendary">
+            <div class="am-inv-icon">🍜</div>
+            <span class="am-inv-name">Food</span>
+            <span class="am-inv-rarity">LEGENDARY</span>
+          </button>
+          <button class="am-inv-slot reveal" data-name="Fitness" data-desc="Gym arc in progress. Currently in the 'thinking about going' phase." data-rarity="common">
+            <div class="am-inv-icon">💪</div>
+            <span class="am-inv-name">Fitness</span>
+            <span class="am-inv-rarity">COMMON</span>
+          </button>
+        </div>
+        <!-- Item detail popup -->
+        <div class="am-inv-detail" id="inv-detail">
+          <div class="am-inv-detail-inner">
+            <span class="am-inv-detail-rarity" id="inv-detail-rarity"></span>
+            <h3 id="inv-detail-name"></h3>
+            <p id="inv-detail-desc"></p>
+            <button class="am-inv-detail-close" id="inv-detail-close">✕</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The Lore ── -->
+    <section class="am-band am-band-5" id="lore">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">03</span> The Lore</h2>
+        <div class="am-lore-list">
+          <div class="am-npc reveal"><div class="am-npc-avatar">🎌</div><div class="am-npc-box"><span class="am-npc-tag">Favorite Anime</span><p class="am-npc-text" data-text="Gintama. Obviously. If you know, you know."></p></div></div>
+          <div class="am-npc reveal"><div class="am-npc-avatar">🍚</div><div class="am-npc-box"><span class="am-npc-tag">Favorite Food</span><p class="am-npc-text" data-text="Biryani — Hyderabadi, of course. Don't start a debate."></p></div></div>
+          <div class="am-npc reveal"><div class="am-npc-avatar">🧠</div><div class="am-npc-box"><span class="am-npc-tag">Fun Fact</span><p class="am-npc-text" data-text="Can quote entire Gintama episodes from memory. It's a skill."></p></div></div>
+          <div class="am-npc reveal"><div class="am-npc-avatar">🎧</div><div class="am-npc-box"><span class="am-npc-tag">Music</span><p class="am-npc-text" data-text="Lo-fi beats for coding, Bollywood bangers for everything else."></p></div></div>
+          <div class="am-npc reveal"><div class="am-npc-avatar">👤</div><div class="am-npc-box"><span class="am-npc-tag">NPC Testimonial</span><p class="am-npc-text" data-text='"He once spent 3 hours debugging a missing semicolon. Respect." — A Friend'></p></div></div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /panel-me -->
+
+  <!-- ══ PANEL: GAMING CORNER ══ -->
+  <div class="am-panel" id="panel-gaming">
+
+    <!-- ── Game of the Month ── -->
+    <section class="am-band am-band-1" id="game-of-month">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">01</span> Game of the Month</h2>
+        <div class="am-spotlight reveal" id="spotlight-card">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Game Library ── -->
+    <section class="am-band am-band-2" id="games">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">02</span> Game Library <span class="am-badge-inline">STEAM API — COMING SOON</span></h2>
+        <div class="am-games-grid" id="games-grid"></div>
+      </div>
+    </section>
+
+    <!-- ── Gaming Stats ── -->
+    <section class="am-band am-band-3" id="gaming-stats">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">03</span> Gaming Stats</h2>
+        <div class="am-gstats-grid" id="gstats-grid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Leaderboard ── -->
+    <section class="am-band am-band-4" id="leaderboard">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">04</span> Leaderboard</h2>
+        <div class="am-leaderboard" id="leaderboard-table">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Moments ── -->
+    <section class="am-band am-band-5" id="moments">
+      <div class="am-container">
+        <h2 class="am-heading reveal"><span class="am-h-num">05</span> Moments</h2>
+        <div class="am-moments-placeholder reveal">
+          <p>Screenshots & GIFs coming soon...</p>
+          <span class="am-moments-sub">This section will hold epic gaming moments, clutch plays, and embarrassing deaths.</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /panel-gaming -->
+
+  <!-- Back -->
+  <div class="am-back-wrap">
+    <a href="landing.html" class="am-back-btn">← BACK TO DEVQUEST</a>
+  </div>
+
+  <footer class="dq-footer">
+    <div class="dq-footer-row1">
+      <span class="dq-footer-brand">DevQuest<span class="dq-brand-dot">.</span></span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-author">built by Sushrut</span>
+    </div>
+    <div class="dq-footer-row2">
+      <span>© 2026 DevQuest · All rights reserved</span>
+      <span class="dq-footer-divider">·</span>
+      <span class="dq-footer-ai">Made with AI <span>(Actual Intelligence)</span></span>
+    </div>
+  </footer>
+
+  <!-- ══ JUKEBOX — Pixel Boombox (fixed floating) ══ -->
+  <!-- Backdrop blur overlay -->
+  <div class="am-jb-backdrop" id="jb-backdrop"></div>
+
+  <div class="am-jukebox" id="jukebox">
+    <!-- Compact state — mini boombox -->
+    <button class="am-jb-pill" id="jb-pill">
+      <div class="am-jb-mini-eq">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="am-jb-track-name" id="jb-track-name"><span class="am-jb-track-name-inner" id="jb-track-name-inner">Corridors of Time — Chrono Trigger</span></div>
+      <span class="am-jb-play-btn" id="jb-play-compact" aria-label="Play/Pause">▶</span>
+    </button>
+
+    <!-- Expanded state — full boombox -->
+    <div class="am-jb-expanded" id="jb-expanded">
+      <div class="am-jb-boombox">
+        <!-- Close button top right -->
+        <div class="am-jb-close-row">
+          <button class="am-jb-close" id="jb-close" aria-label="Close"></button>
+        </div>
+
+        <!-- Top row: speakers + EQ -->
+        <div class="am-jb-top-row">
+          <div class="am-jb-speaker">
+            <div class="am-jb-speaker-grill">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="am-jb-eq-display">
+            <div class="am-jb-eq-bars" id="jb-eq-bars">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="am-jb-speaker">
+            <div class="am-jb-speaker-grill">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cassette slot — scrolling marquee -->
+        <div class="am-jb-cassette">
+          <div class="am-jb-cassette-inner">
+            <div class="am-jb-marquee" id="jb-marquee">
+              <span class="am-jb-marquee-text" id="jb-marquee-text">Corridors of Time — Chrono Trigger</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport controls -->
+        <div class="am-jb-controls">
+          <button class="am-jb-ctrl" id="jb-prev" aria-label="Previous">⏮</button>
+          <button class="am-jb-ctrl am-jb-ctrl-play" id="jb-play" aria-label="Play/Pause">▶</button>
+          <button class="am-jb-ctrl" id="jb-next" aria-label="Next">⏭</button>
+        </div>
+
+        <!-- Tracklist toggle (mobile two-stage) -->
+        <button class="am-jb-tl-toggle" id="jb-tl-toggle" aria-label="Show tracklist">
+          <span class="am-jb-tl-chevron" id="jb-tl-chevron">▾</span>
+          <span class="am-jb-tl-label">Tracklist</span>
+        </button>
+
+        <!-- Track list -->
+        <div class="am-jb-tracklist" id="jb-tracklist"></div>
+
+        <!-- Volume knob row -->
+        <div class="am-jb-volume-row">
+          <span class="am-jb-vol-label">VOL</span>
+          <input type="range" class="am-jb-vol-slider" id="jb-volume" min="0" max="100" value="70" aria-label="Volume">
+          <span class="am-jb-vol-val" id="jb-vol-val">70</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="am-jb-footer">
+          <span>INSERT COIN TO PLAY</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/aboutme.js" defer></script>
+</body>
+</html>

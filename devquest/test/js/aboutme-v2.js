@@ -847,17 +847,18 @@
   ];
 
   // Non-Steam games — always merged with API results
+  // appid used only for Steam CDN header images (game exists on Steam store even if owned on Epic)
   const EPIC_GAMES = [
-    { title: 'Marvel\'s Guardians of the Galaxy', xp: 200, played: 'Completed', color: '#1e90ff', emoji: '🚀', appid: 0 },
-    { title: 'GTA V', xp: 195, played: 'Completed', color: '#2d5a27', emoji: '🚗', appid: 0 },
-    { title: 'Death Stranding', xp: 143, played: 'Completed', color: '#2c3e50', emoji: '📦', appid: 0 },
-    { title: 'Control', xp: 50, played: 'Completed', color: '#c0392b', emoji: '🔺', appid: 0 },
-    { title: 'Warhammer 40K: Space Marine 2', xp: 0, played: 'Completed', color: '#7b2d26', emoji: '⚔️', appid: 0 },
-    { title: 'Hitman', xp: 25, played: 'Completed', color: '#2c3e50', emoji: '🎯', appid: 0 },
-    { title: 'Watch Dogs 2', xp: 20, played: 'Completed', color: '#e67e22', emoji: '📱', appid: 0 },
-    { title: 'Wolfenstein: The New Order', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
-    { title: 'Wolfenstein: The New Colossus', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
-    { title: 'Wolfenstein: The Old Blood', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
+    { title: 'Marvel\'s Guardians of the Galaxy', xp: 200, played: 'Completed', color: '#1e90ff', emoji: '🚀', appid: 2056030 },
+    { title: 'GTA V', xp: 195, played: 'Completed', color: '#2d5a27', emoji: '🚗', appid: 271590 },
+    { title: 'Death Stranding', xp: 143, played: 'Completed', color: '#2c3e50', emoji: '📦', appid: 1190460 },
+    { title: 'Control', xp: 50, played: 'Completed', color: '#c0392b', emoji: '🔺', appid: 870780 },
+    { title: 'Warhammer 40K: Space Marine 2', xp: 0, played: 'Completed', color: '#7b2d26', emoji: '⚔️', appid: 2183900 },
+    { title: 'Hitman', xp: 25, played: 'Completed', color: '#2c3e50', emoji: '🎯', appid: 236870 },
+    { title: 'Watch Dogs 2', xp: 20, played: 'Completed', color: '#e67e22', emoji: '📱', appid: 447040 },
+    { title: 'Wolfenstein: The New Order', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 202140 },
+    { title: 'Wolfenstein: The New Colossus', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 549360 },
+    { title: 'Wolfenstein: The Old Blood', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 350080 },
   ];
 
   const GAME_META = {

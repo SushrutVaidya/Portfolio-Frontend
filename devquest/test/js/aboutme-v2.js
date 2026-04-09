@@ -840,14 +840,24 @@
 
   const MOCK_GAMES = [
     { title: 'Counter-Strike 2', xp: 1500, played: 'Recently', color: '#de9b35', emoji: '💣', appid: 730 },
-    { title: 'GTA V', xp: 420, played: 'A while ago', color: '#2d5a27', emoji: '🚗', appid: 271590 },
     { title: 'DOOM Eternal', xp: 210, played: 'A while ago', color: '#8b0000', emoji: '🔥', appid: 782330 },
     { title: 'Halo Infinite', xp: 195, played: 'A while ago', color: '#3d6b3d', emoji: '🪖', appid: 1240440 },
-    { title: 'Warhammer 40K: Space Marine 2', xp: 180, played: 'A while ago', color: '#7b2d26', emoji: '⚔️', appid: 2183900 },
     { title: 'DOOM (2016)', xp: 145, played: 'A while ago', color: '#a30000', emoji: '💀', appid: 379720 },
-    { title: 'Death Stranding', xp: 62, played: 'A while ago', color: '#2c3e50', emoji: '📦', appid: 1190460 },
     { title: 'Detroit: Become Human', xp: 35, played: 'A while ago', color: '#1a73e8', emoji: '🤖', appid: 1222140 },
-    { title: 'Valorant', xp: 12, played: 'A while ago', color: '#ff4655', emoji: '🗑️', appid: 0 },
+  ];
+
+  // Non-Steam games — always merged with API results
+  const EPIC_GAMES = [
+    { title: 'Marvel\'s Guardians of the Galaxy', xp: 200, played: 'Completed', color: '#1e90ff', emoji: '🚀', appid: 0 },
+    { title: 'GTA V', xp: 195, played: 'Completed', color: '#2d5a27', emoji: '🚗', appid: 0 },
+    { title: 'Death Stranding', xp: 143, played: 'Completed', color: '#2c3e50', emoji: '📦', appid: 0 },
+    { title: 'Control', xp: 50, played: 'Completed', color: '#c0392b', emoji: '🔺', appid: 0 },
+    { title: 'Warhammer 40K: Space Marine 2', xp: 0, played: 'Completed', color: '#7b2d26', emoji: '⚔️', appid: 0 },
+    { title: 'Hitman', xp: 25, played: 'Completed', color: '#2c3e50', emoji: '🎯', appid: 0 },
+    { title: 'Watch Dogs 2', xp: 20, played: 'Completed', color: '#e67e22', emoji: '📱', appid: 0 },
+    { title: 'Wolfenstein: The New Order', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
+    { title: 'Wolfenstein: The New Colossus', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
+    { title: 'Wolfenstein: The Old Blood', xp: 0, played: 'Completed', color: '#4a4a4a', emoji: '🔫', appid: 0 },
   ];
 
   const GAME_META = {
@@ -872,12 +882,16 @@
   let liveGames = null, liveTracks = null;
 
   async function fetchGamingData() {
+    let steamGames;
     try {
       const res = await apiFetch('/api/steam/games');
-      liveGames = enrichGames(res);
+      steamGames = enrichGames(res);
     } catch {
-      liveGames = MOCK_GAMES;
+      steamGames = MOCK_GAMES;
     }
+    // Merge Steam + Epic, sort by hours descending (completed games with 0 hrs go last)
+    liveGames = [...steamGames, ...EPIC_GAMES]
+      .sort((a, b) => b.xp - a.xp);
   }
 
   const MOCK_TRACKS = [
@@ -1016,9 +1030,9 @@
           '<h3 class="cf-title">' + g.emoji + ' ' + g.title + '</h3>' +
           '<div class="cf-bar-wrap">' +
             '<div class="cf-bar"><div class="cf-bar-fill" style="width:0%;background:' + g.color + '"></div></div>' +
-            '<span class="cf-hrs">' + g.xp.toLocaleString() + ' HRS</span>' +
+            '<span class="cf-hrs">' + (g.xp > 0 ? g.xp.toLocaleString() + ' HRS' : 'COMPLETED') + '</span>' +
           '</div>' +
-          '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : '') + '">' + g.played.toUpperCase() + '</span>';
+          '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : g.played === 'Completed' ? 'cf-completed' : '') + '">' + g.played.toUpperCase() + '</span>';
         infoEl.classList.remove('cf-info-out');
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {

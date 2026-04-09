@@ -1469,6 +1469,9 @@
 .cf-recent {
   color: #30d158;
 }
+.cf-completed {
+  color: var(--gta-purple);
+}
 
 /* ── Controls ── */
 .cf-controls {

@@ -835,44 +835,50 @@
   }
 
   // ════════════════════════════════════
-  //  GAMING DATA
+  //  GAMING DATA — Cover Flow
   // ════════════════════════════════════
 
   const MOCK_GAMES = [
-    { title: 'Counter-Strike 2', xp: 1500, played: 'Today', color: '#de9b35', emoji: '💣' },
-    { title: 'Warhammer 40K: Space Marine 2', xp: 180, played: 'Last week', color: '#1a3a7a', emoji: '⚔️' },
-    { title: 'DOOM Eternal', xp: 210, played: '2 weeks ago', color: '#8b0000', emoji: '🔥' },
-    { title: 'DOOM (2016)', xp: 145, played: '3 months ago', color: '#a30000', emoji: '💀' },
-    { title: 'GTA V', xp: 420, played: 'Last month', color: '#2d5a27', emoji: '🚗' },
-    { title: 'Detroit: Become Human', xp: 35, played: 'Yesterday', color: '#2a4a6b', emoji: '🤖' },
-    { title: 'Death Stranding', xp: 62, played: 'This week', color: '#1a1a2e', emoji: '📦' },
-    { title: 'Halo Infinite', xp: 195, played: 'Last month', color: '#3d6b3d', emoji: '🪖' },
-    { title: 'Valorant', xp: 12, played: 'Never again', color: '#ff4655', emoji: '🗑️' },
+    { title: 'Counter-Strike 2', xp: 1500, played: 'Recently', color: '#de9b35', emoji: '💣', appid: 730 },
+    { title: 'GTA V', xp: 420, played: 'A while ago', color: '#2d5a27', emoji: '🚗', appid: 271590 },
+    { title: 'DOOM Eternal', xp: 210, played: 'A while ago', color: '#8b0000', emoji: '🔥', appid: 782330 },
+    { title: 'Halo Infinite', xp: 195, played: 'A while ago', color: '#3d6b3d', emoji: '🪖', appid: 1240440 },
+    { title: 'Warhammer 40K: Space Marine 2', xp: 180, played: 'A while ago', color: '#7b2d26', emoji: '⚔️', appid: 2183900 },
+    { title: 'DOOM (2016)', xp: 145, played: 'A while ago', color: '#a30000', emoji: '💀', appid: 379720 },
+    { title: 'Death Stranding', xp: 62, played: 'A while ago', color: '#2c3e50', emoji: '📦', appid: 1190460 },
+    { title: 'Detroit: Become Human', xp: 35, played: 'A while ago', color: '#1a73e8', emoji: '🤖', appid: 1222140 },
+    { title: 'Valorant', xp: 12, played: 'A while ago', color: '#ff4655', emoji: '🗑️', appid: 0 },
   ];
 
-  const MOCK_SPOTLIGHT = {
-    title: 'Counter-Strike 2',
-    genre: ['FPS', 'Tactical Shooter', 'Competitive'],
-    desc: '1500 hours deep. ~$40K inventory. If you peek mid, that\'s on you. Controller gang — yes, I play CS2 on a PS4 controller. Yes, I still win.',
-    emoji: '💣',
-    color: '#de9b35'
+  const GAME_META = {
+    730:     { emoji: '💣', color: '#de9b35' },
+    782330:  { emoji: '👹', color: '#8b0000' },
+    379720:  { emoji: '💀', color: '#a30000' },
+    271590:  { emoji: '🚗', color: '#2d5a27' },
+    1222140: { emoji: '🤖', color: '#1a73e8' },
+    1190460: { emoji: '📦', color: '#2c3e50' },
+    976730:  { emoji: '🎯', color: '#4a7c59' },
+    2183900: { emoji: '⚔️', color: '#7b2d26' },
   };
+  const DEFAULT_META = { emoji: '🎮', color: '#666' };
 
-  const MOCK_GAMING_STATS = [
-    { label: 'CS2 Hours', value: 1500, suffix: 'hrs', color: '#de9b35' },
-    { label: 'Inventory Value', value: 40, suffix: 'K', color: '#30d158' },
-    { label: 'Demons Ripped', value: 999, suffix: '+', color: '#ff375f' },
-    { label: 'PS4 Controllers', value: 2, suffix: '', color: '#0a84ff' },
-    { label: 'Valo Tolerance', value: 0, suffix: '%', color: '#bf5af2' },
-  ];
+  function enrichGames(games) {
+    return games.map(g => {
+      const meta = GAME_META[g.appid] || DEFAULT_META;
+      return { ...g, emoji: meta.emoji, color: meta.color };
+    });
+  }
 
-  const MOCK_LEADERBOARD = [
-    { rank: 1, name: 'Sushrut', score: '$40,000 inv' },
-    { rank: 2, name: 'Doom Slayer', score: '999 kills' },
-    { rank: 3, name: 'Space Marine', score: 'FOR THE EMPEROR' },
-    { rank: 4, name: 'Connor (RK800)', score: '28 STAB WOUNDS' },
-    { rank: 5, name: 'Sam Bridges', score: '📦📦📦' },
-  ];
+  let liveGames = null, liveTracks = null;
+
+  async function fetchGamingData() {
+    try {
+      const res = await apiFetch('/api/steam/games');
+      liveGames = enrichGames(res);
+    } catch {
+      liveGames = MOCK_GAMES;
+    }
+  }
 
   const MOCK_TRACKS = [
     { title: 'BFG Division', game: 'DOOM (2016)', audioURL: null },
@@ -883,21 +889,6 @@
     { title: 'Kainé — Salvation', game: 'NieR', audioURL: null },
   ];
 
-  let liveGames = null, liveSpotlight = null, liveGamingStats = null, liveLeaderboard = null, liveTracks = null;
-
-  async function fetchGamingData() {
-    const results = await Promise.allSettled([
-      apiFetch('/api/steam/games'),
-      apiFetch('/api/gaming/spotlight'),
-      apiFetch('/api/gaming/stats'),
-      apiFetch('/api/gaming/leaderboard'),
-    ]);
-    liveGames = results[0].status === 'fulfilled' ? results[0].value : MOCK_GAMES;
-    liveSpotlight = results[1].status === 'fulfilled' ? results[1].value : MOCK_SPOTLIGHT;
-    liveGamingStats = results[2].status === 'fulfilled' ? results[2].value : MOCK_GAMING_STATS;
-    liveLeaderboard = results[3].status === 'fulfilled' ? results[3].value : MOCK_LEADERBOARD;
-  }
-
   async function fetchTracks() {
     try { liveTracks = await apiFetch('/api/jukebox/tracks'); }
     catch { liveTracks = MOCK_TRACKS; }
@@ -905,121 +896,190 @@
 
   async function renderGamingSections() {
     await fetchGamingData();
-    renderSpotlight(liveSpotlight);
-    renderGames(liveGames);
-    renderGamingStats(liveGamingStats);
-    renderLeaderboard(liveLeaderboard);
+    renderCoverFlow(liveGames);
     initReveal();
   }
 
-  function renderSpotlight(data) {
-    const card = document.getElementById('spotlight-card');
-    if (!card || card.children.length > 0) return;
-    const chips = data.genre.map(g => '<span class="gc-spot-chip">' + g + '</span>').join('');
-    card.innerHTML =
-      '<div class="gc-spot-bg" style="background:' + data.color + '"></div>' +
-      '<div class="gc-spot-content">' +
-        '<div class="gc-spot-cover" style="background:' + data.color + '">' + data.emoji + '</div>' +
-        '<div class="gc-spot-info">' +
-          '<div class="gc-spot-live"><span class="gc-spot-live-dot"></span><span class="gc-spot-live-text">NOW PLAYING</span></div>' +
-          '<h3 class="gc-spot-title">' + data.title + '</h3>' +
-          '<div class="gc-spot-chips">' + chips + '</div>' +
-          '<p class="gc-spot-desc">' + data.desc + '</p>' +
-          '<p class="gc-spot-hours">1,500+ hrs | PS4 Controller | $40K Inventory</p>' +
-        '</div>' +
-      '</div>';
-  }
+  function renderCoverFlow(games) {
+    const container = document.getElementById('cover-flow');
+    if (!container || container.children.length > 0) return;
+    if (!games || games.length === 0) return;
 
-  function renderGames(games) {
-    const grid = document.getElementById('games-grid');
-    if (!grid || grid.children.length > 0) return;
+    let activeIdx = 0;
+    let isAnimating = false;
     const maxXp = Math.max(...games.map(g => g.xp));
-    games.forEach(g => {
-      const card = document.createElement('div');
-      card.className = 'gc-game-card reveal';
-      const pct = Math.round((g.xp / maxXp) * 100);
-      card.innerHTML =
-        '<div class="gc-game-cover" style="background:' + g.color + '">' + g.emoji + '</div>' +
-        '<div class="gc-game-body">' +
-          '<p class="gc-game-title">' + g.title + '</p>' +
-          '<div class="gc-game-meta">' +
-            '<span class="gc-game-xp">' + g.xp + ' hrs</span>' +
-            '<span class="gc-game-played">' + g.played + '</span>' +
-          '</div>' +
-          '<div class="gc-game-bar"><div class="gc-game-bar-fill" style="width:' + pct + '%;background:' + g.color + '"></div></div>' +
-        '</div>';
-      grid.appendChild(card);
-    });
-  }
+    const totalHrs = games.reduce((sum, g) => sum + g.xp, 0);
 
-  const STAT_ICONS = ['💣', '💰', '👹', '🎮', '🚫'];
+    // Build shell
+    container.innerHTML =
+      '<div class="cf-viewport">' +
+        '<div class="cf-stage" id="cf-stage"></div>' +
+        '<div class="cf-reflection" id="cf-reflection"></div>' +
+      '</div>' +
+      '<div class="cf-info-wrap">' +
+        '<div class="cf-info" id="cf-info"></div>' +
+      '</div>' +
+      '<div class="cf-controls">' +
+        '<button class="cf-btn" id="cf-prev" aria-label="Previous">&#9664;</button>' +
+        '<div class="cf-dots" id="cf-dots"></div>' +
+        '<button class="cf-btn" id="cf-next" aria-label="Next">&#9654;</button>' +
+      '</div>' +
+      '<div class="cf-footer">' +
+        '<span>' + games.length + ' GAMES</span>' +
+        '<span class="cf-footer-hrs">' + totalHrs.toLocaleString() + ' TOTAL HRS</span>' +
+        '<span class="cf-api-badge"><span class="cf-api-dot"></span>STEAM API LIVE</span>' +
+      '</div>';
 
-  function renderGamingStats(stats) {
-    const grid = document.getElementById('gstats-grid');
-    if (!grid || grid.children.length > 0) return;
-    stats.forEach((stat, i) => {
+    const stage = document.getElementById('cf-stage');
+    const reflection = document.getElementById('cf-reflection');
+    const infoEl = document.getElementById('cf-info');
+    const dotsEl = document.getElementById('cf-dots');
+
+    // Create cards + reflections
+    games.forEach((g, i) => {
+      const imgUrl = g.appid ? 'https://cdn.cloudflare.steamstatic.com/steam/apps/' + g.appid + '/header.jpg' : '';
+
+      // Main card
       const card = document.createElement('div');
-      card.className = 'gc-stat-card reveal';
-      card.style.setProperty('--stat-color', stat.color);
-      card.innerHTML =
-        '<div class="gc-stat-icon">' + (STAT_ICONS[i] || '📊') + '</div>' +
-        '<div class="gc-stat-num" data-target="' + stat.value + '" style="color:' + stat.color + '">' +
-          '0' + (stat.suffix ? '<span class="gc-stat-suffix">' + stat.suffix + '</span>' : '') +
-        '</div>' +
-        '<div class="gc-stat-label">' + stat.label + '</div>';
-      grid.appendChild(card);
+      card.className = 'cf-card';
+      card.dataset.idx = i;
+      card.innerHTML = imgUrl
+        ? '<img src="' + imgUrl + '" alt="' + g.title + '" draggable="false" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+          '<div class="cf-card-fallback" style="display:none;background:' + g.color + '"><span>' + g.emoji + '</span></div>'
+        : '<div class="cf-card-fallback" style="background:' + g.color + '"><span>' + g.emoji + '</span></div>';
+      card.addEventListener('click', () => { if (i !== activeIdx) goTo(i); });
+      stage.appendChild(card);
+
+      // Reflection card (mirror)
+      const ref = document.createElement('div');
+      ref.className = 'cf-card cf-card-ref';
+      ref.dataset.idx = i;
+      ref.innerHTML = card.innerHTML;
+      reflection.appendChild(ref);
+
+      // Dot
+      const dot = document.createElement('button');
+      dot.className = 'cf-dot';
+      dot.setAttribute('aria-label', g.title);
+      dot.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(dot);
     });
-    const nums = grid.querySelectorAll('.gc-stat-num');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) { observer.unobserve(entry.target); countUp(entry.target); }
+
+    const cards = stage.querySelectorAll('.cf-card');
+    const refCards = reflection.querySelectorAll('.cf-card');
+    const dots = dotsEl.querySelectorAll('.cf-dot');
+
+    function layoutCards() {
+      const SPACING = 180;
+      const DEPTH = 200;
+      const ANGLE = 45;
+
+      cards.forEach((card, i) => {
+        const offset = i - activeIdx;
+        const absOff = Math.abs(offset);
+        let tx, tz, ry, op, scale;
+
+        if (offset === 0) {
+          tx = 0; tz = 0; ry = 0; op = 1; scale = 1;
+        } else {
+          const dir = offset > 0 ? 1 : -1;
+          tx = dir * (SPACING + (absOff - 1) * 100);
+          tz = -DEPTH - (absOff - 1) * 40;
+          ry = -dir * ANGLE;
+          op = absOff > 3 ? 0 : Math.max(0.25, 0.7 - (absOff - 1) * 0.15);
+          scale = absOff > 3 ? 0.6 : Math.max(0.7, 0.85 - (absOff - 1) * 0.05);
+        }
+
+        card.style.transform = 'translate3d(' + tx + 'px, 0, ' + tz + 'px) rotateY(' + ry + 'deg) scale(' + scale + ')';
+        card.style.opacity = op;
+        card.style.zIndex = 10 - absOff;
+        card.classList.toggle('cf-active', offset === 0);
+
+        // Mirror reflection
+        const rc = refCards[i];
+        rc.style.transform = 'translate3d(' + tx + 'px, 0, ' + tz + 'px) rotateY(' + ry + 'deg) rotateX(180deg) scale(' + scale + ')';
+        rc.style.opacity = op * 0.2;
+        rc.style.zIndex = 10 - absOff;
       });
-    }, { threshold: 0.3 });
-    nums.forEach(el => observer.observe(el));
-  }
 
-  function countUp(el) {
-    const target = parseInt(el.dataset.target, 10);
-    const suffix = el.querySelector('.gc-stat-suffix');
-    const suffixText = suffix ? suffix.textContent : '';
-    const duration = 1500;
-    const start = performance.now();
-    function update(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(ease * target);
-      if (suffixText) el.innerHTML = current.toLocaleString() + '<span class="gc-stat-suffix">' + suffixText + '</span>';
-      else el.textContent = current.toLocaleString();
-      if (progress < 1) requestAnimationFrame(update);
+      dots.forEach((d, i) => d.classList.toggle('cf-dot-active', i === activeIdx));
     }
-    requestAnimationFrame(update);
-  }
 
-  function renderLeaderboard(rows) {
-    const table = document.getElementById('leaderboard-table');
-    if (!table || table.children.length > 0) return;
+    function updateInfo() {
+      const g = games[activeIdx];
+      const pct = Math.round((g.xp / maxXp) * 100);
 
-    // Header row
-    const header = document.createElement('div');
-    header.className = 'gc-lb-header';
-    header.innerHTML =
-      '<span class="gc-lb-header-icon">🏆</span>' +
-      '<span class="gc-lb-header-text">LEADERBOARD</span>' +
-      '<span class="gc-lb-header-icon">🏆</span>';
-    table.appendChild(header);
+      // Crossfade: fade out, swap, fade in
+      infoEl.classList.add('cf-info-out');
+      setTimeout(() => {
+        infoEl.innerHTML =
+          '<h3 class="cf-title">' + g.emoji + ' ' + g.title + '</h3>' +
+          '<div class="cf-bar-wrap">' +
+            '<div class="cf-bar"><div class="cf-bar-fill" style="width:0%;background:' + g.color + '"></div></div>' +
+            '<span class="cf-hrs">' + g.xp.toLocaleString() + ' HRS</span>' +
+          '</div>' +
+          '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : '') + '">' + g.played.toUpperCase() + '</span>';
+        infoEl.classList.remove('cf-info-out');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const bar = infoEl.querySelector('.cf-bar-fill');
+            if (bar) bar.style.width = pct + '%';
+          });
+        });
+      }, 120);
+    }
 
-    const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
-    rows.forEach(row => {
-      const div = document.createElement('div');
-      const rankClass = row.rank <= 3 ? ' gc-lb-row-' + row.rank : '';
-      div.className = 'gc-lb-row reveal' + rankClass;
-      div.innerHTML =
-        '<span class="gc-lb-rank">#' + row.rank + '</span>' +
-        (medals[row.rank] ? '<span class="gc-lb-medal">' + medals[row.rank] + '</span>' : '') +
-        '<span class="gc-lb-name">' + row.name + '</span>' +
-        '<span class="gc-lb-score">' + row.score + '</span>';
-      table.appendChild(div);
+    function goTo(idx) {
+      if (isAnimating || idx === activeIdx) return;
+      isAnimating = true;
+      activeIdx = idx;
+      layoutCards();
+      updateInfo();
+      setTimeout(() => { isAnimating = false; }, 280);
+    }
+
+    function navigate(dir) {
+      goTo((activeIdx + dir + games.length) % games.length);
+    }
+
+    // Button nav
+    document.getElementById('cf-prev').addEventListener('click', () => navigate(-1));
+    document.getElementById('cf-next').addEventListener('click', () => navigate(1));
+
+    // Keyboard nav (only when section is visible)
+    document.addEventListener('keydown', (e) => {
+      const rect = container.getBoundingClientRect();
+      if (rect.top > window.innerHeight || rect.bottom < 0) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); navigate(1); }
+    });
+
+    // Touch / swipe
+    let touchStartX = 0, touchStartY = 0, swiping = false;
+    container.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      swiping = true;
+    }, { passive: true });
+    container.addEventListener('touchend', (e) => {
+      if (!swiping) return;
+      swiping = false;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        navigate(dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+
+    // Initial render
+    layoutCards();
+    updateInfo();
+    // Trigger initial bar animation
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const bar = infoEl.querySelector('.cf-bar-fill');
+        if (bar) bar.style.width = Math.round((games[0].xp / maxXp) * 100) + '%';
+      });
     });
   }
 
@@ -1088,11 +1148,11 @@
 
     pill.addEventListener('click', function(e) {
       if (e.target === playCompact) { e.stopPropagation(); togglePlay(); return; }
-      jukebox.classList.add('expanded'); backdrop.classList.add('active');
+      jukebox.classList.add('expanded'); backdrop.classList.add('active'); document.body.style.overflow = 'hidden';
     });
     playCompact.addEventListener('click', function(e) { e.stopPropagation(); togglePlay(); });
-    closeBtn.addEventListener('click', function() { jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full'); backdrop.classList.remove('active'); });
-    if (backdrop) { backdrop.addEventListener('click', function() { jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full'); backdrop.classList.remove('active'); }); }
+    closeBtn.addEventListener('click', function() { jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full'); backdrop.classList.remove('active'); document.body.style.overflow = ''; });
+    if (backdrop) { backdrop.addEventListener('click', function() { jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full'); backdrop.classList.remove('active'); document.body.style.overflow = ''; }); }
     playBtn.addEventListener('click', togglePlay);
     prevBtn.addEventListener('click', prevTrack);
     nextBtn.addEventListener('click', nextTrack);
@@ -1104,7 +1164,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && jukebox.classList.contains('expanded')) {
         jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full');
-        if (backdrop) backdrop.classList.remove('active'); return;
+        if (backdrop) backdrop.classList.remove('active'); document.body.style.overflow = ''; return;
       }
       if (!jukebox.classList.contains('expanded')) return;
       if (e.target.tagName === 'INPUT') return;
@@ -1132,6 +1192,7 @@
       if (jukebox.classList.contains('expanded') && !jukebox.contains(e.target)) {
         jukebox.classList.remove('expanded'); jukebox.classList.remove('expanded-full');
         if (backdrop) backdrop.classList.remove('active');
+        document.body.style.overflow = '';
       }
     });
 

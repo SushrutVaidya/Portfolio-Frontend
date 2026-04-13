@@ -470,49 +470,6 @@
         </div>
       </div>
 
-      <!-- ── Zone 2: Classified File ── -->
-      <div class="lore-classified reveal" id="lore-classified">
-        <div class="lore-classified-tab">CLASSIFIED — LEVEL 4 CLEARANCE</div>
-        <div class="lore-classified-body">
-          <div class="lore-file-stamp">CONFIDENTIAL</div>
-          <div class="lore-file-entries" id="lore-entries">
-            <!-- JS renders entries here -->
-          </div>
-          <div class="lore-file-footer">
-            <span>CASE FILE: SVV-042</span>
-            <span>STATUS: OPEN</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Zone 3: Retro TV ── -->
-      <div class="lore-tv-wrap reveal">
-        <div class="lore-tv" id="lore-tv">
-          <div class="lore-tv-bezel">
-            <div class="lore-tv-screen" id="tv-screen">
-              <div class="lore-tv-static" id="tv-static"></div>
-              <video class="lore-tv-video" id="tv-video" muted loop playsinline></video>
-              <div class="lore-tv-content" id="tv-content">
-                <div class="lore-tv-channel" id="tv-channel">CH 01</div>
-                <div class="lore-tv-show" id="tv-show"></div>
-                <div class="lore-tv-quote" id="tv-quote"></div>
-              </div>
-              <button class="lore-tv-mute" id="tv-mute" aria-label="Toggle sound">🔇</button>
-              <div class="lore-tv-scanlines"></div>
-            </div>
-            <div class="lore-tv-controls">
-              <button class="lore-tv-btn" id="tv-prev" aria-label="Previous channel">◀</button>
-              <span class="lore-tv-label">CHANNEL</span>
-              <button class="lore-tv-btn" id="tv-next" aria-label="Next channel">▶</button>
-            </div>
-          </div>
-          <div class="lore-tv-legs">
-            <div class="lore-tv-leg"></div>
-            <div class="lore-tv-leg"></div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -540,6 +497,82 @@
           <span class="gta-currently-icon">&#127859;</span>
           <span class="gta-currently-label">COOKING</span>
           <span class="gta-currently-value">Fresh Pasta from Scratch</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#128250; NOW BROADCASTING &#128250;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: The Channel — Retro TV ══ -->
+  <section class="gta-section gta-section-tv" id="the-channel">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">THE<br>CHANNEL</h2>
+      <p class="tv-subtitle reveal">Flip through the things that shaped this guy.</p>
+
+      <div class="lore-tv-wrap reveal">
+        <div class="lore-tv" id="lore-tv">
+          <!-- Rabbit ear antenna -->
+          <div class="lore-tv-antenna">
+            <div class="lore-tv-antenna-ear lore-tv-antenna-l"></div>
+            <div class="lore-tv-antenna-ear lore-tv-antenna-r"></div>
+            <div class="lore-tv-antenna-base"></div>
+          </div>
+
+          <div class="lore-tv-bezel">
+            <!-- Brand badge with red circle scribble -->
+            <div class="lore-tv-brand">
+              <span class="lore-tv-brand-name">SamSong</span>
+              <svg class="lore-tv-brand-circle" viewBox="0 0 140 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <ellipse cx="70" cy="22" rx="66" ry="18" stroke="#e33" stroke-width="2.5" stroke-dasharray="4 2" fill="none" transform="rotate(-2 70 22)" opacity="0.85"/>
+              </svg>
+            </div>
+            <!-- Power LED -->
+            <div class="lore-tv-power-led"></div>
+
+            <div class="lore-tv-screen" id="tv-screen">
+              <div class="lore-tv-static" id="tv-static"></div>
+              <div class="lore-tv-vhs-line"></div>
+              <div class="lore-tv-ch-flash" id="tv-ch-flash"></div>
+              <video class="lore-tv-video" id="tv-video" muted loop playsinline></video>
+              <div class="lore-tv-content" id="tv-content">
+                <div class="lore-tv-channel" id="tv-channel">CH 01</div>
+                <div class="lore-tv-show" id="tv-show"></div>
+                <div class="lore-tv-quote" id="tv-quote"></div>
+              </div>
+              <div class="lore-tv-scanlines"></div>
+            </div>
+
+            <!-- Controls bar: mute + knobs -->
+            <div class="lore-tv-controls">
+              <button class="lore-tv-mute-btn" id="tv-mute" aria-label="Toggle sound">🔇</button>
+              <div class="lore-tv-knob-group">
+                <span class="lore-tv-knob-label">CH</span>
+                <button class="lore-tv-knob" id="tv-prev" aria-label="Previous channel">
+                  <div class="lore-tv-knob-inner">
+                    <div class="lore-tv-knob-notch"></div>
+                  </div>
+                </button>
+              </div>
+              <div class="lore-tv-knob-group">
+                <span class="lore-tv-knob-label">VOL</span>
+                <button class="lore-tv-knob" id="tv-vol" aria-label="Adjust volume">
+                  <div class="lore-tv-knob-inner">
+                    <div class="lore-tv-knob-notch"></div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="lore-tv-legs">
+            <div class="lore-tv-leg"></div>
+            <div class="lore-tv-leg"></div>
+          </div>
         </div>
       </div>
     </div>

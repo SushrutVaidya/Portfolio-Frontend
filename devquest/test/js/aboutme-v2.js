@@ -583,46 +583,8 @@
   // ════════════════════════════════════
   //  LORE ZONE 2: Classified File
   // ════════════════════════════════════
-  const CLASSIFIED_ENTRIES = [
-    {
-      label: 'SUBJECT ASSESSMENT',
-      text: 'Subject demonstrates <span class="lore-redacted">dangerously high</span> levels of curiosity. Known to pursue <span class="lore-redacted">multiple side projects simultaneously</span>. Approach with caution.'
-    },
-    {
-      label: 'KNOWN AFFILIATIONS',
-      text: 'Counter-Strike 2 — 1500+ hours logged. Estimated inventory value: <span class="lore-redacted">$40,000</span>. Plays on a <span class="lore-redacted">PS4 controller</span>. Subject has expressed <span class="lore-redacted">open hostility</span> towards Valorant.'
-    },
-    {
-      label: 'THREAT ASSESSMENT',
-      text: 'Will argue about biryani preparation methods for <span class="lore-redacted">unlimited duration</span>. Has been observed cooking at <span class="lore-redacted">2 AM</span>. Kitchen fire count: <span class="lore-redacted">classified</span>.'
-    },
-    {
-      label: 'RECENT ACTIVITY',
-      text: 'Subject has been acquiring <span class="lore-redacted">Arduino boards</span> and <span class="lore-redacted">breadboard circuits</span>. Purpose: <span class="lore-redacted">unknown but probably cool</span>. Security clearance pending.'
-    },
-  ];
-
-  function initClassifiedFile() {
-    const container = document.getElementById('lore-entries');
-    if (!container || container.children.length > 0) return;
-
-    CLASSIFIED_ENTRIES.forEach(entry => {
-      const div = document.createElement('div');
-      div.className = 'lore-file-entry';
-      div.innerHTML =
-        '<div class="lore-file-entry-label">' + entry.label + '</div>' +
-        '<div class="lore-file-entry-text">' + entry.text + '</div>';
-      container.appendChild(div);
-    });
-
-    // Click to reveal redacted text
-    container.querySelectorAll('.lore-redacted').forEach(el => {
-      el.addEventListener('click', () => el.classList.toggle('revealed'));
-    });
-  }
-
   // ════════════════════════════════════
-  //  LORE ZONE 3: Retro TV
+  //  RETRO TV (The Channel)
   // ════════════════════════════════════
   const TV_CHANNELS = [
     { show: 'FAMILY GUY', emoji: '📺', quote: "I've watched every episode. Multiple times. Peter Griffin is a lifestyle. Giggity.", clip: API_BASE + '/clips/familyguy.mp4' },
@@ -641,29 +603,40 @@
     const quoteEl = document.getElementById('tv-quote');
     const videoEl = document.getElementById('tv-video');
     const muteBtn = document.getElementById('tv-mute');
-    const prevBtn = document.getElementById('tv-prev');
-    const nextBtn = document.getElementById('tv-next');
+    const chKnob = document.getElementById('tv-prev');
+    const volKnob = document.getElementById('tv-vol');
+    const chFlash = document.getElementById('tv-ch-flash');
 
-    if (!screen || !prevBtn || !nextBtn) return;
+    if (!screen || !chKnob) return;
 
     let currentCh = 0;
     let switching = false;
-    let isMuted = true;
+    let warmedUp = false;
 
-    // Track which clips loaded successfully
+    // Volume levels: 0=mute, 0.33=low, 0.66=med, 1=high
+    const VOL_STEPS = [0, 0.33, 0.66, 1];
+    const VOL_ICONS = ['\u{1F507}', '\u{1F508}', '\u{1F509}', '\u{1F50A}'];
+    let volIdx = 0; // start muted
+
     const clipLoaded = {};
 
     function tryLoadClip(idx) {
-      if (clipLoaded[idx] !== undefined) return; // already tried
+      if (clipLoaded[idx] !== undefined) return;
       const ch = TV_CHANNELS[idx];
       if (!ch.clip) { clipLoaded[idx] = false; return; }
-
-      // Test if video loads
       const tester = document.createElement('video');
       tester.src = ch.clip;
       tester.addEventListener('canplaythrough', () => { clipLoaded[idx] = true; }, { once: true });
       tester.addEventListener('error', () => { clipLoaded[idx] = false; }, { once: true });
       tester.load();
+    }
+
+    function applyVolume() {
+      if (videoEl) {
+        videoEl.muted = volIdx === 0;
+        videoEl.volume = VOL_STEPS[volIdx];
+      }
+      if (muteBtn) muteBtn.textContent = VOL_ICONS[volIdx];
     }
 
     function display(idx) {
@@ -672,10 +645,9 @@
       showEl.innerHTML = '<span class="lore-tv-emoji">' + ch.emoji + '</span>' + ch.show;
       quoteEl.textContent = ch.quote;
 
-      // Video handling
       if (clipLoaded[idx] === true && videoEl) {
         videoEl.src = ch.clip;
-        videoEl.muted = isMuted;
+        applyVolume();
         videoEl.classList.add('active');
         videoEl.play().catch(() => {});
       } else {
@@ -687,51 +659,91 @@
       }
     }
 
-    function switchChannel(dir) {
+    // Big channel number flash
+    function flashChannel(idx) {
+      if (!chFlash) return;
+      chFlash.textContent = String(idx + 1).padStart(2, '0');
+      chFlash.classList.remove('active');
+      void chFlash.offsetWidth;
+      chFlash.classList.add('active');
+      setTimeout(() => chFlash.classList.remove('active'), 600);
+    }
+
+    // Knob rotation — cumulative, tracks position
+    let knobAngle = { ch: 0, vol: 0 };
+
+    function animateKnobEl(knob, key, dir) {
+      var step = 30 * dir;
+      knobAngle[key] += step;
+      knob.classList.add('turning');
+      knob.style.transform = 'rotate(' + (knobAngle[key] + (step * 0.4)) + 'deg)';
+      setTimeout(() => {
+        knob.style.transform = 'rotate(' + knobAngle[key] + 'deg)';
+      }, 150);
+    }
+
+    function switchChannel() {
       if (switching) return;
       switching = true;
 
-      // Pause current video
       if (videoEl) {
         videoEl.pause();
         videoEl.classList.remove('active');
       }
 
-      // Static flash
+      animateKnobEl(chKnob, 'ch', 1);
+
       staticEl.classList.add('active');
       content.classList.add('switching');
 
+      var nextCh = (currentCh + 1) % TV_CHANNELS.length;
+      flashChannel(nextCh);
+
       setTimeout(() => {
-        currentCh = (currentCh + dir + TV_CHANNELS.length) % TV_CHANNELS.length;
+        currentCh = nextCh;
         display(currentCh);
         staticEl.classList.remove('active');
         content.classList.remove('switching');
         switching = false;
-      }, 300);
+      }, 400);
     }
 
-    // Mute/unmute
-    if (muteBtn && videoEl) {
+    function cycleVolume() {
+      volIdx = (volIdx + 1) % VOL_STEPS.length;
+      animateKnobEl(volKnob, 'vol', 1);
+      applyVolume();
+    }
+
+    // CH knob — cycles channels
+    chKnob.addEventListener('click', switchChannel);
+
+    // VOL knob — cycles volume levels
+    if (volKnob) volKnob.addEventListener('click', cycleVolume);
+
+    // Mute button also toggles mute
+    if (muteBtn) {
       muteBtn.addEventListener('click', () => {
-        isMuted = !isMuted;
-        videoEl.muted = isMuted;
-        muteBtn.textContent = isMuted ? '🔇' : '🔊';
+        volIdx = volIdx === 0 ? 2 : 0; // toggle between mute and medium
+        applyVolume();
+        if (volKnob) {
+          animateKnobEl(volKnob, 'vol', volIdx === 0 ? -1 : 1);
+        }
       });
     }
 
-    prevBtn.addEventListener('click', () => switchChannel(-1));
-    nextBtn.addEventListener('click', () => switchChannel(1));
+    // CRT warm-up on first scroll into view
+    var tvObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !warmedUp) {
+          warmedUp = true;
+          screen.classList.add('warming-up');
+          tvObs.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    tvObs.observe(screen);
 
-    // Auto-rotate every 6s (longer for video)
-    let autoTimer = setInterval(() => switchChannel(1), 6000);
-    screen.addEventListener('mouseenter', () => clearInterval(autoTimer));
-    screen.addEventListener('mouseleave', () => {
-      autoTimer = setInterval(() => switchChannel(1), 6000);
-    });
-
-    // Preload check all clips
     TV_CHANNELS.forEach((_, i) => tryLoadClip(i));
-
     display(0);
   }
 
@@ -740,7 +752,6 @@
   // ════════════════════════════════════
   function initLore() {
     initPhoneThread();
-    initClassifiedFile();
     initTV();
   }
 

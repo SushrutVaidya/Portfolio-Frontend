@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Card Experiments</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #111;
+    color: #fff;
+    min-height: 100vh;
+    padding: 48px 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: #e0e0e0;
+  }
+  .subtitle {
+    text-align: center;
+    color: #555;
+    font-size: 0.85rem;
+    margin-bottom: 56px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 360px);
+    gap: 56px;
+    justify-content: center;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1600px) { .grid { grid-template-columns: repeat(2, 360px); } }
+  @media (max-width: 820px) { .grid { grid-template-columns: 360px; } }
+  .card-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+  }
+  .card-label {
+    font: 700 0.75rem/1 'Inter', sans-serif;
+    letter-spacing: 4px;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  /* ══ Shared base ══ */
+  .badge {
+    width: 360px;
+    min-height: 580px;
+    border-radius: 22px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ═══════════════════════════
+     1. HOLOGRAPHIC — Premium Badge
+     ═══════════════════════════ */
+  .badge-holo {
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+  .badge-holo::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg,
+      rgba(255,100,200,0.07) 0%, rgba(0,200,255,0.08) 25%,
+      rgba(128,0,255,0.07) 50%, rgba(0,255,128,0.08) 75%,
+      rgba(255,200,0,0.07) 100%);
+    background-size: 300% 300%;
+    animation: holoShift 5s ease-in-out infinite;
+    pointer-events: none; z-index: 1; border-radius: 22px;
+  }
+  @keyframes holoShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .badge-holo:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.2), 0 0 40px rgba(128,0,255,0.08), 0 0 80px rgba(0,200,255,0.04);
+  }
+  .badge-holo .holo-photo {
+    width: 100%; height: 260px;
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #f0e6ff, #e0f0ff);
+  }
+  .badge-holo .holo-photo::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(transparent, #fff);
+  }
+  .badge-holo .holo-content {
+    padding: 24px 32px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; width: 100%;
+  }
+  .badge-holo .holo-name { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; color: #1a1a2e; text-align: center; line-height: 1.15; }
+  .badge-holo .holo-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: #7c3aed; text-transform: uppercase; font-variant: small-caps; }
+  .badge-holo .holo-bio { font-size: 0.7rem; color: #777; text-align: center; line-height: 1.6; }
+  .badge-holo .holo-motto { font-size: 0.65rem; color: #999; font-style: italic; text-align: center; }
+  .badge-holo .holo-motto::before, .badge-holo .holo-motto::after { content: ' \u201C '; color: #ccc; }
+  .badge-holo .holo-motto::after { content: ' \u201D '; }
+  .badge-holo .holo-divider { width: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(128,0,255,0.15), rgba(0,200,255,0.15), transparent); }
+  .badge-holo .holo-stats {
+    display: flex; gap: 0; width: 100%; justify-content: center;
+  }
+  .badge-holo .holo-stat {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 0 14px;
+  }
+  .badge-holo .holo-stat:not(:last-child) { border-right: 1px solid rgba(0,0,0,0.06); }
+  .badge-holo .holo-stat-val { font-size: 1.15rem; font-weight: 800; color: #1a1a2e; }
+  .badge-holo .holo-stat-lbl { font-size: 0.65rem; font-weight: 600; letter-spacing: 1px; color: #999; text-transform: uppercase; }
+  .badge-holo .holo-wanted { display: flex; align-items: center; gap: 10px; }
+  .badge-holo .holo-stars { display: flex; gap: 5px; font-size: 1rem; color: #d4a017; }
+  .badge-holo .holo-stars .off { opacity: 0.15; }
+  .badge-holo .holo-xp { width: 100%; }
+  .badge-holo .holo-xp-label { font-size: 0.6rem; font-weight: 600; color: #999; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+  .badge-holo .holo-xp-bar { width: 100%; height: 6px; background: rgba(128,0,255,0.06); border-radius: 3px; overflow: hidden; }
+  .badge-holo .holo-xp-fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #00c8ff); border-radius: 3px; }
+  .badge-holo .holo-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .badge-holo .holo-chip {
+    font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 8px;
+    background: rgba(128,0,255,0.05); color: #7c3aed; border: 1px solid rgba(128,0,255,0.1);
+  }
+  .badge-holo .holo-id { font: 500 0.6rem/1 monospace; letter-spacing: 2px; color: #ccc; margin-top: auto; text-align: center; }
+
+  /* ═══════════════════════════
+     2. CARBON FIBER — Performance
+     ═══════════════════════════ */
+  .badge-carbon {
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px),
+                linear-gradient(160deg, #1e1e1e, #111);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    display: flex; flex-direction: row;
+    padding: 0;
+  }
+  .badge-carbon::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, #ff4500, #ff6a00, #ff4500); z-index: 2;
+  }
+  .badge-carbon:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,69,0,0.12);
+  }
+  .badge-carbon .cb-photo-col {
+    width: 40%; min-height: 100%; overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  }
+  .badge-carbon .cb-photo-col .photo-img { width: 100%; height: 100%; object-fit: cover; }
+  .badge-carbon .cb-photo-col::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 60%, rgba(17,17,17,0.9));
+    pointer-events: none;
+  }
+  .badge-carbon .cb-info-col {
+    width: 60%; padding: 28px 22px 24px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .badge-carbon .cb-name { font-size: 1.4rem; font-weight: 900; color: #f0f0f0; letter-spacing: 0.5px; line-height: 1.15; }
+  .badge-carbon .cb-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; color: #ff6a00; text-transform: uppercase; }
+  .badge-carbon .cb-bio { font-size: 0.65rem; color: #666; line-height: 1.5; }
+  .badge-carbon .cb-motto { font-size: 0.6rem; color: #555; font-style: italic; }
+  .badge-carbon .cb-motto::before { content: '// '; color: #ff6a00; font-style: normal; }
+  .badge-carbon .cb-stats { display: flex; flex-direction: column; gap: 10px; }
+  .badge-carbon .cb-stat-row { display: flex; align-items: center; gap: 10px; }
+  .badge-carbon .cb-stat-lbl { font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; color: #555; text-transform: uppercase; width: 32px; flex-shrink: 0; }
+  .badge-carbon .cb-stat-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .badge-carbon .cb-stat-fill { height: 100%; background: linear-gradient(90deg, #ff4500, #ff6a00); border-radius: 2px; }
+  .badge-carbon .cb-stat-val { font-size: 0.7rem; font-weight: 800; color: #ff6a00; width: 24px; text-align: right; }
+  .badge-carbon .cb-xp { margin-top: auto; }
+  .badge-carbon .cb-xp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .badge-carbon .cb-xp-lbl { font-size: 0.6rem; font-weight: 800; color: #ff6a00; letter-spacing: 1px; }
+  .badge-carbon .cb-xp-lvl { font-size: 0.6rem; font-weight: 700; color: #555; }
+  .badge-carbon .cb-xp-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .badge-carbon .cb-xp-fill { height: 100%; background: linear-gradient(90deg, #ff4500, #ff8c00); border-radius: 2px; }
+  .badge-carbon .cb-traits { display: flex; flex-wrap: wrap; gap: 5px; }
+  .badge-carbon .cb-chip {
+    font-size: 0.65rem; font-weight: 700; padding: 4px 12px;
+    background: rgba(255,69,0,0.06); color: #ff6a00;
+    border: 1px solid rgba(255,69,0,0.12); text-transform: uppercase; letter-spacing: 0.5px;
+    clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  }
+  .badge-carbon .cb-id { font: 500 0.6rem/1 monospace; letter-spacing: 1px; color: #444; text-align: right; margin-top: auto; }
+
+  /* ═══════════════════════════
+     3. FROSTED GLASS — Aura
+     ═══════════════════════════ */
+  .card-col.glass-bg { position: relative; }
+  .card-col.glass-bg::after {
+    content: ''; position: absolute; top: 35%; left: 5%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(128,0,255,0.25), rgba(0,150,255,0.12) 50%, transparent 70%);
+    border-radius: 50%; pointer-events: none; z-index: -1;
+    filter: blur(10px);
+  }
+  .badge-glass {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 0 24px;
+  }
+  .badge-glass:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 50px rgba(128,0,255,0.06);
+    border-color: rgba(255,255,255,0.18);
+  }
+  .badge-glass .gl-photo-area {
+    width: 100%; height: 200px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(128,0,255,0.06), transparent);
+    position: relative; padding-top: 20px;
+  }
+  .badge-glass .gl-photo {
+    width: 130px; height: 130px; border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 3px solid rgba(255,255,255,0.12);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 6px rgba(128,0,255,0.06);
+  }
+  .badge-glass .gl-content {
+    padding: 0 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 1; width: 100%;
+  }
+  .badge-glass .gl-name {
+    font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #fff;
+    background: rgba(255,255,255,0.05); padding: 10px 24px; border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .badge-glass .gl-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: rgba(180,140,255,0.7); text-transform: uppercase; }
+  .badge-glass .gl-bio { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.6; }
+  .badge-glass .gl-motto { font-size: 0.6rem; color: rgba(255,255,255,0.3); font-style: italic; text-align: center; }
+  .badge-glass .gl-motto::before { content: '\u201C '; opacity: 0.5; }
+  .badge-glass .gl-motto::after { content: ' \u201D'; opacity: 0.5; }
+  .badge-glass .gl-stats { display: flex; gap: 24px; }
+  .badge-glass .gl-stat { font-size: 1.3rem; font-weight: 800; color: rgba(255,255,255,0.85); }
+  .badge-glass .gl-wanted { display: flex; align-items: center; gap: 8px; }
+  .badge-glass .gl-stars { display: flex; gap: 5px; font-size: 1rem; color: rgba(200,150,255,0.7); }
+  .badge-glass .gl-stars .off { opacity: 0.15; }
+  .badge-glass .gl-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .badge-glass .gl-pill {
+    font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+  }
+  .badge-glass .gl-id { font: 500 0.6rem/1 monospace; letter-spacing: 2px; color: rgba(255,255,255,0.2); margin-top: auto; }
+
+  /* ═══════════════════════════
+     4. BRUSHED METAL — Government ID
+     ═══════════════════════════ */
+  .badge-metal {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0) 80%, rgba(255,255,255,0.04) 100%),
+                linear-gradient(180deg, #c8c8c8, #a0a0a0, #b8b8b8);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+  .badge-metal::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0px, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 3px);
+    border-radius: 22px; pointer-events: none;
+  }
+  .badge-metal::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 45%, transparent 50%);
+    border-radius: 22px; pointer-events: none; z-index: 1;
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  .badge-metal:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.4);
+  }
+  .badge-metal:hover::after { opacity: 1; }
+  .badge-metal .mt-header {
+    background: linear-gradient(90deg, #555, #666, #555);
+    padding: 16px 24px; text-align: center;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 5px; color: #ccc;
+    text-transform: uppercase; text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+    border-radius: 22px 22px 0 0;
+  }
+  .badge-metal .mt-body { display: flex; padding: 20px 24px 0; gap: 18px; }
+  .badge-metal .mt-photo {
+    width: 100px; height: 120px; border-radius: 8px; flex-shrink: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ddd, #bbb);
+    border: 2px solid rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .badge-metal .mt-photo .photo-img { border-radius: 6px; }
+  .badge-metal .mt-info { flex: 1; }
+  .badge-metal .mt-name { font-size: 1.15rem; font-weight: 900; color: #222; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+  .badge-metal .mt-class { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-top: 4px; }
+  .badge-metal .mt-bio { font-size: 0.6rem; color: #555; margin-top: 8px; line-height: 1.6; }
+  .badge-metal .mt-hr { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12), transparent); margin: 14px 24px; }
+  .badge-metal .mt-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; padding: 0 24px; }
+  .badge-metal .mt-stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; }
+  .badge-metal .mt-stat-row .lbl { color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-metal .mt-stat-row .val { color: #333; font-weight: 800; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
+  .badge-metal .mt-wanted { padding: 10px 24px; }
+  .badge-metal .mt-wanted-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; color: #777; text-transform: uppercase; margin-bottom: 4px; }
+  .badge-metal .mt-wanted-stars { font-size: 1rem; color: #8b7000; }
+  .badge-metal .mt-wanted-stars .off { opacity: 0.2; }
+  .badge-metal .mt-traits { padding: 8px 24px 0; }
+  .badge-metal .mt-trait { font-size: 0.65rem; color: #555; line-height: 2; }
+  .badge-metal .mt-trait::before { content: '\2022 '; color: #888; }
+  .badge-metal .mt-bottom { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: auto; padding: 14px 24px 22px; }
+  .badge-metal .mt-serial { font: 700 0.65rem/1 monospace; letter-spacing: 3px; color: #888; }
+  .badge-metal .mt-bars { display: flex; gap: 1px; height: 22px; }
+  .badge-metal .mt-bars span { display: block; height: 100%; background: #333; opacity: 0.3; }
+
+  /* ═══════════════════════════
+     5. NEON CYBERPUNK — Terminal
+     ═══════════════════════════ */
+  .badge-neon {
+    background: #0a0a14;
+    border: 2px solid; border-image: linear-gradient(180deg, #00ffff, #ff00ff) 1;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,255,0.08), 0 0 20px rgba(255,0,255,0.08);
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+  .badge-neon::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,255,255,0.03) 0%, transparent 30%), linear-gradient(0deg, rgba(255,0,255,0.03) 0%, transparent 30%);
+    pointer-events: none; border-radius: 18px;
+  }
+  .badge-neon:hover {
+    box-shadow: 0 28px 80px rgba(0,0,0,0.7), 0 0 50px rgba(0,255,255,0.12), 0 0 50px rgba(255,0,255,0.12);
+    transform: translateY(-6px);
+  }
+  .badge-neon .nn-photo-wrap {
+    position: relative; width: 100%; height: 200px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .badge-neon .nn-photo {
+    width: 120px; height: 120px; border-radius: 50%;
+    overflow: hidden;
+    background: rgba(0,255,255,0.04);
+    border: 2px solid rgba(0,255,255,0.3);
+    box-shadow: 0 0 24px rgba(0,255,255,0.15);
+    position: relative; z-index: 2;
+  }
+  .badge-neon .nn-photo-glitch1 {
+    position: absolute; top: 50%; left: 50%; width: 120px; height: 120px;
+    margin: -60px 0 0 -60px; border-radius: 50%;
+    border: 2px solid rgba(0,255,255,0.25);
+    transform: translate(5px, -4px); z-index: 1;
+  }
+  .badge-neon .nn-photo-glitch2 {
+    position: absolute; top: 50%; left: 50%; width: 120px; height: 120px;
+    margin: -60px 0 0 -60px; border-radius: 50%;
+    border: 2px solid rgba(255,0,255,0.25);
+    transform: translate(-5px, 4px); z-index: 1;
+  }
+  .badge-neon .nn-content { padding: 0 28px 28px; display: flex; flex-direction: column; flex: 1; gap: 12px; }
+  .badge-neon .nn-name {
+    font-size: 1.5rem; font-weight: 900; color: #fff;
+    text-shadow: 0 0 14px rgba(0,255,255,0.3);
+    letter-spacing: 1.5px;
+  }
+  .badge-neon .nn-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: #ff00ff; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,0,255,0.3); }
+  .badge-neon .nn-bio { font-size: 0.65rem; color: rgba(0,255,255,0.3); line-height: 1.6; }
+  .badge-neon .nn-motto { font-size: 0.6rem; color: rgba(0,255,255,0.4); font-style: italic; }
+  .badge-neon .nn-motto::before { content: '> '; color: #00ffff; font-style: normal; }
+  .badge-neon .nn-stats { display: flex; flex-direction: column; gap: 8px; }
+  .badge-neon .nn-stat-row { display: flex; align-items: center; gap: 10px; }
+  .badge-neon .nn-stat-lbl { font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; color: rgba(255,0,255,0.5); text-transform: uppercase; width: 32px; flex-shrink: 0; }
+  .badge-neon .nn-stat-bar { flex: 1; height: 5px; background: rgba(0,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .badge-neon .nn-stat-fill { height: 100%; background: linear-gradient(90deg, #00ffff, #00ffaa); border-radius: 2px; box-shadow: 2px 0 12px rgba(0,255,255,0.4); }
+  .badge-neon .nn-stat-val { font-size: 0.7rem; font-weight: 800; color: #00ffff; text-shadow: 0 0 8px rgba(0,255,255,0.3); width: 24px; text-align: right; }
+  .badge-neon .nn-wanted { display: flex; align-items: center; gap: 10px; }
+  .badge-neon .nn-wanted-stars { font-size: 1.1rem; color: #ff00ff; text-shadow: 0 0 12px rgba(255,0,255,0.5); display: flex; gap: 4px;
+    animation: neonPulse 2s ease-in-out infinite;
+  }
+  @keyframes neonPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+  }
+  .badge-neon .nn-wanted-stars .off { opacity: 0.12; }
+  .badge-neon .nn-traits { display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge-neon .nn-pill {
+    font-size: 0.65rem; font-weight: 600; padding: 4px 12px; border-radius: 5px;
+    background: transparent; color: #00ffff;
+    border: 1px solid rgba(0,255,255,0.2); text-shadow: 0 0 4px rgba(0,255,255,0.2);
+  }
+  .badge-neon .nn-id { font: 500 0.6rem/1 monospace; letter-spacing: 2px; color: rgba(255,0,255,0.3); margin-top: auto; }
+
+  /* ═══════════════════════════
+     6. MINIMAL — Swiss Design
+     ═══════════════════════════ */
+  .badge-minimal {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+  .badge-minimal:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    border-color: #ccc;
+    transform: translateY(-4px);
+  }
+  .badge-minimal .mn-photo {
+    width: 100%; height: 220px;
+    overflow: hidden; position: relative;
+    background: #f5f5f5;
+  }
+  .badge-minimal .mn-photo::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50px;
+    background: linear-gradient(transparent, #fff);
+  }
+  .badge-minimal .mn-content { padding: 20px 32px 28px; display: flex; flex-direction: column; flex: 1; gap: 8px; }
+  .badge-minimal .mn-name { font-size: 1.7rem; font-weight: 900; color: #111; letter-spacing: 0.5px; line-height: 1.1; }
+  .badge-minimal .mn-class { font-size: 0.75rem; font-weight: 300; color: #aaa; letter-spacing: 3px; text-transform: uppercase; }
+  .badge-minimal .mn-bio { font-size: 0.7rem; color: #666; line-height: 1.7; }
+  .badge-minimal .mn-motto { font-size: 0.65rem; color: #aaa; font-style: italic; }
+  .badge-minimal .mn-divider { width: 100%; height: 1px; background: #e8e8e8; margin: 10px 0; }
+  .badge-minimal .mn-stats { display: flex; align-items: center; gap: 0; }
+  .badge-minimal .mn-stat { display: flex; align-items: baseline; gap: 6px; padding: 0 14px; }
+  .badge-minimal .mn-stat:first-child { padding-left: 0; }
+  .badge-minimal .mn-stat:not(:last-child) { border-right: 1px solid #e8e8e8; }
+  .badge-minimal .mn-stat-lbl { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.5px; color: #bbb; text-transform: uppercase; }
+  .badge-minimal .mn-stat-val { font-size: 0.85rem; font-weight: 700; color: #333; }
+  .badge-minimal .mn-wanted { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .badge-minimal .mn-wanted-dots { display: flex; gap: 4px; }
+  .badge-minimal .mn-wanted-dot {
+    width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #333;
+  }
+  .badge-minimal .mn-wanted-dot.on { background: #333; }
+  .badge-minimal .mn-traits { font-size: 0.7rem; color: #888; line-height: 1.8; }
+  .badge-minimal .mn-xp { margin-top: 8px; }
+  .badge-minimal .mn-xp-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .badge-minimal .mn-xp-lbl { font-size: 0.6rem; font-weight: 500; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-minimal .mn-xp-bar { width: 100%; height: 3px; background: #f0f0f0; border-radius: 1px; overflow: hidden; }
+  .badge-minimal .mn-xp-fill { height: 100%; background: #333; border-radius: 1px; }
+  .badge-minimal .mn-id { font: 400 0.6rem/1 monospace; letter-spacing: 2px; color: #ddd; margin-top: auto; }
+
+  /* ═══════════════════════════
+     7. RETRO VHS — Tape
+     ═══════════════════════════ */
+  .badge-vhs {
+    background: linear-gradient(180deg, #1a0a2e, #0d0d1a);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,100,200,0.08);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    padding: 20px 22px 22px;
+    font-family: 'Inter', monospace;
+  }
+  .badge-vhs::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px);
+    pointer-events: none; z-index: 2; border-radius: 22px;
+  }
+  .badge-vhs::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none; z-index: 3; border-radius: 22px;
+  }
+  .badge-vhs:hover {
+    transform: translateY(-6px) skewX(-0.5deg);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,100,200,0.08), 0 0 30px rgba(100,200,255,0.06);
+  }
+  .badge-vhs .vhs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .badge-vhs .vhs-rec { font-size: 0.65rem; font-weight: 700; color: #ff3333; display: flex; align-items: center; gap: 6px; }
+  .badge-vhs .vhs-rec-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff3333; animation: recBlink 1.5s ease-in-out infinite; }
+  @keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+  .badge-vhs .vhs-time { font-size: 0.6rem; font-weight: 600; color: rgba(100,200,255,0.4); font-family: monospace; }
+  .badge-vhs .vhs-screen {
+    width: 100%; aspect-ratio: 16/10; border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2a1040, #1a0830);
+    border: 2px solid rgba(255,110,180,0.12);
+    position: relative; margin-bottom: 14px;
+  }
+  .badge-vhs .vhs-screen .photo-img { filter: saturate(0.7) contrast(1.1); }
+  .badge-vhs .vhs-screen::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.12) 1px, rgba(0,0,0,0.12) 2px);
+    pointer-events: none; z-index: 1;
+  }
+  .badge-vhs .vhs-name {
+    font-size: 1.4rem; font-weight: 900; color: #ff6eb4;
+    text-shadow: 2px 0 #00c8ff, -2px 0 #ff0080;
+    margin-bottom: 4px; letter-spacing: 1.5px;
+  }
+  .badge-vhs .vhs-class { font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; color: rgba(100,200,255,0.5); text-transform: uppercase; margin-bottom: 4px; }
+  .badge-vhs .vhs-bio { font-size: 0.6rem; color: rgba(100,200,255,0.3); line-height: 1.5; margin-bottom: 4px; }
+  .badge-vhs .vhs-motto { font-size: 0.6rem; color: rgba(255,110,180,0.45); font-style: italic; margin-bottom: 8px; }
+  .badge-vhs .vhs-motto::before { content: '>> '; color: rgba(100,200,255,0.35); font-style: normal; }
+  .badge-vhs .vhs-stats { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; font-family: monospace; }
+  .badge-vhs .vhs-stat { font-size: 0.7rem; color: #00c8ff; display: flex; align-items: center; }
+  .badge-vhs .vhs-stat-lbl { width: 36px; color: rgba(255,110,180,0.5); font-weight: 700; font-size: 0.65rem; }
+  .badge-vhs .vhs-stat-bar { color: #00c8ff; letter-spacing: -1px; font-size: 0.7rem; }
+  .badge-vhs .vhs-stat-val { color: rgba(100,200,255,0.55); font-size: 0.65rem; margin-left: 8px; }
+  .badge-vhs .vhs-wanted { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .badge-vhs .vhs-play { font-size: 0.6rem; color: rgba(255,110,180,0.35); font-weight: 700; }
+  .badge-vhs .vhs-wanted-stars { font-size: 1rem; color: #ff6eb4; text-shadow: 0 0 8px rgba(255,110,180,0.3); }
+  .badge-vhs .vhs-wanted-stars .off { opacity: 0.12; }
+  .badge-vhs .vhs-xp { margin-bottom: 6px; font-family: monospace; }
+  .badge-vhs .vhs-xp-text { font-size: 0.7rem; color: #00c8ff; }
+  .badge-vhs .vhs-xp-bar { letter-spacing: -1px; }
+  .badge-vhs .vhs-traits { font-size: 0.6rem; color: rgba(255,110,180,0.35); margin-bottom: 8px; }
+  .badge-vhs .vhs-traits span { color: #ff6eb4; }
+  .badge-vhs .vhs-bottom { margin-top: auto; text-align: center; font-size: 0.65rem; font-weight: 700; color: rgba(100,200,255,0.25); letter-spacing: 4px; }
+
+  /* ═══════════════════════════
+     8. GTA ORIGINAL — Character Sheet
+     ═══════════════════════════ */
+  .badge-gta {
+    background: linear-gradient(170deg, #1c1c24, #12121a);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,165,0,0.06);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0;
+  }
+  .badge-gta::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, transparent, #ff8c00, #ffb347, #ff8c00, transparent); z-index: 2;
+  }
+  .badge-gta::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, transparent, #ff8c00, #ffb347, #ff8c00, transparent); z-index: 2;
+  }
+  .badge-gta:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,140,0,0.08);
+  }
+  .badge-gta .gta-photo-wrap {
+    width: 100%; height: 280px; position: relative;
+    overflow: hidden; border-radius: 22px 22px 0 0;
+  }
+  .badge-gta .gta-photo-wrap::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,140,0,0.2) 0%, transparent 40%, rgba(18,18,26,0.95) 100%);
+    pointer-events: none; z-index: 1;
+  }
+  .badge-gta .gta-photo-wrap .photo-img { width: 100%; height: 100%; object-fit: cover; }
+  .badge-gta .gta-body { padding: 14px 28px 24px; width: 100%; display: flex; flex-direction: column; align-items: center; flex: 1; gap: 10px; }
+  .badge-gta .gta-name { font-size: 1.6rem; font-weight: 900; color: #f0f0f0; letter-spacing: 6px; text-align: center; line-height: 1.15; }
+  .badge-gta .gta-class { font-size: 0.75rem; font-weight: 800; letter-spacing: 4px; color: #ff8c00; text-transform: uppercase; }
+  .badge-gta .gta-bio { font-size: 0.65rem; color: rgba(255,140,0,0.45); font-style: italic; text-align: center; line-height: 1.5; }
+  .badge-gta .gta-motto { font-size: 0.65rem; color: rgba(255,140,0,0.65); font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+  .badge-gta .gta-wanted { width: 100%; }
+  .badge-gta .gta-wanted-label { font-size: 0.75rem; font-weight: 800; color: #ff8c00; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
+  .badge-gta .gta-wanted-stars { font-size: 1.3rem; color: #ff8c00; display: flex; justify-content: center; gap: 5px; }
+  .badge-gta .gta-wanted-stars .off { opacity: 0.12; }
+  .badge-gta .gta-stats { display: flex; gap: 10px; width: 100%; justify-content: center; }
+  .badge-gta .gta-stat-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .badge-gta .gta-stat-bar-wrap { width: 18px; height: 65px; background: rgba(255,255,255,0.04); border-radius: 3px; position: relative; overflow: hidden; }
+  .badge-gta .gta-stat-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg, #ff8c00, #ffb347); border-radius: 3px; }
+  .badge-gta .gta-stat-lbl { font-size: 0.65rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-gta .gta-xp { width: 100%; }
+  .badge-gta .gta-xp-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .badge-gta .gta-xp-lbl { font-size: 0.6rem; font-weight: 800; color: #ff8c00; letter-spacing: 1px; text-transform: uppercase; }
+  .badge-gta .gta-xp-lvl { font-size: 0.6rem; font-weight: 700; color: #555; }
+  .badge-gta .gta-xp-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.04); border-radius: 2px; overflow: hidden; }
+  .badge-gta .gta-xp-fill { height: 100%; background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffb347); border-radius: 2px; }
+  .badge-gta .gta-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .badge-gta .gta-chip {
+    font-size: 0.65rem; font-weight: 800; padding: 5px 12px;
+    background: rgba(255,140,0,0.08); color: #ff8c00;
+    border: 1px solid rgba(255,140,0,0.12); border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-gta .gta-id { font: 500 0.6rem/1 monospace; letter-spacing: 1px; color: #444; margin-top: auto; align-self: flex-end; }
+
+  /* ═══════════════════════════
+     ZOOM OVERLAY
+     ═══════════════════════════ */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+    cursor: pointer;
+  }
+  .overlay.active { opacity: 1; pointer-events: all; }
+  .overlay .badge-zoom { transform: scale(1.5); pointer-events: none; cursor: default; }
+  .overlay .badge-zoom .badge { cursor: default; }
+  .overlay .badge-zoom .badge:hover { transform: none; box-shadow: none; }
+  .overlay-label {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+    font: 600 0.75rem/1 'Inter', sans-serif; letter-spacing: 4px;
+    color: #555; text-transform: uppercase; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <h1>PLAYER CARD — STYLE OPTIONS</h1>
+  <p class="subtitle">Click any card to zoom (bio + motto revealed). Hover to interact.</p>
+  <div class="grid" id="cardGrid"></div>
+  <div class="overlay" id="overlay">
+    <div class="badge-zoom" id="zoomTarget"></div>
+    <div class="overlay-label" id="overlayLabel"></div>
+  </div>
+
+<script>
+// ── Shared data ──
+const DATA = {
+  photo: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <rect fill="#2a2a3e" width="200" height="200"/>
+    <circle cx="100" cy="76" r="40" fill="#4a4a6a"/>
+    <ellipse cx="100" cy="170" rx="55" ry="45" fill="#4a4a6a"/>
+    <text x="100" y="85" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="36" fill="#8b8baf">S</text>
+  </svg>`),
+  name: 'SUSHRUT VAIDYA',
+  classRole: 'Full-Stack Mage',
+  title: 'The One Who Debugs & Cooks',
+  bio: 'Full-stack dev by day, home chef by night. Building things that matter \u2014 and occasionally breaking them.',
+  motto: 'Sleep is optional, shipping is not.',
+  stats: [
+    { lbl: 'CUR', val: 88 },
+    { lbl: 'HUM', val: 92 },
+    { lbl: 'CRE', val: 85 },
+    { lbl: 'DIS', val: 70 },
+    { lbl: 'SPI', val: 95 },
+  ],
+  wanted: 4,
+  wantedText: 'Armed and caffeinated',
+  traits: ['Hyderabad', 'Gamer', 'Cook', 'Otaku'],
+  level: 42,
+  xpPercent: 72,
+  cardId: '0001',
+};
+
+const BARCODE_WIDTHS = [2,1,3,1,2,1,1,3,2,1,2,1,3,1,2,1,1,3,2,1];
+function barcodeHTML(cls) {
+  return `<div class="${cls}">${BARCODE_WIDTHS.map(w => `<span style="width:${w}px"></span>`).join('')}</div>`;
+}
+function cardTag(id) { return `DEVQUEST #${id}`; }
+function stars(onClass, offClass) {
+  return Array.from({length: 5}, (_, i) =>
+    `<span class="${i < DATA.wanted ? (onClass || '') : (offClass || 'off')}">\u2605</span>`
+  ).join('');
+}
+function photoImg() {
+  return `<img class="photo-img" src="${DATA.photo}" alt="${DATA.name}">`;
+}
+
+// ── 1. Holographic — Premium Badge ──
+function buildHolo(zoomed) {
+  return `<div class="badge badge-holo">
+    <div class="holo-photo">${photoImg()}</div>
+    <div class="holo-content">
+      <div class="holo-name">${DATA.name}</div>
+      <div class="holo-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="holo-bio">${DATA.bio}</div><div class="holo-motto">${DATA.motto}</div>` : ''}
+      <div class="holo-divider"></div>
+      <div class="holo-stats">
+        ${DATA.stats.map(s => `<div class="holo-stat"><span class="holo-stat-val">${s.val}</span><span class="holo-stat-lbl">${s.lbl}</span></div>`).join('')}
+      </div>
+      <div class="holo-wanted">
+        <div class="holo-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="holo-xp">
+        <div class="holo-xp-label">LVL ${DATA.level} \u2014 ${DATA.xpPercent}% XP</div>
+        <div class="holo-xp-bar"><div class="holo-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="holo-traits">
+        ${DATA.traits.map(t => `<span class="holo-chip">${t}</span>`).join('')}
+      </div>
+      <div class="holo-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── 2. Carbon Fiber — Performance ──
+function buildCarbon(zoomed) {
+  return `<div class="badge badge-carbon">
+    <div class="cb-photo-col">${photoImg()}</div>
+    <div class="cb-info-col">
+      <div class="cb-name">${DATA.name}</div>
+      <div class="cb-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="cb-bio">${DATA.bio}</div><div class="cb-motto">${DATA.motto}</div>` : ''}
+      <div class="cb-stats">
+        ${DATA.stats.map(s => `<div class="cb-stat-row"><span class="cb-stat-lbl">${s.lbl}</span><div class="cb-stat-bar"><div class="cb-stat-fill" style="width:${s.val}%"></div></div><span class="cb-stat-val">${s.val}</span></div>`).join('')}
+      </div>
+      <div class="cb-traits">
+        ${DATA.traits.map(t => `<span class="cb-chip">${t}</span>`).join('')}
+      </div>
+      <div class="cb-xp">
+        <div class="cb-xp-head"><span class="cb-xp-lbl">XP</span><span class="cb-xp-lvl">LVL ${DATA.level}</span></div>
+        <div class="cb-xp-bar"><div class="cb-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="cb-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── 3. Frosted Glass — Aura ──
+function buildGlass(zoomed) {
+  return `<div class="badge badge-glass">
+    <div class="gl-photo-area">
+      <div class="gl-photo">${photoImg()}</div>
+    </div>
+    <div class="gl-content">
+      <div class="gl-name">${DATA.name}</div>
+      <div class="gl-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="gl-bio">${DATA.bio}</div><div class="gl-motto">${DATA.motto}</div>` : ''}
+      <div class="gl-stats">
+        ${DATA.stats.map(s => `<span class="gl-stat">${s.val}</span>`).join('')}
+      </div>
+      <div class="gl-wanted">
+        <div class="gl-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="gl-traits">
+        ${DATA.traits.map(t => `<span class="gl-pill">${t}</span>`).join('')}
+      </div>
+      <div class="gl-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── 4. Brushed Metal — Government ID ──
+function buildMetal(zoomed) {
+  return `<div class="badge badge-metal">
+    <div class="mt-header">DEVQUEST IDENTIFICATION</div>
+    <div class="mt-body">
+      <div class="mt-photo">${photoImg()}</div>
+      <div class="mt-info">
+        <div class="mt-name">${DATA.name}</div>
+        <div class="mt-class">${DATA.classRole}</div>
+        ${zoomed ? `<div class="mt-bio">${DATA.bio}</div>` : ''}
+      </div>
+    </div>
+    <div class="mt-hr"></div>
+    <div class="mt-stats">
+      ${DATA.stats.map(s => `<div class="mt-stat-row"><span class="lbl">${s.lbl}:</span><span class="val">${s.val}</span></div>`).join('')}
+    </div>
+    <div class="mt-wanted">
+      <div class="mt-wanted-label">Wanted Level</div>
+      <div class="mt-wanted-stars">${stars('', 'off')}</div>
+    </div>
+    <div class="mt-traits">
+      ${DATA.traits.map(t => `<div class="mt-trait">${t}</div>`).join('')}
+    </div>
+    <div class="mt-bottom">
+      <div class="mt-serial">SN: DQ-${DATA.cardId}</div>
+      ${barcodeHTML('mt-bars')}
+    </div>
+  </div>`;
+}
+
+// ── 5. Neon Cyberpunk — Terminal ──
+function buildNeon(zoomed) {
+  return `<div class="badge badge-neon">
+    <div class="nn-photo-wrap">
+      <div class="nn-photo-glitch1"></div>
+      <div class="nn-photo-glitch2"></div>
+      <div class="nn-photo">${photoImg()}</div>
+    </div>
+    <div class="nn-content">
+      <div class="nn-name">${DATA.name}</div>
+      <div class="nn-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="nn-bio">${DATA.bio}</div><div class="nn-motto">${DATA.motto}</div>` : ''}
+      <div class="nn-stats">
+        ${DATA.stats.map(s => `<div class="nn-stat-row"><span class="nn-stat-lbl">${s.lbl}</span><div class="nn-stat-bar"><div class="nn-stat-fill" style="width:${s.val}%"></div></div><span class="nn-stat-val">${s.val}</span></div>`).join('')}
+      </div>
+      <div class="nn-wanted">
+        <div class="nn-wanted-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="nn-traits">
+        ${DATA.traits.map(t => `<span class="nn-pill">${t}</span>`).join('')}
+      </div>
+      <div class="nn-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── 6. Minimal — Swiss Design ──
+function buildMinimal(zoomed) {
+  return `<div class="badge badge-minimal">
+    <div class="mn-photo">${photoImg()}</div>
+    <div class="mn-content">
+      <div class="mn-name">${DATA.name}</div>
+      <div class="mn-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="mn-bio">${DATA.bio}</div><div class="mn-motto">${DATA.motto}</div>` : ''}
+      <div class="mn-divider"></div>
+      <div class="mn-stats">
+        ${DATA.stats.map(s => `<div class="mn-stat"><span class="mn-stat-val">${s.val}</span><span class="mn-stat-lbl">${s.lbl}</span></div>`).join('')}
+      </div>
+      <div class="mn-wanted">
+        <div class="mn-wanted-dots">${Array.from({length: 5}, (_, i) => `<span class="mn-wanted-dot${i < DATA.wanted ? ' on' : ''}"></span>`).join('')}</div>
+      </div>
+      <div class="mn-traits">${DATA.traits.join(', ')}</div>
+      <div class="mn-xp">
+        <div class="mn-xp-head"><span class="mn-xp-lbl">LVL ${DATA.level}</span><span class="mn-xp-lbl">${DATA.xpPercent}%</span></div>
+        <div class="mn-xp-bar"><div class="mn-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="mn-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── 7. Retro VHS — Tape ──
+function buildVHS(zoomed) {
+  function vhsBar(val) {
+    const filled = Math.round(val / 10);
+    return '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
+  }
+  return `<div class="badge badge-vhs">
+    <div class="vhs-top">
+      <div class="vhs-rec"><span class="vhs-rec-dot"></span> REC</div>
+      <div class="vhs-time">00:42:00</div>
+    </div>
+    <div class="vhs-screen">${photoImg()}</div>
+    <div class="vhs-name">${DATA.name}</div>
+    <div class="vhs-class">${DATA.classRole}</div>
+    ${zoomed ? `<div class="vhs-bio">${DATA.bio}</div><div class="vhs-motto">${DATA.motto}</div>` : ''}
+    <div class="vhs-stats">
+      ${DATA.stats.map(s => `<div class="vhs-stat"><span class="vhs-stat-lbl">${s.lbl}</span><span class="vhs-stat-bar">\u2595${vhsBar(s.val)}</span><span class="vhs-stat-val">${s.val}</span></div>`).join('')}
+    </div>
+    <div class="vhs-wanted">
+      <span class="vhs-play">PLAY \u25B6</span>
+      <div class="vhs-wanted-stars">${stars('', 'off')}</div>
+    </div>
+    <div class="vhs-xp">
+      <span class="vhs-xp-text">[<span class="vhs-xp-bar">${'\u2588'.repeat(7)}${'\u2591'.repeat(3)}</span>] LVL ${DATA.level}</span>
+    </div>
+    <div class="vhs-traits">CATEGORIES: <span>${DATA.traits.join(' / ')}</span></div>
+    <div class="vhs-bottom">\u25C0\u25C0 REWIND \u2014 ${cardTag(DATA.cardId)}</div>
+  </div>`;
+}
+
+// ── 8. GTA Original — Character Sheet ──
+function buildGTA(zoomed) {
+  return `<div class="badge badge-gta">
+    <div class="gta-photo-wrap">${photoImg()}</div>
+    <div class="gta-body">
+      <div class="gta-name">${DATA.name}</div>
+      <div class="gta-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="gta-bio">"${DATA.bio}"</div><div class="gta-motto">${DATA.motto}</div>` : ''}
+      <div class="gta-wanted">
+        <div class="gta-wanted-label">Wanted Level</div>
+        <div class="gta-wanted-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="gta-stats">
+        ${DATA.stats.map(s => `<div class="gta-stat-col"><div class="gta-stat-bar-wrap"><div class="gta-stat-fill" style="height:${s.val}%"></div></div><span class="gta-stat-lbl">${s.lbl}</span></div>`).join('')}
+      </div>
+      <div class="gta-xp">
+        <div class="gta-xp-head"><span class="gta-xp-lbl">Mission Progress</span><span class="gta-xp-lvl">LVL ${DATA.level}</span></div>
+        <div class="gta-xp-bar"><div class="gta-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="gta-traits">
+        ${DATA.traits.map(t => `<span class="gta-chip">${t}</span>`).join('')}
+      </div>
+      <div class="gta-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
+// ── Style registry ──
+const CARD_STYLES = [
+  { name: 'Holographic',    build: buildHolo,    wrapper: '' },
+  { name: 'Carbon Fiber',   build: buildCarbon,  wrapper: '' },
+  { name: 'Frosted Glass',  build: buildGlass,   wrapper: 'glass-bg' },
+  { name: 'Brushed Metal',  build: buildMetal,    wrapper: '' },
+  { name: 'Neon Cyberpunk', build: buildNeon,     wrapper: '' },
+  { name: 'Minimal Clean',  build: buildMinimal,  wrapper: '' },
+  { name: 'Retro VHS',      build: buildVHS,      wrapper: '' },
+  { name: 'GTA Original',   build: buildGTA,      wrapper: '' },
+];
+
+// ── Build grid (not zoomed) ──
+const grid = document.getElementById('cardGrid');
+CARD_STYLES.forEach((style, i) => {
+  const col = document.createElement('div');
+  col.className = 'card-col' + (style.wrapper ? ' ' + style.wrapper : '');
+  col.innerHTML = `<span class="card-label">${i + 1}. ${style.name}</span>${style.build(false)}`;
+  col.addEventListener('click', () => openZoom(style, i));
+  grid.appendChild(col);
+});
+
+// ── Zoom overlay (zoomed = true → bio + motto revealed) ──
+const overlay = document.getElementById('overlay');
+const zoomTarget = document.getElementById('zoomTarget');
+const overlayLabel = document.getElementById('overlayLabel');
+
+function openZoom(style, index) {
+  zoomTarget.innerHTML = style.build(true);
+  overlayLabel.textContent = `${index + 1}. ${style.name}`;
+  overlay.classList.add('active');
+}
+overlay.addEventListener('click', () => overlay.classList.remove('active'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('active'); });
+</script>
+</body>
+</html>

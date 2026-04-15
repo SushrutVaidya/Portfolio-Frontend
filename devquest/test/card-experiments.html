@@ -597,11 +597,252 @@
     font: 600 0.75rem/1 'Inter', sans-serif; letter-spacing: 4px;
     color: #555; text-transform: uppercase; pointer-events: none;
   }
+
+  /* ═══════════════════════════
+     CARD EDITOR PANEL
+     ═══════════════════════════ */
+  .editor-wrap {
+    max-width: 900px; margin: 0 auto 48px; width: 100%;
+  }
+  .editor-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(94,59,255,0.08); border: 1px solid rgba(94,59,255,0.18);
+    border-radius: 14px; padding: 14px 24px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .editor-toggle:hover { background: rgba(94,59,255,0.14); }
+  .editor-toggle h2 {
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 3px;
+    color: #b49aff; text-transform: uppercase; margin: 0;
+  }
+  .editor-toggle .arrow {
+    font-size: 1rem; color: #b49aff; transition: transform 0.3s;
+  }
+  .editor-toggle.open .arrow { transform: rotate(180deg); }
+  .editor-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-top: none; border-radius: 0 0 14px 14px;
+  }
+  .editor-panel.open { max-height: 2000px; }
+  .editor-inner { padding: 28px 28px 20px; }
+  .editor-section { margin-bottom: 22px; }
+  .editor-section-title {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 3px;
+    color: #666; text-transform: uppercase; margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;
+  }
+  .editor-row { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .editor-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+  .editor-field label {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 1px;
+    color: #888; text-transform: uppercase;
+  }
+  .editor-field input, .editor-field select, .editor-field textarea {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px 14px; color: #ddd; font-family: 'Inter', sans-serif;
+    font-size: 0.8rem; outline: none; transition: border-color 0.2s;
+  }
+  .editor-field input:focus, .editor-field select:focus, .editor-field textarea:focus {
+    border-color: #5e3bff;
+  }
+  .editor-field input[readonly] { opacity: 0.5; cursor: not-allowed; }
+  .editor-field textarea { resize: vertical; min-height: 60px; }
+  .editor-field select { cursor: pointer; }
+  .editor-field select option { background: #1a1a1a; color: #ddd; }
+
+  /* Stat sliders */
+  .stat-slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .stat-slider-lbl {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+    color: #888; text-transform: uppercase; width: 55px; flex-shrink: 0;
+  }
+  .stat-slider-row input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px;
+    outline: none; border: none; padding: 0;
+  }
+  .stat-slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: #5e3bff; cursor: pointer; border: 2px solid #7c5cff;
+  }
+  .stat-slider-val {
+    font-size: 0.8rem; font-weight: 800; color: #b49aff; width: 28px; text-align: right;
+  }
+
+  /* Style selector */
+  .style-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+  .style-option {
+    padding: 8px 16px; border-radius: 8px; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: #888;
+  }
+  .style-option:hover { border-color: rgba(94,59,255,0.3); color: #aaa; }
+  .style-option.active {
+    background: rgba(94,59,255,0.15); border-color: #5e3bff; color: #b49aff;
+  }
+
+  /* Save button */
+  .editor-actions { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+  .btn-save {
+    background: #5e3bff; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 32px; font-family: 'Inter', sans-serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-save:hover { background: #7c5cff; transform: translateY(-1px); }
+  .btn-save:active { transform: translateY(0); }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .save-status {
+    font-size: 0.75rem; font-weight: 600; transition: opacity 0.3s;
+  }
+  .save-status.success { color: #4ade80; }
+  .save-status.error { color: #f87171; }
+
+  /* Completeness nudge */
+  .completeness-nudge {
+    max-width: 900px; margin: 0 auto 20px; padding: 12px 20px;
+    background: rgba(250,204,21,0.08); border: 1px solid rgba(250,204,21,0.18);
+    border-radius: 10px; font-size: 0.75rem; color: #fbbf24;
+    display: none;
+  }
+  .completeness-nudge.visible { display: block; }
 </style>
 </head>
 <body>
   <h1>PLAYER CARD — STYLE OPTIONS</h1>
   <p class="subtitle">Click any card to zoom (bio + motto revealed). Hover to interact.</p>
+
+  <!-- Completeness nudge -->
+  <div class="completeness-nudge" id="nudge"></div>
+
+  <!-- Card Editor -->
+  <div class="editor-wrap">
+    <div class="editor-toggle" id="editorToggle" onclick="toggleEditor()">
+      <h2>Card Editor</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="editor-panel" id="editorPanel">
+      <div class="editor-inner">
+
+        <!-- Identity -->
+        <div class="editor-section">
+          <div class="editor-section-title">Identity</div>
+          <div class="editor-row">
+            <div class="editor-field">
+              <label>Name</label>
+              <input type="text" id="ed-name" readonly>
+            </div>
+            <div class="editor-field">
+              <label>Class / Role</label>
+              <input type="text" id="ed-classRole" maxlength="50" placeholder="e.g. Full-Stack Mage">
+            </div>
+          </div>
+          <div class="editor-row">
+            <div class="editor-field">
+              <label>Bio</label>
+              <textarea id="ed-bio" maxlength="280" placeholder="Tell the world who you are..."></textarea>
+            </div>
+          </div>
+          <div class="editor-row">
+            <div class="editor-field">
+              <label>Motto</label>
+              <input type="text" id="ed-motto" maxlength="120" placeholder="Your signature line">
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo -->
+        <div class="editor-section">
+          <div class="editor-section-title">Photo</div>
+          <div class="editor-row">
+            <div class="editor-field">
+              <label>Photo URL</label>
+              <input type="text" id="ed-photoUrl" maxlength="500" placeholder="https://example.com/photo.jpg">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="editor-section">
+          <div class="editor-section-title">Stats</div>
+          <div class="stat-slider-row">
+            <span class="stat-slider-lbl">DEV</span>
+            <input type="range" min="0" max="100" value="50" id="ed-statDev">
+            <span class="stat-slider-val" id="val-statDev">50</span>
+          </div>
+          <div class="stat-slider-row">
+            <span class="stat-slider-lbl">DESIGN</span>
+            <input type="range" min="0" max="100" value="50" id="ed-statDesign">
+            <span class="stat-slider-val" id="val-statDesign">50</span>
+          </div>
+          <div class="stat-slider-row">
+            <span class="stat-slider-lbl">BRAIN</span>
+            <input type="range" min="0" max="100" value="50" id="ed-statBrain">
+            <span class="stat-slider-val" id="val-statBrain">50</span>
+          </div>
+          <div class="stat-slider-row">
+            <span class="stat-slider-lbl">SOCIAL</span>
+            <input type="range" min="0" max="100" value="50" id="ed-statSocial">
+            <span class="stat-slider-val" id="val-statSocial">50</span>
+          </div>
+          <div class="stat-slider-row">
+            <span class="stat-slider-lbl">GRIND</span>
+            <input type="range" min="0" max="100" value="50" id="ed-statGrind">
+            <span class="stat-slider-val" id="val-statGrind">50</span>
+          </div>
+        </div>
+
+        <!-- Traits -->
+        <div class="editor-section">
+          <div class="editor-section-title">Traits</div>
+          <div class="editor-row">
+            <div class="editor-field">
+              <label>Traits (comma-separated)</label>
+              <input type="text" id="ed-traits" maxlength="200" placeholder="Gamer, Cook, Otaku">
+            </div>
+          </div>
+        </div>
+
+        <!-- Wanted -->
+        <div class="editor-section">
+          <div class="editor-section-title">Wanted</div>
+          <div class="editor-row">
+            <div class="editor-field" style="max-width:140px">
+              <label>Wanted Level</label>
+              <select id="ed-wantedLevel">
+                <option value="1">★</option>
+                <option value="2">★★</option>
+                <option value="3">★★★</option>
+                <option value="4">★★★★</option>
+                <option value="5">★★★★★</option>
+              </select>
+            </div>
+            <div class="editor-field">
+              <label>Wanted Text</label>
+              <input type="text" id="ed-wantedText" maxlength="100" placeholder="Armed and caffeinated">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Style -->
+        <div class="editor-section">
+          <div class="editor-section-title">Card Style</div>
+          <div class="style-selector" id="styleSelector"></div>
+        </div>
+
+        <!-- Save -->
+        <div class="editor-actions">
+          <button class="btn-save" id="btnSave" onclick="saveCard()">Save Card</button>
+          <span class="save-status" id="saveStatus"></span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <div class="grid" id="cardGrid"></div>
   <div class="overlay" id="overlay">
     <div class="badge-zoom" id="zoomTarget"></div>
@@ -609,34 +850,85 @@
   </div>
 
 <script>
-// ── Shared data ──
-const DATA = {
-  photo: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+// ── API Config ──
+const API_BASE = 'http://localhost:8081';
+const DEFAULT_PHOTO = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
     <rect fill="#2a2a3e" width="200" height="200"/>
     <circle cx="100" cy="76" r="40" fill="#4a4a6a"/>
     <ellipse cx="100" cy="170" rx="55" ry="45" fill="#4a4a6a"/>
     <text x="100" y="85" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="36" fill="#8b8baf">S</text>
-  </svg>`),
-  name: 'SUSHRUT VAIDYA',
-  classRole: 'Full-Stack Mage',
-  title: 'The One Who Debugs & Cooks',
-  bio: 'Full-stack dev by day, home chef by night. Building things that matter \u2014 and occasionally breaking them.',
-  motto: 'Sleep is optional, shipping is not.',
-  stats: [
-    { lbl: 'CUR', val: 88 },
-    { lbl: 'HUM', val: 92 },
-    { lbl: 'CRE', val: 85 },
-    { lbl: 'DIS', val: 70 },
-    { lbl: 'SPI', val: 95 },
-  ],
-  wanted: 4,
-  wantedText: 'Armed and caffeinated',
-  traits: ['Hyderabad', 'Gamer', 'Cook', 'Otaku'],
-  level: 42,
-  xpPercent: 72,
-  cardId: '0001',
+  </svg>`);
+
+const STAT_KEYS = ['DEV', 'DESIGN', 'BRAIN', 'SOCIAL', 'GRIND'];
+
+// ── Mutable shared data ──
+let DATA = {
+  photo: DEFAULT_PHOTO,
+  name: 'PLAYER NAME',
+  classRole: 'Unclassed',
+  bio: 'No bio yet.',
+  motto: 'No motto yet.',
+  stats: STAT_KEYS.map(k => ({ lbl: k, val: 50 })),
+  wanted: 3,
+  wantedText: '',
+  traits: ['New Player'],
+  level: 1,
+  xpPercent: 0,
+  cardId: '0000',
+  cardStyle: 'HOLOGRAPHIC',
+  profileComplete: true,
 };
 
+let selectedStyleIndex = 0;
+
+// ── API helpers ──
+async function fetchCard() {
+  const userId = localStorage.getItem('dq-user-id');
+  if (!userId) return null;
+  try {
+    console.log('[CardAPI] Fetching card for', userId);
+    const res = await fetch(API_BASE + '/api/user/' + userId + '/card');
+    console.log('[CardAPI] Response status:', res.status);
+    if (!res.ok) return null;
+    const data = await res.json();
+    console.log('[CardAPI] Data:', data);
+    return data;
+  } catch (err) { console.error('[CardAPI] Fetch error:', err); return null; }
+}
+
+function applyApiResponse(data) {
+  DATA.name = ((data.firstName || '') + ' ' + (data.lastName || '')).trim().toUpperCase() || DATA.name;
+  DATA.classRole = data.classRole || DATA.classRole;
+  DATA.bio = data.bio || DATA.bio;
+  DATA.motto = data.motto || DATA.motto;
+  DATA.photo = data.photoUrl || DEFAULT_PHOTO;
+  DATA.wanted = data.wantedLevel || DATA.wanted;
+  DATA.wantedText = data.wantedText || DATA.wantedText;
+  DATA.level = data.level || DATA.level;
+  DATA.xpPercent = data.xpPercent != null ? data.xpPercent : DATA.xpPercent;
+  DATA.cardStyle = data.cardStyle || DATA.cardStyle;
+  DATA.cardId = data.id ? String(data.id).slice(-4) : DATA.cardId;
+
+  // Stats from API map → ordered array
+  if (data.stats) {
+    DATA.stats = STAT_KEYS.map(k => ({ lbl: k, val: data.stats[k] != null ? data.stats[k] : 50 }));
+  }
+
+  // Traits from API list
+  if (data.traits && data.traits.length > 0) {
+    DATA.traits = data.traits;
+  }
+
+  DATA.profileComplete = data.profileComplete !== false;
+
+  // Match card style to index
+  const styleMap = { HOLOGRAPHIC: 0, CARBON_FIBER: 1, FROSTED_GLASS: 2, BRUSHED_METAL: 3, NEON_CYBERPUNK: 4, MINIMAL_CLEAN: 5, RETRO_VHS: 6, GTA_ORIGINAL: 7 };
+  if (data.cardStyle && styleMap[data.cardStyle] != null) {
+    selectedStyleIndex = styleMap[data.cardStyle];
+  }
+}
+
+// ── Utility functions ──
 const BARCODE_WIDTHS = [2,1,3,1,2,1,1,3,2,1,2,1,3,1,2,1,1,3,2,1];
 function barcodeHTML(cls) {
   return `<div class="${cls}">${BARCODE_WIDTHS.map(w => `<span style="width:${w}px"></span>`).join('')}</div>`;
@@ -644,7 +936,7 @@ function barcodeHTML(cls) {
 function cardTag(id) { return `DEVQUEST #${id}`; }
 function stars(onClass, offClass) {
   return Array.from({length: 5}, (_, i) =>
-    `<span class="${i < DATA.wanted ? (onClass || '') : (offClass || 'off')}">\u2605</span>`
+    `<span class="${i < DATA.wanted ? (onClass || '') : (offClass || 'off')}">★</span>`
   ).join('');
 }
 function photoImg() {
@@ -667,7 +959,7 @@ function buildHolo(zoomed) {
         <div class="holo-stars">${stars('', 'off')}</div>
       </div>
       <div class="holo-xp">
-        <div class="holo-xp-label">LVL ${DATA.level} \u2014 ${DATA.xpPercent}% XP</div>
+        <div class="holo-xp-label">LVL ${DATA.level} — ${DATA.xpPercent}% XP</div>
         <div class="holo-xp-bar"><div class="holo-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
       </div>
       <div class="holo-traits">
@@ -810,7 +1102,7 @@ function buildMinimal(zoomed) {
 function buildVHS(zoomed) {
   function vhsBar(val) {
     const filled = Math.round(val / 10);
-    return '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
+    return '█'.repeat(filled) + '░'.repeat(10 - filled);
   }
   return `<div class="badge badge-vhs">
     <div class="vhs-top">
@@ -822,17 +1114,17 @@ function buildVHS(zoomed) {
     <div class="vhs-class">${DATA.classRole}</div>
     ${zoomed ? `<div class="vhs-bio">${DATA.bio}</div><div class="vhs-motto">${DATA.motto}</div>` : ''}
     <div class="vhs-stats">
-      ${DATA.stats.map(s => `<div class="vhs-stat"><span class="vhs-stat-lbl">${s.lbl}</span><span class="vhs-stat-bar">\u2595${vhsBar(s.val)}</span><span class="vhs-stat-val">${s.val}</span></div>`).join('')}
+      ${DATA.stats.map(s => `<div class="vhs-stat"><span class="vhs-stat-lbl">${s.lbl}</span><span class="vhs-stat-bar">▕${vhsBar(s.val)}</span><span class="vhs-stat-val">${s.val}</span></div>`).join('')}
     </div>
     <div class="vhs-wanted">
-      <span class="vhs-play">PLAY \u25B6</span>
+      <span class="vhs-play">PLAY ▶</span>
       <div class="vhs-wanted-stars">${stars('', 'off')}</div>
     </div>
     <div class="vhs-xp">
-      <span class="vhs-xp-text">[<span class="vhs-xp-bar">${'\u2588'.repeat(7)}${'\u2591'.repeat(3)}</span>] LVL ${DATA.level}</span>
+      <span class="vhs-xp-text">[<span class="vhs-xp-bar">${'█'.repeat(7)}${'░'.repeat(3)}</span>] LVL ${DATA.level}</span>
     </div>
     <div class="vhs-traits">CATEGORIES: <span>${DATA.traits.join(' / ')}</span></div>
-    <div class="vhs-bottom">\u25C0\u25C0 REWIND \u2014 ${cardTag(DATA.cardId)}</div>
+    <div class="vhs-bottom">◀◀ REWIND — ${cardTag(DATA.cardId)}</div>
   </div>`;
 }
 
@@ -864,6 +1156,7 @@ function buildGTA(zoomed) {
 }
 
 // ── Style registry ──
+const STYLE_NAMES = ['HOLOGRAPHIC', 'CARBON_FIBER', 'FROSTED_GLASS', 'BRUSHED_METAL', 'NEON_CYBERPUNK', 'MINIMAL_CLEAN', 'RETRO_VHS', 'GTA_ORIGINAL'];
 const CARD_STYLES = [
   { name: 'Holographic',    build: buildHolo,    wrapper: '' },
   { name: 'Carbon Fiber',   build: buildCarbon,  wrapper: '' },
@@ -875,17 +1168,20 @@ const CARD_STYLES = [
   { name: 'GTA Original',   build: buildGTA,      wrapper: '' },
 ];
 
-// ── Build grid (not zoomed) ──
+// ── Build grid ──
 const grid = document.getElementById('cardGrid');
-CARD_STYLES.forEach((style, i) => {
-  const col = document.createElement('div');
-  col.className = 'card-col' + (style.wrapper ? ' ' + style.wrapper : '');
-  col.innerHTML = `<span class="card-label">${i + 1}. ${style.name}</span>${style.build(false)}`;
-  col.addEventListener('click', () => openZoom(style, i));
-  grid.appendChild(col);
-});
+function renderGrid() {
+  grid.innerHTML = '';
+  CARD_STYLES.forEach((style, i) => {
+    const col = document.createElement('div');
+    col.className = 'card-col' + (style.wrapper ? ' ' + style.wrapper : '');
+    col.innerHTML = `<span class="card-label">${i + 1}. ${style.name}</span>${style.build(false)}`;
+    col.addEventListener('click', () => openZoom(style, i));
+    grid.appendChild(col);
+  });
+}
 
-// ── Zoom overlay (zoomed = true → bio + motto revealed) ──
+// ── Zoom overlay ──
 const overlay = document.getElementById('overlay');
 const zoomTarget = document.getElementById('zoomTarget');
 const overlayLabel = document.getElementById('overlayLabel');
@@ -894,9 +1190,194 @@ function openZoom(style, index) {
   zoomTarget.innerHTML = style.build(true);
   overlayLabel.textContent = `${index + 1}. ${style.name}`;
   overlay.classList.add('active');
+  // Also select this style in the editor
+  selectStyle(index);
 }
 overlay.addEventListener('click', () => overlay.classList.remove('active'));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('active'); });
+
+// ── Editor: toggle ──
+function toggleEditor() {
+  document.getElementById('editorToggle').classList.toggle('open');
+  document.getElementById('editorPanel').classList.toggle('open');
+}
+
+// ── Editor: style selector ──
+const styleSelector = document.getElementById('styleSelector');
+CARD_STYLES.forEach((style, i) => {
+  const btn = document.createElement('div');
+  btn.className = 'style-option' + (i === selectedStyleIndex ? ' active' : '');
+  btn.textContent = style.name;
+  btn.dataset.index = i;
+  btn.addEventListener('click', () => selectStyle(i));
+  styleSelector.appendChild(btn);
+});
+
+function selectStyle(index) {
+  selectedStyleIndex = index;
+  DATA.cardStyle = STYLE_NAMES[index];
+  document.querySelectorAll('.style-option').forEach((el, i) => {
+    el.classList.toggle('active', i === index);
+  });
+}
+
+// ── Editor: populate from DATA ──
+function populateEditor() {
+  document.getElementById('ed-name').value = DATA.name;
+  document.getElementById('ed-classRole').value = DATA.classRole;
+  document.getElementById('ed-bio').value = DATA.bio;
+  document.getElementById('ed-motto').value = DATA.motto;
+  document.getElementById('ed-photoUrl').value = DATA.photo === DEFAULT_PHOTO ? '' : DATA.photo;
+  document.getElementById('ed-wantedLevel').value = DATA.wanted;
+  document.getElementById('ed-wantedText').value = DATA.wantedText;
+  document.getElementById('ed-traits').value = DATA.traits.join(', ');
+
+  STAT_KEYS.forEach((k, i) => {
+    const key = 'stat' + k.charAt(0) + k.slice(1).toLowerCase();
+    const slider = document.getElementById('ed-' + key);
+    const valSpan = document.getElementById('val-' + key);
+    if (slider && valSpan) {
+      slider.value = DATA.stats[i].val;
+      valSpan.textContent = DATA.stats[i].val;
+    }
+  });
+
+  selectStyle(selectedStyleIndex);
+}
+
+// ── Editor: live preview — bind input events ──
+function bindEditorInputs() {
+  const liveFields = ['ed-classRole', 'ed-bio', 'ed-motto', 'ed-photoUrl', 'ed-wantedText', 'ed-traits'];
+  liveFields.forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', syncEditorToData);
+  });
+
+  document.getElementById('ed-wantedLevel').addEventListener('change', syncEditorToData);
+
+  // Stat sliders
+  STAT_KEYS.forEach(k => {
+    const key = 'stat' + k.charAt(0) + k.slice(1).toLowerCase();
+    const slider = document.getElementById('ed-' + key);
+    const valSpan = document.getElementById('val-' + key);
+    slider.addEventListener('input', () => {
+      valSpan.textContent = slider.value;
+      syncEditorToData();
+    });
+  });
+}
+
+function syncEditorToData() {
+  DATA.classRole = document.getElementById('ed-classRole').value || 'Unclassed';
+  DATA.bio = document.getElementById('ed-bio').value || 'No bio yet.';
+  DATA.motto = document.getElementById('ed-motto').value || 'No motto yet.';
+  const photoVal = document.getElementById('ed-photoUrl').value.trim();
+  DATA.photo = photoVal || DEFAULT_PHOTO;
+  DATA.wanted = parseInt(document.getElementById('ed-wantedLevel').value) || 3;
+  DATA.wantedText = document.getElementById('ed-wantedText').value;
+
+  const traitsVal = document.getElementById('ed-traits').value.trim();
+  DATA.traits = traitsVal ? traitsVal.split(',').map(t => t.trim()).filter(Boolean) : ['New Player'];
+
+  STAT_KEYS.forEach((k, i) => {
+    const key = 'stat' + k.charAt(0) + k.slice(1).toLowerCase();
+    DATA.stats[i].val = parseInt(document.getElementById('ed-' + key).value) || 0;
+  });
+
+  renderGrid();
+}
+
+// ── Save flow ──
+async function saveCard() {
+  const userId = localStorage.getItem('dq-user-id');
+  if (!userId) {
+    showSaveStatus('No user ID found — register first', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const body = {
+    classRole: document.getElementById('ed-classRole').value || null,
+    bio: document.getElementById('ed-bio').value || null,
+    motto: document.getElementById('ed-motto').value || null,
+    photoUrl: document.getElementById('ed-photoUrl').value.trim() || null,
+    cardStyle: STYLE_NAMES[selectedStyleIndex],
+    wantedLevel: parseInt(document.getElementById('ed-wantedLevel').value),
+    wantedText: document.getElementById('ed-wantedText').value || null,
+    statDev: parseInt(document.getElementById('ed-statDev').value),
+    statDesign: parseInt(document.getElementById('ed-statDesign').value),
+    statBrain: parseInt(document.getElementById('ed-statBrain').value),
+    statSocial: parseInt(document.getElementById('ed-statSocial').value),
+    statGrind: parseInt(document.getElementById('ed-statGrind').value),
+    traits: document.getElementById('ed-traits').value.trim() || null,
+  };
+
+  try {
+    const res = await fetch(API_BASE + '/api/user/' + userId + '/card', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || 'Save failed');
+    }
+    const updated = await res.json();
+    applyApiResponse(updated);
+    populateEditor();
+    renderGrid();
+    updateNudge(updated);
+    showSaveStatus('Saved', 'success');
+  } catch (err) {
+    showSaveStatus(err.message || 'Save failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Card';
+  }
+}
+
+function showSaveStatus(msg, type) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  el.className = 'save-status ' + type;
+  setTimeout(() => { el.textContent = ''; el.className = 'save-status'; }, 3000);
+}
+
+// ── Completeness nudge ──
+function updateNudge(apiData) {
+  const nudge = document.getElementById('nudge');
+  if (!apiData || apiData.profileComplete) {
+    nudge.classList.remove('visible');
+    return;
+  }
+  const missing = [];
+  if (!apiData.photoUrl) missing.push('a photo');
+  if (!apiData.bio) missing.push('a bio');
+  if (!apiData.classRole) missing.push('a class/role');
+  if (missing.length === 0) {
+    nudge.classList.remove('visible');
+    return;
+  }
+  nudge.textContent = 'Add ' + missing.join(', ') + ' to complete your card';
+  nudge.classList.add('visible');
+}
+
+// ── Init ──
+async function init() {
+  const apiData = await fetchCard();
+  if (apiData) {
+    applyApiResponse(apiData);
+    updateNudge(apiData);
+  }
+  populateEditor();
+  bindEditorInputs();
+  renderGrid();
+}
+
+init();
 </script>
 </body>
 </html>

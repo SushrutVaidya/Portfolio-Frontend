@@ -189,120 +189,95 @@
     const w = canvas.width, h = canvas.height;
     const cx = w / 2, cy = h / 2, r = 120;
 
-    const labels = ['Curiosity', 'Humor', 'Creativity', 'Discipline', 'Adventure', 'Spice'];
-    const values = [88, 92, 85, 70, 78, 95];
-    const colors = ['#c8ff00', '#ff6600', '#ff375f', '#0a84ff', '#bf5af2', '#ff9f0a'];
+    const labels = ['Dev', 'Design', 'Brain', 'Social', 'Grind'];
+    const values = [88, 85, 92, 70, 95];
+    const colors = ['#c8ff00', '#ff375f', '#ff6600', '#0a84ff', '#bf5af2'];
     const n = labels.length;
     const step = (Math.PI * 2) / n;
     const startAngle = -Math.PI / 2;
 
-    const duration = 1200;
-    const start = performance.now();
+    console.log('[Pentagon] Drawing — n:', n, 'cx:', cx, 'cy:', cy, 'r:', r);
+    console.log('[Pentagon] Values:', values);
 
-    function draw(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
+    // Draw static final frame immediately to test
+    ctx.clearRect(0, 0, w, h);
 
-      ctx.clearRect(0, 0, w, h);
-
-      // Grid rings (draw immediately)
-      for (let ring = 1; ring <= 4; ring++) {
-        const rr = (r / 4) * ring;
-        ctx.beginPath();
-        for (let i = 0; i <= n; i++) {
-          const a = startAngle + step * i;
-          const x = cx + Math.cos(a) * rr;
-          const y = cy + Math.sin(a) * rr;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Axis lines
-      for (let i = 0; i < n; i++) {
-        const a = startAngle + step * i;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-        ctx.stroke();
-      }
-
-      // Data polygon — animated
+    // Grid rings
+    for (let ring = 1; ring <= 4; ring++) {
+      const rr = (r / 4) * ring;
       ctx.beginPath();
       for (let i = 0; i <= n; i++) {
-        const idx = i % n;
-        const a = startAngle + step * idx;
-        const v = (values[idx] / 100) * r * ease;
-        const x = cx + Math.cos(a) * v;
-        const y = cy + Math.sin(a) * v;
+        const a = startAngle + step * i;
+        const x = cx + Math.cos(a) * rr;
+        const y = cy + Math.sin(a) * rr;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
       ctx.closePath();
-
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      grad.addColorStop(0, 'rgba(255,102,0,0.25)');
-      grad.addColorStop(1, 'rgba(255,102,0,0.05)');
-      ctx.fillStyle = grad;
-      ctx.globalAlpha = ease;
-      ctx.fill();
-      ctx.strokeStyle = '#ff6600';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
       ctx.stroke();
-      ctx.globalAlpha = 1;
+    }
 
-      // Data points + labels
+    // Axis lines
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + step * i;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.stroke();
+    }
+
+    // Data polygon — STATIC (no animation for now)
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const idx = i % n;
+      const a = startAngle + step * idx;
+      const v = (values[idx] / 100) * r;
+      const x = cx + Math.cos(a) * v;
+      const y = cy + Math.sin(a) * v;
+      console.log('[Pentagon] Point', idx, ':', x.toFixed(1), y.toFixed(1), 'val:', values[idx], 'v:', v.toFixed(1));
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+
+    ctx.fillStyle = 'rgba(255,102,0,0.35)';
+    ctx.fill();
+    ctx.strokeStyle = '#ff6600';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Data points
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + step * i;
+      const v = (values[i] / 100) * r;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(a) * v, cy + Math.sin(a) * v, 6, 0, Math.PI * 2);
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Label
+      const lr = r + 24;
+      ctx.font = '700 11px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillText(labels[i], cx + Math.cos(a) * lr, cy + Math.sin(a) * lr);
 
-      for (let i = 0; i < n; i++) {
-        const a = startAngle + step * i;
-        const v = (values[i] / 100) * r * ease;
-
-        // Point
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * v, cy + Math.sin(a) * v, 5 * ease, 0, Math.PI * 2);
-        ctx.fillStyle = colors[i];
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Glow
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * v, cy + Math.sin(a) * v, 8, 0, Math.PI * 2);
-        ctx.fillStyle = colors[i] + '20';
-        ctx.fill();
-
-        // Label (always at full position)
-        const lr = r + 24;
-        ctx.font = '700 11px -apple-system, sans-serif';
-        ctx.fillStyle = `rgba(0,0,0,${0.45 * ease})`;
-        ctx.fillText(labels[i], cx + Math.cos(a) * lr, cy + Math.sin(a) * lr);
-
-        // Value at vertex (fades in during last 30% of animation)
-        const valFade = Math.max(0, (progress - 0.7) / 0.3);
-        if (valFade > 0) {
-          const vr = r + 38;
-          ctx.font = '800 10px -apple-system, sans-serif';
-          ctx.fillStyle = colors[i] + Math.round(valFade * 200).toString(16).padStart(2, '0');
-          ctx.fillText(Math.round(values[i] * ease), cx + Math.cos(a) * vr, cy + Math.sin(a) * vr);
-        }
-      }
-
-      if (progress < 1) requestAnimationFrame(draw);
-      else {
-        // Glow pulse when pentagon finishes drawing
-        canvas.classList.add('glow');
-        const wrap = canvas.closest('.stats-pentagon-wrap');
-        if (wrap) wrap.classList.add('pulse');
-      }
+      // Value
+      const vr = r + 38;
+      ctx.font = '800 10px -apple-system, sans-serif';
+      ctx.fillStyle = colors[i];
+      ctx.fillText(values[i], cx + Math.cos(a) * vr, cy + Math.sin(a) * vr);
     }
-    requestAnimationFrame(draw);
+
+    console.log('[Pentagon] Draw complete');
+    canvas.classList.add('glow');
+    const wrap = canvas.closest('.stats-pentagon-wrap');
+    if (wrap) wrap.classList.add('pulse');
   }
 
   // ════════════════════════════════════
@@ -1346,19 +1321,19 @@
   // ── Init ──
   function init() {
     runIntro();
-    initScrollProgress();
-    initTips();
-    initWheel();
-    initStatPentagon();
-    initReveal();
-    animateStatBars();
-    animateWantedStars();
-    initLore();
-    initWantedPosters();
-    initCardTilt();
-    initJukebox();
-    renderKitchen();
-    renderGamingSections();
+    try { initScrollProgress(); } catch(e) { console.error('initScrollProgress failed:', e); }
+    try { initTips(); } catch(e) { console.error('initTips failed:', e); }
+    try { initWheel(); } catch(e) { console.error('initWheel failed:', e); }
+    try { initStatPentagon(); } catch(e) { console.error('initStatPentagon failed:', e); }
+    try { initReveal(); } catch(e) { console.error('initReveal failed:', e); }
+    try { animateStatBars(); } catch(e) { console.error('animateStatBars failed:', e); }
+    try { animateWantedStars(); } catch(e) { console.error('animateWantedStars failed:', e); }
+    try { initLore(); } catch(e) { console.error('initLore failed:', e); }
+    try { initWantedPosters(); } catch(e) { console.error('initWantedPosters failed:', e); }
+    try { initCardTilt(); } catch(e) { console.error('initCardTilt failed:', e); }
+    try { initJukebox(); } catch(e) { console.error('initJukebox failed:', e); }
+    try { renderKitchen(); } catch(e) { console.error('renderKitchen failed:', e); }
+    try { renderGamingSections(); } catch(e) { console.error('renderGamingSections failed:', e); }
   }
 
   if (document.readyState === 'loading') {

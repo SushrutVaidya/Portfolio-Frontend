@@ -1202,12 +1202,18 @@
   }
 
   // ════════════════════════════════════
-  //  PLAYER CARD 3D TILT
+  //  PLAYER CARD — FIFA UNBOXING + 3D TILT
   // ════════════════════════════════════
   function initCardTilt() {
+    const wrap = document.getElementById('card-wrap');
     const card = document.getElementById('example-card');
-    if (!card) return;
+    const overlay = document.getElementById('unboxOverlay');
+    const stage = document.getElementById('unboxStage');
+    const raysContainer = document.getElementById('unboxRays');
+    const particlesContainer = document.getElementById('unboxParticles');
+    if (!wrap || !card || !overlay) return;
 
+    // 3D tilt on the in-page card
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -1223,6 +1229,92 @@
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
       card.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+    });
+
+    // Build light rays once
+    function buildRays() {
+      raysContainer.innerHTML = '';
+      const count = 16;
+      for (let i = 0; i < count; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'unbox-ray';
+        const angle = (360 / count) * i;
+        const width = 2 + Math.random() * 3;
+        ray.style.transform = 'rotate(' + angle + 'deg)';
+        ray.style.width = width + 'px';
+        ray.style.opacity = 0.3 + Math.random() * 0.5;
+        raysContainer.appendChild(ray);
+      }
+    }
+
+    // Build floating particles
+    function buildParticles() {
+      particlesContainer.innerHTML = '';
+      const colors = ['#ff6600', '#ff9f0a', '#bf5af2', '#0a84ff', '#ffcc00', '#fff'];
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'unbox-particle';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = 2 + Math.random() * 5;
+        const x = 10 + Math.random() * 80;
+        const startY = 50 + Math.random() * 40;
+        const travel = -(100 + Math.random() * 300);
+        const dur = 2 + Math.random() * 2;
+        const delay = Math.random() * 1.2;
+        p.style.cssText =
+          'left:' + x + '%;' +
+          'top:' + startY + '%;' +
+          'width:' + size + 'px;' +
+          'height:' + size + 'px;' +
+          'background:' + color + ';' +
+          'box-shadow:0 0 ' + (size * 2) + 'px ' + color + ';' +
+          '--travel:' + travel + 'px;' +
+          '--dur:' + dur + 's;' +
+          '--delay:' + delay + 's;';
+        particlesContainer.appendChild(p);
+      }
+    }
+
+    // Open unboxing overlay
+    function openUnbox() {
+      buildRays();
+      buildParticles();
+
+      // Clone the card into the stage
+      stage.innerHTML = '';
+      const clone = card.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.style.transform = '';
+      clone.style.transition = '';
+      stage.appendChild(clone);
+
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // After rays appear, start pulsing
+      setTimeout(() => {
+        raysContainer.style.animation = 'raysPulse 3s ease-in-out infinite';
+      }, 1200);
+    }
+
+    // Close overlay
+    function closeUnbox() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      raysContainer.style.animation = '';
+    }
+
+    // Click card → open unboxing
+    wrap.addEventListener('click', openUnbox);
+
+    // Click overlay → close
+    overlay.addEventListener('click', closeUnbox);
+
+    // Escape to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('active')) {
+        closeUnbox();
+      }
     });
   }
 

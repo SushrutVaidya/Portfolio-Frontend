@@ -337,6 +337,11 @@ html, body {
 .modal-title { font-size: 1.2rem; font-weight: 700; color: #0a0a0a; letter-spacing: -0.3px; }
 .modal-sub   { font-size: 0.78rem; color: rgba(0,0,0,0.4); }
 
+.name-row {
+  display: flex; gap: 10px;
+}
+.name-row .name-input { flex: 1; }
+
 .name-input {
   width: 100%;
   background: rgba(0,0,0,0.03);
@@ -459,6 +464,7 @@ html, body {
 
   .modal          { padding: 28px 20px 40px; border-radius: 20px 20px 0 0; }
   .modal-title    { font-size: 1.05rem; }
+  .name-row       { flex-direction: column; gap: 6px; }
   .modal-actions  { flex-direction: column; }
   .modal-cancel, .modal-start { flex: unset; width: 100%; }
 

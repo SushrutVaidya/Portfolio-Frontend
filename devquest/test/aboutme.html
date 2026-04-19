@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About Sushrut — GTA style.">
+  <meta name="theme-color" content="#f5f3ef">
+  <title>About Me — DevQuest</title>
+  <!-- Pricedown font (GTA title font) -->
+  <link rel="preconnect" href="https://fonts.cdnfonts.com">
+  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/aboutme-v2.css">
+  <script src="js/theme.js" defer></script>
+</head>
+<body class="gta-page loading">
+
+  <!-- ══ SCROLL PROGRESS BAR ══ -->
+  <div class="gta-scroll-progress" id="scroll-progress">
+    <div class="gta-scroll-fill" id="scroll-fill"></div>
+  </div>
+
+  <!-- ══ GTA LOADING SCREEN — Intro Sequence ══ -->
+  <div class="gta-intro-overlay" id="intro-overlay">
+    <div class="gta-intro-content">
+      <div class="gta-intro-logo">GRAND THEFT<br>PORTFOLIO</div>
+      <div class="gta-intro-bar">
+        <div class="gta-intro-fill" id="intro-fill"></div>
+      </div>
+      <div class="gta-intro-tip" id="intro-tip">Loading profile data...</div>
+    </div>
+    <div class="gta-intro-flash" id="intro-flash"></div>
+  </div>
+
+  <!-- ══ GTA HERO ══ -->
+  <section class="gta-hero" id="hero">
+    <div class="gta-hero-inner">
+      <!-- Left: Photo placeholder -->
+      <div class="gta-hero-art">
+        <div class="gta-photo-frame gta-photo-hero">
+          <div class="gta-photo-placeholder">
+            <span class="gta-photo-icon">&#128247;</span>
+            <span class="gta-photo-label">YOUR PHOTO HERE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Character info -->
+      <div class="gta-hero-info">
+        <span class="gta-hero-eyebrow">GRAND THEFT PORTFOLIO</span>
+        <h1 class="gta-hero-name">SUSHRUT<br>VAIDYA</h1>
+        <div class="gta-hero-divider"></div>
+        <p class="gta-hero-tagline">The one who cooks, games, and debugs — not always in that order.</p>
+        <div class="gta-hero-traits">
+          <span class="gta-trait">Hyderabad</span>
+          <span class="gta-trait-dot">&bull;</span>
+          <span class="gta-trait">Gamer</span>
+          <span class="gta-trait-dot">&bull;</span>
+          <span class="gta-trait">Cook</span>
+          <span class="gta-trait-dot">&bull;</span>
+          <span class="gta-trait">Anime Nerd</span>
+        </div>
+        <div class="gta-hero-scroll-cue" id="scroll-cue">
+          <span class="gta-scroll-arrow">&#8595;</span>
+          <span class="gta-scroll-label">SCROLL TO EXPLORE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading tip -->
+    <div class="gta-tip">
+      <span class="gta-tip-text" id="gta-tip">Sushrut has never successfully made round rotis. The irregularity adds character.</span>
+    </div>
+  </section>
+
+  <!-- ══ CHARACTER SWITCH WHEEL (fixed) ══ -->
+  <button class="gta-wheel-trigger" id="wheel-trigger" aria-label="Open character wheel">
+    <span class="gta-wheel-icon">&#11014;</span>
+  </button>
+
+  <div class="gta-wheel-overlay" id="wheel-overlay">
+    <div class="gta-wheel" id="char-wheel">
+      <div class="gta-wheel-center">
+        <span>S</span>
+      </div>
+      <button class="gta-wheel-seg" data-section="stats" data-color="#c8ff00" style="--seg-angle: 0deg">
+        <span class="gta-seg-icon">&#9733;</span>
+        <span class="gta-seg-label">Stats</span>
+      </button>
+      <button class="gta-wheel-seg" data-section="personas" data-color="#ff9f0a" style="--seg-angle: 72deg">
+        <span class="gta-seg-icon">&#128100;</span>
+        <span class="gta-seg-label">Personas</span>
+      </button>
+      <button class="gta-wheel-seg" data-section="gaming" data-color="#0a84ff" style="--seg-angle: 144deg">
+        <span class="gta-seg-icon">&#127918;</span>
+        <span class="gta-seg-label">Gaming</span>
+      </button>
+      <button class="gta-wheel-seg" data-section="lore" data-color="#30d158" style="--seg-angle: 216deg">
+        <span class="gta-seg-icon">&#128172;</span>
+        <span class="gta-seg-label">The Lore</span>
+      </button>
+      <button class="gta-wheel-seg" data-section="currently" data-color="#bf5af2" style="--seg-angle: 288deg">
+        <span class="gta-seg-icon">&#128293;</span>
+        <span class="gta-seg-label">Into</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SECTION: Stats — GTA V Stat Pentagon ══ -->
+  <section class="gta-section gta-section-stats" id="stats">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">CHARACTER<br>STATS</h2>
+
+      <div class="stats-card reveal">
+        <div class="stats-card-header">
+          <span class="stats-card-badge">DOSSIER</span>
+          <span class="stats-card-id">PROFILE #0042</span>
+        </div>
+        <div class="gta-stats-layout">
+          <div class="stats-pentagon-wrap">
+            <canvas id="gta-stat-pentagon" width="320" height="320"></canvas>
+          </div>
+          <div class="gta-stats-list">
+            <div class="gta-stat-row" data-val="88" style="--bar-color: #c8ff00">
+              <span class="gta-stat-icon">🧠</span>
+              <span class="gta-stat-name">Curiosity</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="88" style="--bar-color: #c8ff00"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+            <div class="gta-stat-row" data-val="92" style="--bar-color: #ff6600">
+              <span class="gta-stat-icon">😂</span>
+              <span class="gta-stat-name">Humor</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="92" style="--bar-color: #ff6600"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+            <div class="gta-stat-row" data-val="85" style="--bar-color: #ff375f">
+              <span class="gta-stat-icon">🎨</span>
+              <span class="gta-stat-name">Creativity</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="85" style="--bar-color: #ff375f"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+            <div class="gta-stat-row" data-val="70" style="--bar-color: #0a84ff">
+              <span class="gta-stat-icon">⚙️</span>
+              <span class="gta-stat-name">Discipline</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="70" style="--bar-color: #0a84ff"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+            <div class="gta-stat-row" data-val="78" style="--bar-color: #bf5af2">
+              <span class="gta-stat-icon">🌍</span>
+              <span class="gta-stat-name">Adventure</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="78" style="--bar-color: #bf5af2"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+            <div class="gta-stat-row" data-val="95" style="--bar-color: #ff9f0a">
+              <span class="gta-stat-icon">🌶️</span>
+              <span class="gta-stat-name">Spice Tolerance</span>
+              <div class="gta-stat-bar"><div class="gta-stat-fill" data-val="95" style="--bar-color: #ff9f0a"></div></div>
+              <span class="gta-stat-val">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wanted-badge reveal" id="wanted-level">
+        <div class="wanted-badge-glow"></div>
+        <div class="wanted-badge-content">
+          <div class="wanted-badge-top">
+            <span class="wanted-badge-icon">🚨</span>
+            <span class="wanted-badge-label">WANTED LEVEL</span>
+            <span class="wanted-badge-icon">🚨</span>
+          </div>
+          <div class="wanted-badge-stars">
+            <span class="gta-star" data-star="1">&#9733;</span>
+            <span class="gta-star" data-star="2">&#9733;</span>
+            <span class="gta-star" data-star="3">&#9733;</span>
+            <span class="gta-star" data-star="4">&#9733;</span>
+            <span class="gta-star" data-star="5">&#9733;</span>
+          </div>
+          <div class="wanted-badge-divider"></div>
+          <span class="wanted-badge-charge">CHARGED WITH</span>
+          <span class="wanted-badge-reason">Dangerously strong biryani opinions</span>
+          <div class="wanted-badge-footer">
+            <span class="wanted-badge-status">STATUS: AT LARGE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#9733; PROFILE ANALYZED &#9733;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: Personas — Wanted Poster Reveal ══ -->
+  <section class="gta-section gta-section-personas" id="personas">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">THE MANY<br>FACES</h2>
+      <p class="gta-personas-hint reveal">Click a poster to reveal the suspect</p>
+
+      <div class="gta-posters-grid">
+
+        <!-- THE COOK -->
+        <div class="wanted-poster reveal" data-persona="cook" data-accent="var(--gta-amber)">
+          <!-- Front: Wanted poster -->
+          <div class="wanted-front">
+            <div class="wanted-tape wanted-tape-l"></div>
+            <div class="wanted-tape wanted-tape-r"></div>
+            <div class="wanted-paper">
+              <div class="wanted-header">
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+                <span class="wanted-title">WANTED</span>
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+              </div>
+              <div class="wanted-mugshot">
+                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=500&fit=crop&crop=face" alt="The Cook" class="wanted-mugshot-img">
+                <div class="wanted-silhouette-overlay"></div>
+              </div>
+              <div class="wanted-name">THE COOK</div>
+              <div class="wanted-reward">
+                <span>REWARD</span>
+                <span class="wanted-reward-amt">$10,000</span>
+              </div>
+              <div class="wanted-charge">WANTED FOR: DANGEROUSLY SPICY COOKING</div>
+            </div>
+          </div>
+
+          <!-- Back: Revealed content -->
+          <div class="wanted-reveal">
+            <button class="wanted-close" aria-label="Close">&times;</button>
+            <div class="wanted-reveal-inner">
+              <div class="wanted-reveal-photos">
+                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop" alt="Cooking" class="reveal-photo reveal-photo-main">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=300&fit=crop" alt="Plated dish" class="reveal-photo reveal-photo-sm">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=300&fit=crop" alt="Pizza" class="reveal-photo reveal-photo-sm">
+              </div>
+              <div class="wanted-reveal-info">
+                <span class="wanted-reveal-badge" style="--accent: var(--gta-amber)">THE COOK</span>
+                <h3 class="wanted-reveal-name">Kitchen Experiments</h3>
+                <p class="wanted-reveal-quote">"If it doesn't make you sweat, is it even food?"</p>
+                <p class="wanted-reveal-desc">Currently perfecting fresh pasta from scratch. The kitchen smells like Italy — or at least, Hyderabad's version of it. His cooking is either a 10/10 or a health hazard. There is no in-between.</p>
+                <div class="wanted-reveal-tags">
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Fresh Pasta</span>
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Spice King</span>
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Reckless Confidence</span>
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Biryani Critic</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE GAMER -->
+        <div class="wanted-poster reveal" data-persona="gamer" data-accent="var(--gta-blue)">
+          <div class="wanted-front">
+            <div class="wanted-tape wanted-tape-l"></div>
+            <div class="wanted-tape wanted-tape-r"></div>
+            <div class="wanted-paper">
+              <div class="wanted-header">
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+                <span class="wanted-title">WANTED</span>
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+              </div>
+              <div class="wanted-mugshot">
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=500&fit=crop&crop=center" alt="The Gamer" class="wanted-mugshot-img">
+                <div class="wanted-silhouette-overlay"></div>
+              </div>
+              <div class="wanted-name">THE GAMER</div>
+              <div class="wanted-reward">
+                <span>REWARD</span>
+                <span class="wanted-reward-amt">$25,000</span>
+              </div>
+              <div class="wanted-charge">WANTED FOR: EXTREME BACKLOG HOARDING</div>
+            </div>
+          </div>
+
+          <div class="wanted-reveal">
+            <button class="wanted-close" aria-label="Close">&times;</button>
+            <div class="wanted-reveal-inner">
+              <div class="wanted-reveal-photos">
+                <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=600&h=400&fit=crop" alt="Gaming setup" class="reveal-photo reveal-photo-main reveal-photo-wide">
+                <img src="https://images.unsplash.com/photo-1592155931584-901ac15763e3?w=300&h=300&fit=crop" alt="Controller" class="reveal-photo reveal-photo-sm">
+              </div>
+              <div class="wanted-reveal-info">
+                <span class="wanted-reveal-badge" style="--accent: var(--gta-blue)">THE GAMER</span>
+                <h3 class="wanted-reveal-name">Controller In Hand</h3>
+                <p class="wanted-reveal-quote">"73 games in the backlog. 12% completion rate. No regrets."</p>
+                <p class="wanted-reveal-desc">Currently getting absolutely destroyed by Malenia in Elden Ring. Steam library is a graveyard of good intentions. Send help. Or a summon. Preferably both.</p>
+                <div class="wanted-reveal-tags">
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">Steam</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">Soulslike Fan</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">Backlog Hoarder</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">Rage Quitter</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE SOCIAL -->
+        <div class="wanted-poster reveal" data-persona="social" data-accent="var(--gta-pink)">
+          <div class="wanted-front">
+            <div class="wanted-tape wanted-tape-l"></div>
+            <div class="wanted-tape wanted-tape-r"></div>
+            <div class="wanted-paper">
+              <div class="wanted-header">
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+                <span class="wanted-title">WANTED</span>
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+              </div>
+              <div class="wanted-mugshot">
+                <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44f5b8?w=400&h=500&fit=crop&crop=center" alt="The Social" class="wanted-mugshot-img">
+                <div class="wanted-silhouette-overlay"></div>
+              </div>
+              <div class="wanted-name">THE SOCIAL</div>
+              <div class="wanted-reward">
+                <span>REWARD</span>
+                <span class="wanted-reward-amt">$15,000</span>
+              </div>
+              <div class="wanted-charge">WANTED FOR: EXCESSIVE CRAFT BEER EXPERTISE</div>
+            </div>
+          </div>
+
+          <div class="wanted-reveal">
+            <button class="wanted-close" aria-label="Close">&times;</button>
+            <div class="wanted-reveal-inner">
+              <div class="wanted-reveal-photos">
+                <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44f5b8?w=600&h=400&fit=crop" alt="Craft beer" class="reveal-photo reveal-photo-main">
+                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=300&fit=crop" alt="Fine dining" class="reveal-photo reveal-photo-sm">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt="Travel" class="reveal-photo reveal-photo-sm">
+              </div>
+              <div class="wanted-reveal-info">
+                <span class="wanted-reveal-badge" style="--accent: var(--gta-pink)">THE SOCIAL</span>
+                <h3 class="wanted-reveal-name">Craft Beers &amp; Good Food</h3>
+                <p class="wanted-reveal-quote">"Weekend plans are mandatory, not optional."</p>
+                <p class="wanted-reveal-desc">A sucker for craft beers and good food. Always at the regular go-to spot with good conversations. Gym arc in progress — it's called character development. Passport finally getting some exercise.</p>
+                <div class="wanted-reveal-tags">
+                  <span class="wr-tag" style="--accent: var(--gta-pink)">Craft Beer</span>
+                  <span class="wr-tag" style="--accent: var(--gta-pink)">Good Food</span>
+                  <span class="wr-tag" style="--accent: var(--gta-pink)">Travel</span>
+                  <span class="wr-tag" style="--accent: var(--gta-pink)">Gym Arc</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE OTAKU -->
+        <div class="wanted-poster reveal" data-persona="otaku" data-accent="var(--gta-purple)">
+          <div class="wanted-front">
+            <div class="wanted-tape wanted-tape-l"></div>
+            <div class="wanted-tape wanted-tape-r"></div>
+            <div class="wanted-paper">
+              <div class="wanted-header">
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+                <span class="wanted-title">WANTED</span>
+                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
+              </div>
+              <div class="wanted-mugshot">
+                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&h=500&fit=crop&crop=center" alt="The Otaku" class="wanted-mugshot-img">
+                <div class="wanted-silhouette-overlay"></div>
+              </div>
+              <div class="wanted-name">THE OTAKU</div>
+              <div class="wanted-reward">
+                <span>REWARD</span>
+                <span class="wanted-reward-amt">$50,000</span>
+              </div>
+              <div class="wanted-charge">WANTED FOR: 367 EPISODES OF GINTAMA (×5)</div>
+            </div>
+          </div>
+
+          <div class="wanted-reveal">
+            <button class="wanted-close" aria-label="Close">&times;</button>
+            <div class="wanted-reveal-inner">
+              <div class="wanted-reveal-photos">
+                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=400&fit=crop" alt="Anime collection" class="reveal-photo reveal-photo-main reveal-photo-wide">
+              </div>
+              <div class="wanted-reveal-info">
+                <span class="wanted-reveal-badge" style="--accent: var(--gta-purple)">THE OTAKU</span>
+                <h3 class="wanted-reveal-name">Gintama Enthusiast</h3>
+                <p class="wanted-reveal-quote">"Gintoki is the most relatable protagonist. This is not up for debate."</p>
+                <p class="wanted-reveal-desc">367 episodes. Rewatch #5 in progress. Can quote entire scenes from memory. Lo-fi for focus, Bollywood bangers for vibes. No in-between exists. Don't ask him about Gintama unless you have 3 hours to spare.</p>
+                <div class="wanted-reveal-tags">
+                  <span class="wr-tag" style="--accent: var(--gta-purple)">Gintama</span>
+                  <span class="wr-tag" style="--accent: var(--gta-purple)">Lo-fi & Bollywood</span>
+                  <span class="wr-tag" style="--accent: var(--gta-purple)">Anime Nerd</span>
+                  <span class="wr-tag" style="--accent: var(--gta-purple)">Rewatch King</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#127918; SUSPECTS IDENTIFIED &#127918;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: The Kitchen ══ -->
+  <section class="gta-section gta-section-kitchen" id="kitchen">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">THE<br>KITCHEN</h2>
+      <p class="kitchen-subtitle reveal">Where code reviews turn into curry reviews.</p>
+
+      <div class="kitchen-status reveal">
+        <span class="kitchen-status-dot"></span>
+        <span class="kitchen-status-text">CURRENTLY EXPERIMENTING WITH: <strong>Fresh Pasta from Scratch</strong></span>
+      </div>
+
+      <div class="kitchen-wall" id="kitchen-wall">
+        <!-- JS renders polaroid cards here -->
+      </div>
+
+      <p class="kitchen-disclaimer reveal">* No roommates were harmed in the making of these dishes. Probably.</p>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#127860; EXITING THE KITCHEN &#127860;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: The Gamer — Gaming Corner ══ -->
+  <section class="gta-section gta-section-gaming" id="gaming">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">GAMING<br>CORNER</h2>
+      <div class="cover-flow reveal" id="cover-flow"></div>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#128172; ENTERING THE ARCHIVES &#128172;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: The Lore ══ -->
+  <section class="gta-section gta-section-lore" id="lore">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">THE LORE</h2>
+
+      <!-- ── Zone 1: GTA Phone Thread — Peter Griffin ── -->
+      <div class="lore-phone reveal" id="lore-phone">
+        <div class="lore-phone-header">
+          <span class="lore-phone-signal">●●●○○</span>
+          <span class="lore-phone-carrier">LS MOBILE</span>
+          <span class="lore-phone-time" id="lore-phone-time">--:--</span>
+        </div>
+        <div class="lore-phone-contact">
+          <div class="lore-phone-avatar lore-phone-avatar-peter">P</div>
+          <div class="lore-phone-contact-info">
+            <span class="lore-phone-name">Peter Griffin</span>
+            <span class="lore-phone-status">Online — probably at the Clam</span>
+          </div>
+        </div>
+        <div class="lore-phone-chat" id="lore-chat">
+          <!-- JS renders messages here -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION: What I'm Into ══ -->
+  <section class="gta-section" id="currently">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">WHAT I'M<br>INTO</h2>
+      <div class="gta-currently-grid reveal">
+        <div class="gta-currently-card">
+          <span class="gta-currently-icon">&#128250;</span>
+          <span class="gta-currently-label">WATCHING</span>
+          <span class="gta-currently-value">Family Guy (all of it. again.)</span>
+        </div>
+        <div class="gta-currently-card">
+          <span class="gta-currently-icon">&#127918;</span>
+          <span class="gta-currently-label">PLAYING</span>
+          <span class="gta-currently-value">Detroit: Become Human + Death Stranding</span>
+        </div>
+        <div class="gta-currently-card">
+          <span class="gta-currently-icon">&#128268;</span>
+          <span class="gta-currently-label">LEARNING</span>
+          <span class="gta-currently-value">Arduino + Breadboard Circuits</span>
+        </div>
+        <div class="gta-currently-card">
+          <span class="gta-currently-icon">&#127859;</span>
+          <span class="gta-currently-label">COOKING</span>
+          <span class="gta-currently-value">Fresh Pasta from Scratch</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission checkpoint -->
+  <div class="gta-checkpoint reveal">
+    <div class="gta-checkpoint-line"></div>
+    <span class="gta-checkpoint-label">&#128250; NOW BROADCASTING &#128250;</span>
+    <div class="gta-checkpoint-line"></div>
+  </div>
+
+  <!-- ══ SECTION: The Channel — Retro TV ══ -->
+  <section class="gta-section gta-section-tv" id="the-channel">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">THE<br>CHANNEL</h2>
+      <p class="tv-subtitle reveal">Flip through the things that shaped this guy.</p>
+
+      <div class="lore-tv-wrap reveal">
+        <div class="lore-tv" id="lore-tv">
+          <!-- Rabbit ear antenna -->
+          <div class="lore-tv-antenna">
+            <div class="lore-tv-antenna-ear lore-tv-antenna-l"></div>
+            <div class="lore-tv-antenna-ear lore-tv-antenna-r"></div>
+            <div class="lore-tv-antenna-base"></div>
+          </div>
+
+          <div class="lore-tv-bezel">
+            <!-- Brand badge with red circle scribble -->
+            <div class="lore-tv-brand">
+              <span class="lore-tv-brand-name">SamSong</span>
+              <svg class="lore-tv-brand-circle" viewBox="0 0 140 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <ellipse cx="70" cy="22" rx="66" ry="18" stroke="#e33" stroke-width="2.5" stroke-dasharray="4 2" fill="none" transform="rotate(-2 70 22)" opacity="0.85"/>
+              </svg>
+            </div>
+            <!-- Power LED -->
+            <div class="lore-tv-power-led"></div>
+
+            <div class="lore-tv-screen" id="tv-screen">
+              <div class="lore-tv-static" id="tv-static"></div>
+              <div class="lore-tv-vhs-line"></div>
+              <div class="lore-tv-ch-flash" id="tv-ch-flash"></div>
+              <video class="lore-tv-video" id="tv-video" muted loop playsinline></video>
+              <div class="lore-tv-content" id="tv-content">
+                <div class="lore-tv-channel" id="tv-channel">CH 01</div>
+                <div class="lore-tv-show" id="tv-show"></div>
+                <div class="lore-tv-quote" id="tv-quote"></div>
+              </div>
+              <div class="lore-tv-scanlines"></div>
+            </div>
+
+            <!-- Controls bar: mute + knobs -->
+            <div class="lore-tv-controls">
+              <button class="lore-tv-mute-btn" id="tv-mute" aria-label="Toggle sound">🔇</button>
+              <div class="lore-tv-knob-group">
+                <span class="lore-tv-knob-label">CH</span>
+                <button class="lore-tv-knob" id="tv-prev" aria-label="Previous channel">
+                  <div class="lore-tv-knob-inner">
+                    <div class="lore-tv-knob-notch"></div>
+                  </div>
+                </button>
+              </div>
+              <div class="lore-tv-knob-group">
+                <span class="lore-tv-knob-label">VOL</span>
+                <button class="lore-tv-knob" id="tv-vol" aria-label="Adjust volume">
+                  <div class="lore-tv-knob-inner">
+                    <div class="lore-tv-knob-notch"></div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="lore-tv-legs">
+            <div class="lore-tv-leg"></div>
+            <div class="lore-tv-leg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: Player Card Generator ══ -->
+  <section class="gta-section gta-section-cardgen" id="cardgen">
+    <div class="gta-container">
+      <h2 class="gta-section-title reveal">PLAYER<br>CARD</h2>
+
+      <p class="cardgen-unlock-msg reveal">&#128275; You've seen the whole story. Now build yours.</p>
+
+      <div class="cardgen-layout reveal">
+        <!-- Example card — Sushrut's card as teaser -->
+        <div class="player-card" id="example-card">
+          <div class="pc-accent-stripe"></div>
+          <div class="pc-inner">
+            <!-- Top: Wanted badge + rating -->
+            <div class="pc-top-row">
+              <div class="pc-rating">
+                <span class="pc-rating-num">94</span>
+                <span class="pc-rating-label">OVR</span>
+              </div>
+              <div class="pc-class">
+                <span class="pc-class-icon">&#9733;</span>
+                <span class="pc-class-name">LEGEND</span>
+              </div>
+            </div>
+
+            <!-- Mugshot -->
+            <div class="pc-mugshot">
+              <div class="pc-mugshot-inner">
+                <div class="pc-mugshot-placeholder">
+                  <span>S</span>
+                </div>
+              </div>
+              <div class="pc-wanted-stars">
+                <span class="pc-ws active">&#9733;</span>
+                <span class="pc-ws active">&#9733;</span>
+                <span class="pc-ws active">&#9733;</span>
+                <span class="pc-ws active">&#9733;</span>
+                <span class="pc-ws">&#9733;</span>
+              </div>
+            </div>
+
+            <!-- Name -->
+            <div class="pc-name-block">
+              <h3 class="pc-name">SUSHRUT VAIDYA</h3>
+              <span class="pc-title">The One Who Debugs &amp; Cooks</span>
+            </div>
+
+            <!-- Stats -->
+            <div class="pc-stats">
+              <div class="pc-stat"><span class="pc-stat-val">88</span><span class="pc-stat-lbl">CUR</span></div>
+              <div class="pc-stat"><span class="pc-stat-val">92</span><span class="pc-stat-lbl">HUM</span></div>
+              <div class="pc-stat"><span class="pc-stat-val">85</span><span class="pc-stat-lbl">CRE</span></div>
+              <div class="pc-stat"><span class="pc-stat-val">70</span><span class="pc-stat-lbl">DIS</span></div>
+              <div class="pc-stat"><span class="pc-stat-val">95</span><span class="pc-stat-lbl">SPI</span></div>
+            </div>
+
+            <!-- Traits -->
+            <div class="pc-traits">
+              <span class="pc-trait">Hyderabad</span>
+              <span class="pc-trait">Gamer</span>
+              <span class="pc-trait">Cook</span>
+              <span class="pc-trait">Otaku</span>
+            </div>
+
+            <!-- Footer -->
+            <div class="pc-footer">
+              <span class="pc-footer-brand">DEVQUEST</span>
+              <span class="pc-footer-id">#0001</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA side -->
+        <div class="cardgen-cta">
+          <h3 class="cardgen-cta-title">Want your own?</h3>
+          <p class="cardgen-cta-desc">Pick your class, set your stats, choose a wanted level — generate your own GTA-style player card and download it.</p>
+          <div class="cardgen-preview-features">
+            <div class="cardgen-feat">
+              <span class="cardgen-feat-icon">&#127918;</span>
+              <span class="cardgen-feat-text">Choose your class</span>
+            </div>
+            <div class="cardgen-feat">
+              <span class="cardgen-feat-icon">&#9733;</span>
+              <span class="cardgen-feat-text">Set your stats</span>
+            </div>
+            <div class="cardgen-feat">
+              <span class="cardgen-feat-icon">&#128247;</span>
+              <span class="cardgen-feat-text">Upload your mugshot</span>
+            </div>
+            <div class="cardgen-feat">
+              <span class="cardgen-feat-icon">&#128229;</span>
+              <span class="cardgen-feat-text">Download as image</span>
+            </div>
+          </div>
+          <button class="cardgen-btn" disabled>
+            <span class="cardgen-btn-text">CREATE YOUR CARD</span>
+            <span class="cardgen-btn-badge">COMING SOON</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="gta-footer">
+    <div class="gta-footer-inner">
+      <span class="gta-footer-brand">DevQuest<span class="gta-footer-dot">.</span></span>
+      <span class="gta-footer-sep">&middot;</span>
+      <span class="gta-footer-credit">built by Sushrut</span>
+      <span class="gta-footer-sep">&middot;</span>
+      <span class="gta-footer-copy">&copy; 2026</span>
+    </div>
+  </footer>
+
+  <!-- ══ JUKEBOX — Pixel Boombox (copied as-is) ══ -->
+  <div class="am-jb-backdrop" id="jb-backdrop"></div>
+  <div class="am-jukebox" id="jukebox">
+    <button class="am-jb-pill" id="jb-pill">
+      <div class="am-jb-mini-eq"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="am-jb-track-name" id="jb-track-name"><span class="am-jb-track-name-inner" id="jb-track-name-inner">Corridors of Time — Chrono Trigger</span></div>
+      <span class="am-jb-play-btn" id="jb-play-compact" aria-label="Play/Pause">&#9654;</span>
+    </button>
+    <div class="am-jb-expanded" id="jb-expanded">
+      <div class="am-jb-boombox">
+        <div class="am-jb-close-row"><button class="am-jb-close" id="jb-close" aria-label="Close"></button></div>
+        <div class="am-jb-top-row">
+          <div class="am-jb-speaker"><div class="am-jb-speaker-grill"><span></span><span></span><span></span><span></span><span></span></div></div>
+          <div class="am-jb-eq-display"><div class="am-jb-eq-bars" id="jb-eq-bars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+          <div class="am-jb-speaker"><div class="am-jb-speaker-grill"><span></span><span></span><span></span><span></span><span></span></div></div>
+        </div>
+        <div class="am-jb-cassette"><div class="am-jb-cassette-inner"><div class="am-jb-marquee" id="jb-marquee"><span class="am-jb-marquee-text" id="jb-marquee-text">Corridors of Time — Chrono Trigger</span></div></div></div>
+        <div class="am-jb-controls">
+          <button class="am-jb-ctrl" id="jb-prev" aria-label="Previous">&#9198;</button>
+          <button class="am-jb-ctrl am-jb-ctrl-play" id="jb-play" aria-label="Play/Pause">&#9654;</button>
+          <button class="am-jb-ctrl" id="jb-next" aria-label="Next">&#9197;</button>
+        </div>
+        <button class="am-jb-tl-toggle" id="jb-tl-toggle" aria-label="Show tracklist">
+          <span class="am-jb-tl-chevron" id="jb-tl-chevron">&#9662;</span>
+          <span class="am-jb-tl-label">Tracklist</span>
+        </button>
+        <div class="am-jb-tracklist" id="jb-tracklist"></div>
+        <div class="am-jb-volume-row">
+          <span class="am-jb-vol-label">VOL</span>
+          <input type="range" class="am-jb-vol-slider" id="jb-volume" min="0" max="100" value="70" aria-label="Volume">
+          <span class="am-jb-vol-val" id="jb-vol-val">70</span>
+        </div>
+        <div class="am-jb-footer"><span>INSERT COIN TO PLAY</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/aboutme-v2.js" defer></script>
+</body>
+</html>

@@ -2539,11 +2539,12 @@
 .cardgen-btn {
   all: unset; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 12px;
+  text-decoration: none;
   width: 100%; max-width: 320px;
   padding: 16px 24px;
   background: linear-gradient(135deg, var(--gta-orange), #ff4500);
   border-radius: 12px;
-  cursor: not-allowed;
+  cursor: pointer;
   position: relative;
   overflow: hidden;
   margin-top: 8px;

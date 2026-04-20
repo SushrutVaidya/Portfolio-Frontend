@@ -578,6 +578,75 @@
   .badge-gta .gta-id { font: 500 0.6rem/1 monospace; letter-spacing: 1px; color: #444; margin-top: auto; align-self: flex-end; }
 
   /* ═══════════════════════════
+     9. ROYAL WHITE
+     ═══════════════════════════ */
+  .badge-royal {
+    background: linear-gradient(170deg, #fefefe, #f9f7f3, #fefefe);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(180,155,100,0.15);
+    display: flex; flex-direction: column; padding: 0;
+    position: relative;
+  }
+  .badge-royal::before {
+    content: ''; position: absolute; inset: 0;
+    border: 1.5px solid rgba(200,170,100,0.18);
+    border-radius: 22px; pointer-events: none; z-index: 2;
+  }
+  .badge-royal::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg,
+      rgba(210,180,120,0.04) 0%, transparent 40%,
+      rgba(210,180,120,0.03) 70%, transparent 100%);
+    pointer-events: none; z-index: 1; border-radius: 22px;
+  }
+  .badge-royal:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 0 40px rgba(200,170,100,0.06);
+  }
+  .badge-royal .royal-photo {
+    width: 100%; height: 260px;
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #f5f0e8, #ede8df);
+  }
+  .badge-royal .royal-photo::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(transparent, #faf8f4);
+  }
+  .badge-royal .royal-content {
+    padding: 24px 32px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 1; width: 100%;
+  }
+  .badge-royal .royal-name { font-size: 1.6rem; font-weight: 800; letter-spacing: 3px; color: #2a2520; text-align: center; line-height: 1.15; }
+  .badge-royal .royal-class { font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #b49a6a; text-transform: uppercase; }
+  .badge-royal .royal-bio { font-size: 0.7rem; color: #8a8078; text-align: center; line-height: 1.6; }
+  .badge-royal .royal-motto { font-size: 0.65rem; color: #a09488; font-style: italic; text-align: center; }
+  .badge-royal .royal-motto::before, .badge-royal .royal-motto::after { content: ' \u201C '; color: #c8b898; }
+  .badge-royal .royal-motto::after { content: ' \u201D '; }
+  .badge-royal .royal-divider { width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,170,100,0.3), transparent); }
+  .badge-royal .royal-stats {
+    display: flex; gap: 0; width: 100%; justify-content: center;
+  }
+  .badge-royal .royal-stat {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 0 14px;
+  }
+  .badge-royal .royal-stat:not(:last-child) { border-right: 1px solid rgba(180,155,100,0.12); }
+  .badge-royal .royal-stat-val { font-size: 1.15rem; font-weight: 800; color: #2a2520; }
+  .badge-royal .royal-stat-lbl { font-size: 0.65rem; font-weight: 600; letter-spacing: 1px; color: #b49a6a; text-transform: uppercase; }
+  .badge-royal .royal-wanted { display: flex; align-items: center; gap: 10px; }
+  .badge-royal .royal-stars { display: flex; gap: 5px; font-size: 1rem; color: #c8a84e; }
+  .badge-royal .royal-stars .off { opacity: 0.2; }
+  .badge-royal .royal-xp { width: 100%; }
+  .badge-royal .royal-xp-label { font-size: 0.6rem; font-weight: 600; color: #a09488; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+  .badge-royal .royal-xp-bar { width: 100%; height: 5px; background: rgba(200,170,100,0.1); border-radius: 3px; overflow: hidden; }
+  .badge-royal .royal-xp-fill { height: 100%; background: linear-gradient(90deg, #c8a84e, #dcc088); border-radius: 3px; }
+  .badge-royal .royal-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .badge-royal .royal-chip {
+    font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 8px;
+    background: rgba(200,170,100,0.06); color: #b49a6a; border: 1px solid rgba(200,170,100,0.15);
+  }
+  .badge-royal .royal-id { font: 500 0.6rem/1 monospace; letter-spacing: 2px; color: #c8c0b4; margin-top: auto; text-align: center; }
+
+  /* ═══════════════════════════
      ZOOM OVERLAY
      ═══════════════════════════ */
   .overlay {
@@ -886,12 +955,9 @@ async function fetchCard() {
   const userId = localStorage.getItem('dq-user-id');
   if (!userId) return null;
   try {
-    console.log('[CardAPI] Fetching card for', userId);
     const res = await fetch(API_BASE + '/api/user/' + userId + '/card');
-    console.log('[CardAPI] Response status:', res.status);
     if (!res.ok) return null;
     const data = await res.json();
-    console.log('[CardAPI] Data:', data);
     return data;
   } catch (err) { console.error('[CardAPI] Fetch error:', err); return null; }
 }
@@ -922,7 +988,7 @@ function applyApiResponse(data) {
   DATA.profileComplete = data.profileComplete !== false;
 
   // Match card style to index
-  const styleMap = { HOLOGRAPHIC: 0, CARBON_FIBER: 1, FROSTED_GLASS: 2, BRUSHED_METAL: 3, NEON_CYBERPUNK: 4, MINIMAL_CLEAN: 5, RETRO_VHS: 6, GTA_ORIGINAL: 7 };
+  const styleMap = { HOLOGRAPHIC: 0, CARBON_FIBER: 1, FROSTED_GLASS: 2, BRUSHED_METAL: 3, NEON_CYBERPUNK: 4, MINIMAL_CLEAN: 5, RETRO_VHS: 6, GTA_ORIGINAL: 7, ROYAL_WHITE: 8 };
   if (data.cardStyle && styleMap[data.cardStyle] != null) {
     selectedStyleIndex = styleMap[data.cardStyle];
   }
@@ -1155,8 +1221,35 @@ function buildGTA(zoomed) {
   </div>`;
 }
 
+// ── 9. Royal White — Prestige ──
+function buildRoyal(zoomed) {
+  return `<div class="badge badge-royal">
+    <div class="royal-photo">${photoImg()}</div>
+    <div class="royal-content">
+      <div class="royal-name">${DATA.name}</div>
+      <div class="royal-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="royal-bio">${DATA.bio}</div><div class="royal-motto">${DATA.motto}</div>` : ''}
+      <div class="royal-divider"></div>
+      <div class="royal-stats">
+        ${DATA.stats.map(s => `<div class="royal-stat"><span class="royal-stat-val">${s.val}</span><span class="royal-stat-lbl">${s.lbl}</span></div>`).join('')}
+      </div>
+      <div class="royal-wanted">
+        <div class="royal-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="royal-xp">
+        <div class="royal-xp-label">LVL ${DATA.level} — ${DATA.xpPercent}% XP</div>
+        <div class="royal-xp-bar"><div class="royal-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="royal-traits">
+        ${DATA.traits.map(t => `<span class="royal-chip">${t}</span>`).join('')}
+      </div>
+      <div class="royal-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
 // ── Style registry ──
-const STYLE_NAMES = ['HOLOGRAPHIC', 'CARBON_FIBER', 'FROSTED_GLASS', 'BRUSHED_METAL', 'NEON_CYBERPUNK', 'MINIMAL_CLEAN', 'RETRO_VHS', 'GTA_ORIGINAL'];
+const STYLE_NAMES = ['HOLOGRAPHIC', 'CARBON_FIBER', 'FROSTED_GLASS', 'BRUSHED_METAL', 'NEON_CYBERPUNK', 'MINIMAL_CLEAN', 'RETRO_VHS', 'GTA_ORIGINAL', 'ROYAL_WHITE'];
 const CARD_STYLES = [
   { name: 'Holographic',    build: buildHolo,    wrapper: '' },
   { name: 'Carbon Fiber',   build: buildCarbon,  wrapper: '' },
@@ -1166,6 +1259,7 @@ const CARD_STYLES = [
   { name: 'Minimal Clean',  build: buildMinimal,  wrapper: '' },
   { name: 'Retro VHS',      build: buildVHS,      wrapper: '' },
   { name: 'GTA Original',   build: buildGTA,      wrapper: '' },
+  { name: 'Royal White',    build: buildRoyal,    wrapper: '' },
 ];
 
 // ── Build grid ──

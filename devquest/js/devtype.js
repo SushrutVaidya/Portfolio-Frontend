@@ -5,6 +5,63 @@
 // Hard:   SHA values + all quirks + SHA fade
 // ==========================================
 
+const API_BASE = 'http://localhost:8081';
+
+// ==========================================
+// LEADERBOARD
+// ==========================================
+
+const MOCK_LEADERBOARD = [
+  { rank: 1, name: 'Sushrut',        score: 99999 },
+  { rank: 2, name: 'xX_ProGamer_Xx', score: 45200 },
+  { rank: 3, name: 'ShadowBlade99',  score: 38750 },
+  { rank: 4, name: 'NPC_Steve',      score: 22100 },
+  { rank: 5, name: 'Bot_McBotface',  score: 8400  },
+];
+
+async function submitScore(wpm, accuracy, difficulty) {
+  const userId = localStorage.getItem('dq-user-id');
+  if (!userId) return;
+  try {
+    await fetch(API_BASE + '/api/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, game: 'devtype', wpm, accuracy, difficulty }),
+    });
+  } catch { /* backend offline — silent fail */ }
+}
+
+async function fetchLeaderboard() {
+  try {
+    const res = await fetch(API_BASE + '/api/leaderboard');
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } catch {
+    return MOCK_LEADERBOARD;
+  }
+}
+
+function renderLeaderboard(rows) {
+  const container = document.getElementById('dt-lb-rows');
+  if (!container) return;
+  container.innerHTML = '';
+  const playerName = (localStorage.getItem('dq-player-first') || '').trim();
+
+  rows.forEach(row => {
+    const isMe = playerName && row.name.toLowerCase() === playerName.toLowerCase();
+    const div = document.createElement('div');
+    div.className = 'dt-lb-row' + (isMe ? ' dt-lb-row-me' : '');
+
+    const rankClass = row.rank === 1 ? 'gold' : row.rank === 2 ? 'silver' : row.rank === 3 ? 'bronze' : '';
+
+    div.innerHTML =
+      '<span class="dt-lb-rank ' + rankClass + '">' + (row.rank <= 3 ? ['', '🥇', '🥈', '🥉'][row.rank] : '#' + row.rank) + '</span>' +
+      '<span class="dt-lb-name">' + row.name + (isMe ? ' <span class="dt-lb-you">YOU</span>' : '') + '</span>' +
+      '<span class="dt-lb-score">' + (typeof row.score === 'number' ? row.score.toLocaleString() : row.score) + '</span>';
+    container.appendChild(div);
+  });
+}
+
 // ==========================================
 // DIFFICULTY CONFIG
 // ==========================================
@@ -746,6 +803,10 @@ function endGame() {
 
   resultsEl.classList.remove('dt-hidden');
   drawWpmGraph();
+
+  // Leaderboard: submit score + fetch & render
+  submitScore(wpm, acc, currentDifficulty);
+  fetchLeaderboard().then(renderLeaderboard);
 }
 
 function resetGame() {

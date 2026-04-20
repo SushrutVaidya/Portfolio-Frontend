@@ -196,10 +196,7 @@
     const step = (Math.PI * 2) / n;
     const startAngle = -Math.PI / 2;
 
-    console.log('[Pentagon] Drawing — n:', n, 'cx:', cx, 'cy:', cy, 'r:', r);
-    console.log('[Pentagon] Values:', values);
-
-    // Draw static final frame immediately to test
+    // Draw static final frame
     ctx.clearRect(0, 0, w, h);
 
     // Grid rings
@@ -236,7 +233,6 @@
       const v = (values[idx] / 100) * r;
       const x = cx + Math.cos(a) * v;
       const y = cy + Math.sin(a) * v;
-      console.log('[Pentagon] Point', idx, ':', x.toFixed(1), y.toFixed(1), 'val:', values[idx], 'v:', v.toFixed(1));
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.closePath();
@@ -260,21 +256,21 @@
       ctx.stroke();
 
       // Label
-      const lr = r + 24;
+      const lr = r + 28;
+      const lx = cx + Math.cos(a) * lr;
+      const ly = cy + Math.sin(a) * lr;
       ctx.font = '700 11px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillText(labels[i], cx + Math.cos(a) * lr, cy + Math.sin(a) * lr);
+      ctx.fillText(labels[i], lx, ly);
 
-      // Value
-      const vr = r + 38;
+      // Value — stacked below label
       ctx.font = '800 10px -apple-system, sans-serif';
       ctx.fillStyle = colors[i];
-      ctx.fillText(values[i], cx + Math.cos(a) * vr, cy + Math.sin(a) * vr);
+      ctx.fillText(values[i], lx, ly + 14);
     }
 
-    console.log('[Pentagon] Draw complete');
     canvas.classList.add('glow');
     const wrap = canvas.closest('.stats-pentagon-wrap');
     if (wrap) wrap.classList.add('pulse');

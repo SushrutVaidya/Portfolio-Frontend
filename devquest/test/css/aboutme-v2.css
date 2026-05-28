@@ -3,6 +3,9 @@
    Marketing material / box art aesthetic
    ═══════════════════════════════════════════════ */
 
+/* Skip intro when coming from bulb loading screen */
+.skip-intro #intro-overlay { display: none !important; }
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,7 +54,100 @@
 .gta-page.loading .gta-wheel-trigger,
 .gta-page.loading .am-jukebox,
 .gta-page.loading .gta-checkpoint,
-.gta-page.loading .gta-footer { opacity: 0; }
+.gta-page.loading .gta-footer,
+.gta-page.loading .dq-nav { opacity: 0; }
+
+/* ── Shared Nav (inline for test/ pages) ── */
+.dq-nav {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 52px;
+  background: rgba(28,28,30,0.72);
+  backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  position: sticky; top: 0; z-index: 100;
+  transition: opacity 0.6s ease-out;
+}
+.dq-nav-brand {
+  font-family: -apple-system, 'SF Pro Display', sans-serif; font-size: 0.82rem;
+  font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.5px; text-decoration: none;
+}
+.dq-brand-dot { color: #0a84ff; }
+.dq-nav-links { display: flex; align-items: center; gap: 24px; }
+.dq-nav-link {
+  font-family: -apple-system, 'SF Pro Text', sans-serif; font-size: 0.72rem; font-weight: 500;
+  color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px; transition: color 0.2s;
+}
+.dq-nav-link:hover { color: rgba(255,255,255,0.92); }
+.dq-nav-link.active { color: rgba(255,255,255,0.92); font-weight: 600; }
+.dq-nav-right-group { display: flex; align-items: center; gap: 10px; }
+.dq-theme-toggle {
+  display: flex; align-items: center; gap: 6px; padding: 5px 12px 5px 8px;
+  border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08); backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  cursor: pointer; font-size: 0.65rem; font-family: -apple-system, 'SF Pro Text', sans-serif;
+  color: rgba(255,255,255,0.65); letter-spacing: 0.3px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s; flex-shrink: 0; white-space: nowrap;
+}
+.dq-toggle-icon { font-size: 0.8rem; line-height: 1; display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.dq-theme-toggle:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.9);
+  border-color: rgba(255,255,255,0.25); }
+
+[data-theme="light"] .dq-nav {
+  background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.07);
+  box-shadow: 0 0.5px 0 rgba(0,0,0,0.08);
+}
+[data-theme="light"] .dq-nav-brand { color: rgba(0,0,0,0.85); }
+[data-theme="light"] .dq-brand-dot { color: #007aff; }
+[data-theme="light"] .dq-nav-link { color: rgba(60,60,67,0.55); }
+[data-theme="light"] .dq-nav-link:hover,
+[data-theme="light"] .dq-nav-link.active { color: rgba(0,0,0,0.85); }
+[data-theme="light"] .dq-theme-toggle {
+  border-color: rgba(0,0,0,0.12); background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .dq-theme-toggle:hover { background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.8); }
+@media (max-width: 768px) { .dq-nav-links { display: none; } }
+
+/* ── Registration bar ── */
+.reg-bar {
+  width: 100%; padding: 16px 24px;
+  background: rgba(48,209,88,0.08); border-bottom: 0.5px solid rgba(48,209,88,0.2);
+  position: relative; z-index: 99;
+}
+.reg-bar-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
+}
+.reg-bar-text {
+  font: 500 0.78rem/1.4 -apple-system, 'SF Pro Text', sans-serif;
+  color: var(--gta-text); text-align: center;
+}
+.reg-bar-wave { margin-right: 6px; }
+.reg-bar-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.reg-input {
+  font: 500 0.75rem/1 -apple-system, sans-serif;
+  padding: 8px 14px; border-radius: 8px;
+  border: 0.5px solid var(--gta-card-border); background: var(--gta-card);
+  color: var(--gta-text); outline: none; width: 140px; transition: border-color 0.2s;
+}
+.reg-input:focus { border-color: #30d158; }
+.reg-input::placeholder { color: var(--gta-text-muted); }
+.reg-btn {
+  font: 600 0.72rem/1 -apple-system, sans-serif;
+  padding: 8px 20px; border-radius: 8px;
+  border: none; background: #30d158; color: #fff;
+  cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+}
+.reg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.reg-btn:not(:disabled):hover { opacity: 0.85; }
+.reg-bar-nudge {
+  font: 400 0.65rem/1.4 -apple-system, sans-serif;
+  color: var(--gta-text-secondary); text-align: center;
+}
+.reg-bar-nudge a { color: #30d158; text-decoration: none; }
+.reg-bar-nudge a:hover { text-decoration: underline; }
+.gta-page.loading .reg-bar { opacity: 0; }
 
 /* Content fade-in after loading */
 .gta-page:not(.loading) .gta-hero { transition: opacity 0.8s ease 0.1s; opacity: 1; }
@@ -810,8 +906,8 @@
 
 .gta-posters-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
 }
 
 /* ── The Wanted Poster Card ── */
@@ -827,139 +923,127 @@
 
 /* Tape strips */
 .wanted-tape {
-  position: absolute; top: -6px; z-index: 2;
-  width: 60px; height: 20px;
-  background: rgba(200,180,130,0.5);
+  position: absolute; top: -8px; z-index: 2;
+  width: 70px; height: 22px;
+  background: rgba(200,180,130,0.55);
   border-radius: 2px;
-  transform: rotate(-3deg);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
-.wanted-tape-l { left: 20px; transform: rotate(-4deg); }
-.wanted-tape-r { right: 20px; transform: rotate(3deg); }
+.wanted-tape-l { left: 24px; transform: rotate(-4deg); }
+.wanted-tape-r { right: 24px; transform: rotate(3deg); }
 
 /* The paper poster */
 .wanted-paper {
-  background:
-    linear-gradient(135deg, #fdf6e3 0%, #f5ecd3 50%, #ece2c6 100%);
-  border: 3px solid #c9b896;
-  border-radius: 4px;
-  padding: 20px 16px 16px;
+  background: linear-gradient(160deg, #fdf6e3 0%, #f5ecd3 60%, #ece2c6 100%);
+  border: 3px solid #b8a474;
+  border-radius: 3px;
+  padding: 0;
   text-align: center;
   position: relative;
   box-shadow:
-    0 4px 20px rgba(0,0,0,0.12),
-    0 1px 3px rgba(0,0,0,0.08),
-    inset 0 0 40px rgba(160,140,100,0.08);
+    0 8px 32px rgba(0,0,0,0.15),
+    0 2px 6px rgba(0,0,0,0.08),
+    inset 0 0 60px rgba(160,140,100,0.06);
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s;
+  overflow: hidden;
 }
 
-/* Paper texture overlay */
+/* Inner frame */
 .wanted-paper::before {
   content: '';
-  position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(160,140,100,0.02) 2px,
-      rgba(160,140,100,0.02) 4px
-    );
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(184,164,116,0.5);
   pointer-events: none;
-  border-radius: 4px;
+  z-index: 1;
+  border-radius: 1px;
 }
 
 .wanted-poster:hover .wanted-paper {
-  transform: translateY(-4px) rotate(-0.5deg);
+  transform: translateY(-6px) rotate(-0.5deg);
   box-shadow:
-    0 12px 40px rgba(0,0,0,0.15),
-    0 2px 6px rgba(0,0,0,0.1);
+    0 20px 60px rgba(0,0,0,0.18),
+    0 4px 12px rgba(0,0,0,0.1);
 }
 
 /* Poster header */
 .wanted-header {
   display: flex; align-items: center; justify-content: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(184,164,116,0.4);
 }
 .wanted-title {
   font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: #8b0000;
-  letter-spacing: 4px;
-  text-shadow: 1px 1px 0 rgba(139,0,0,0.2);
+  letter-spacing: 6px;
+  text-shadow: 1px 1px 0 rgba(139,0,0,0.15);
 }
 .wanted-stars {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #8b0000;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
 }
 
 /* Mugshot area */
 .wanted-mugshot {
-  width: 100%; aspect-ratio: 4/5;
-  max-height: 240px;
-  margin: 0 auto 12px;
-  border: 2px solid #b8a882;
-  border-radius: 2px;
+  width: 100%;
+  aspect-ratio: 3/4;
+  margin: 0;
   overflow: hidden;
   position: relative;
-  background: #2a2a2a;
+  background: #1a1a1a;
 }
 .wanted-mugshot-img {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
 }
-/* Dark silhouette overlay — mostly hides the image, teases on hover */
+/* Silhouette — toned down so real photos show through */
 .wanted-silhouette-overlay {
   position: absolute; inset: 0;
-  background:
-    linear-gradient(180deg, #1a1a1a 0%, #2a2015 100%);
-  opacity: 0.92;
+  background: linear-gradient(180deg, rgba(15,15,10,0.5) 0%, rgba(30,24,10,0.65) 100%);
   transition: opacity 0.5s ease;
 }
-.wanted-poster:hover .wanted-silhouette-overlay {
-  opacity: 0.6;
-}
-.wanted-poster.revealed .wanted-silhouette-overlay {
-  opacity: 0;
-}
+.wanted-poster:hover .wanted-silhouette-overlay { opacity: 0.25; }
+.wanted-poster.revealed .wanted-silhouette-overlay { opacity: 0; }
 
 /* Poster name */
 .wanted-name {
   font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: #2a2015;
-  letter-spacing: 3px;
-  margin-bottom: 8px;
+  letter-spacing: 4px;
+  padding: 12px 16px 6px;
 }
 
 /* Reward line */
 .wanted-reward {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-bottom: 6px;
+  padding: 0 16px 6px;
 }
 .wanted-reward span {
-  font: 800 0.6rem/1 -apple-system, sans-serif;
+  font: 800 0.58rem/1 -apple-system, sans-serif;
   color: #8b6914;
   letter-spacing: 2px;
 }
 .wanted-reward-amt {
   font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 1.2rem !important;
+  font-size: 1.3rem !important;
   color: #8b0000 !important;
   letter-spacing: 1px !important;
 }
 
 /* Charge line */
 .wanted-charge {
-  font: 700 0.5rem/1.3 -apple-system, sans-serif;
+  font: 700 0.5rem/1.4 -apple-system, sans-serif;
   color: #6b5b3e;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  padding-top: 8px;
-  border-top: 1px solid #c9b896;
+  padding: 8px 16px 14px;
+  border-top: 1px solid rgba(184,164,116,0.4);
+  margin-top: 4px;
 }
 
 /* ── Reveal Panel — appended to body by JS ── */
@@ -1681,116 +1765,54 @@
    LORE ZONE 2: Classified File
    ════════════════════════════════════ */
 /* ════════════════════════════════════
-   RETRO TV (The Channel)
+   MODERN TV (The Channel)
    ════════════════════════════════════ */
 .lore-tv-wrap {
-  display: flex; justify-content: center;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 40px 40px 32px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 4px;
 }
 .lore-tv {
   display: flex; flex-direction: column; align-items: center;
-  position: relative;
+  width: 100%;
+  max-width: 900px;
 }
 
-/* ── Rabbit ear antenna ── */
-.lore-tv-antenna {
-  position: relative;
-  width: 60px; height: 0;
-  display: flex; justify-content: center;
-  z-index: 1;
-}
-.lore-tv-antenna-ear {
-  position: absolute;
-  bottom: 0;
-  width: 2px; height: 80px;
-  background: linear-gradient(180deg, #666, #333);
-  border-radius: 2px 2px 0 0;
-  transform-origin: bottom center;
-}
-.lore-tv-antenna-ear::after {
-  content: '';
-  position: absolute;
-  top: -4px; left: -3px;
-  width: 8px; height: 8px;
-  background: radial-gradient(circle, #888, #555);
-  border-radius: 50%;
-}
-.lore-tv-antenna-l { transform: rotate(-25deg); left: 0; }
-.lore-tv-antenna-r { transform: rotate(25deg); right: 0; }
-.lore-tv-antenna-base {
-  position: absolute;
-  bottom: -4px;
-  width: 16px; height: 8px;
-  background: linear-gradient(180deg, #444, #2a2a2a);
-  border-radius: 3px 3px 0 0;
-}
-
-/* ── Bezel — wider ── */
+/* ── Bezel ── */
 .lore-tv-bezel {
-  background: linear-gradient(160deg, #2a2a2a, #1a1a1a);
-  border-radius: 20px;
-  padding: 16px 20px 16px;
+  width: 100%;
+  background: #181818;
+  border-radius: 10px 10px 4px 4px;
+  padding: 8px 8px 0;
   box-shadow:
-    0 20px 60px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.06),
-    0 0 0 2px rgba(255,255,255,0.03);
-  width: 640px;
-  max-width: 100%;
-  position: relative;
-}
-
-/* ── Brand badge — "SamSong" with red circle ── */
-.lore-tv-brand {
-  position: absolute;
-  top: 8px; left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-}
-.lore-tv-brand-name {
-  font: italic 700 0.85rem/1 -apple-system, sans-serif;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-.lore-tv-brand-circle {
-  position: absolute;
-  top: -12px; left: -18px;
-  width: calc(100% + 36px);
-  height: calc(100% + 24px);
-  pointer-events: none;
-}
-
-/* ── Power LED ── */
-.lore-tv-power-led {
-  position: absolute;
-  bottom: 54px; left: 28px;
-  width: 6px; height: 6px;
-  background: #30d158;
-  border-radius: 50%;
-  box-shadow: 0 0 6px #30d158, 0 0 12px rgba(48,209,88,0.3);
-  animation: ledPulse 2s ease-in-out infinite;
-}
-@keyframes ledPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 6px #30d158, 0 0 12px rgba(48,209,88,0.3); }
-  50% { opacity: 0.5; box-shadow: 0 0 3px #30d158; }
+    0 40px 100px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 0 0 1px rgba(255,255,255,0.04);
+  overflow: hidden;
 }
 
 /* ── Screen ── */
 .lore-tv-screen {
   position: relative;
-  background: #0a0a0a;
-  border-radius: 10px;
+  background: #000;
+  border-radius: 4px 4px 0 0;
   overflow: hidden;
-  aspect-ratio: 16/10;
-  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16/9;
+  width: 100%;
+  display: block;
 }
+
 /* CRT warm-up */
 .lore-tv-screen.warming-up {
   animation: crtWarmUp 1.2s ease-out forwards;
 }
 @keyframes crtWarmUp {
-  0% { filter: brightness(0); }
-  30% { filter: brightness(0.3); }
-  60% { filter: brightness(0.7); }
+  0%   { filter: brightness(0); }
+  30%  { filter: brightness(0.3); }
+  60%  { filter: brightness(0.7); }
   100% { filter: brightness(1); }
 }
 
@@ -1798,77 +1820,68 @@
 .lore-tv-static {
   position: absolute; inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.05s;
-  z-index: 3;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.05s; z-index: 3;
 }
 .lore-tv-static.active {
   opacity: 1;
   animation: staticFlicker 0.15s steps(4) 3;
 }
 @keyframes staticFlicker {
-  0% { opacity: 0.9; background-position: 0 0; }
-  25% { opacity: 0.5; background-position: 10px -20px; }
-  50% { opacity: 0.8; background-position: -15px 10px; }
-  75% { opacity: 0.4; background-position: 20px 20px; }
-  100% { opacity: 1; background-position: -10px -10px; }
+  0%   { opacity: 0.9; background-position: 0 0; }
+  25%  { opacity: 0.5; background-position: 10px -20px; }
+  50%  { opacity: 0.8; background-position: -15px 10px; }
+  75%  { opacity: 0.4; background-position: 20px 20px; }
+  100% { opacity: 1;   background-position: -10px -10px; }
 }
 
-/* ── VHS tracking glitch line ── */
+/* ── VHS line ── */
 .lore-tv-vhs-line {
-  position: absolute;
-  left: 0; right: 0;
+  position: absolute; left: 0; right: 0;
   height: 3px;
   background: rgba(255,255,255,0.12);
-  box-shadow: 0 0 8px rgba(255,255,255,0.1);
-  z-index: 5;
-  pointer-events: none;
+  z-index: 5; pointer-events: none;
   opacity: 0;
   animation: vhsSweep 8s linear infinite;
 }
 @keyframes vhsSweep {
   0%, 88% { opacity: 0; top: -5px; }
-  90% { opacity: 1; top: 0; }
-  100% { opacity: 0; top: 100%; }
+  90%      { opacity: 1; top: 0; }
+  100%     { opacity: 0; top: 100%; }
 }
 
-/* ── Channel flash overlay ── */
+/* ── Channel flash ── */
 .lore-tv-ch-flash {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Pricedown', Impact, sans-serif;
   font-size: 5rem;
   color: rgba(200,255,0,0.7);
   text-shadow: 0 0 30px rgba(200,255,0,0.4);
-  z-index: 6;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
+  z-index: 6; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s;
 }
 .lore-tv-ch-flash.active {
   opacity: 1;
   animation: chFlashIn 0.5s ease-out forwards;
 }
 @keyframes chFlashIn {
-  0% { opacity: 1; transform: scale(1.4); }
-  40% { opacity: 0.9; transform: scale(1); }
+  0%   { opacity: 1; transform: scale(1.4); }
+  40%  { opacity: 0.9; transform: scale(1); }
   100% { opacity: 0; transform: scale(1); }
 }
 
-/* Scanline overlay */
+/* ── Scanlines ── */
 .lore-tv-scanlines {
   position: absolute; inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    transparent 0px,
-    transparent 1px,
-    rgba(0,0,0,0.05) 1px,
-    rgba(0,0,0,0.05) 2px
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
   );
-  pointer-events: none;
-  z-index: 2;
+  pointer-events: none; z-index: 2;
 }
 
 /* ── Video ── */
@@ -1876,71 +1889,34 @@
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  z-index: 0;
-  opacity: 0;
+  z-index: 0; opacity: 0;
   transition: opacity 0.3s;
 }
 .lore-tv-video.active { opacity: 1; }
-.lore-tv-video.active ~ .lore-tv-content {
-  background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, transparent 60%);
-  justify-content: flex-end;
-  padding-bottom: 20px;
-}
-.lore-tv-video.active ~ .lore-tv-content .lore-tv-show {
-  font-size: 1.2rem;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-}
-.lore-tv-video.active ~ .lore-tv-content .lore-tv-quote {
-  font-size: 0.75rem;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-}
-.lore-tv-video.active ~ .lore-tv-content .lore-tv-emoji {
-  display: none;
-}
 
-/* Mute button — physical bezel button in controls bar */
-.lore-tv-mute-btn {
-  all: unset;
-  width: 32px; height: 32px;
-  background: linear-gradient(180deg, #3a3a3a, #222);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-}
-.lore-tv-mute-btn:hover {
-  background: linear-gradient(180deg, #444, #2a2a2a);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 10px rgba(200,255,0,0.08);
-}
-.lore-tv-mute-btn:active {
-  transform: scale(0.92);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* ── Content ── */
+/* ── Overlay content ── */
 .lore-tv-content {
-  position: relative;
+  position: absolute; inset: 0;
   z-index: 1;
-  padding: 28px 24px;
-  text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
   transition: opacity 0.15s;
 }
 .lore-tv-content.switching { opacity: 0; }
+
+/* Channel number — top right */
 .lore-tv-channel {
   font: 800 0.5rem/1 'SF Mono', monospace;
   letter-spacing: 3px;
-  color: rgba(200,255,0,0.6);
-  background: rgba(0,0,0,0.4);
+  color: rgba(200,255,0,0.7);
+  background: rgba(0,0,0,0.5);
   padding: 4px 10px;
   border-radius: 4px;
   position: absolute;
   top: 12px; right: 12px;
 }
+
+/* Show name — center when no video, bottom bar when video */
 .lore-tv-show {
   font-family: 'Pricedown', Impact, sans-serif;
   font-size: 1.8rem;
@@ -1948,125 +1924,144 @@
   letter-spacing: 2px;
   text-shadow: 0 0 20px rgba(200,255,0,0.3);
 }
-.lore-tv-quote {
-  font: italic 400 0.9rem/1.6 -apple-system, sans-serif;
-  color: rgba(255,255,255,0.7);
-  max-width: 400px;
-}
 .lore-tv-emoji {
   font-size: 2.8rem;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
-/* ── Knob controls ── */
+/* When video is playing — small pill bottom-left */
+.lore-tv-video.active ~ .lore-tv-content {
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 0 0 8px 12px;
+}
+.lore-tv-video.active ~ .lore-tv-content .lore-tv-show {
+  width: auto;
+  background: rgba(0,0,0,0.62);
+  border-left: 2px solid rgba(200,255,0,0.6);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  padding: 5px 10px;
+  text-align: left;
+  text-shadow: none;
+}
+.lore-tv-video.active ~ .lore-tv-content .lore-tv-emoji { display: none; }
+
+/* ── Bottom control bar ── */
+.lore-tv-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background: #111;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.lore-tv-brand-area {
+  display: flex; align-items: center; gap: 10px;
+}
+.lore-tv-brand-name {
+  font: italic 700 0.68rem/1 -apple-system, sans-serif;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.lore-tv-power-led {
+  width: 5px; height: 5px;
+  background: #30d158; border-radius: 50%;
+  box-shadow: 0 0 6px #30d158, 0 0 12px rgba(48,209,88,0.3);
+  animation: ledPulse 2s ease-in-out infinite;
+}
+@keyframes ledPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
 .lore-tv-controls {
-  display: flex; align-items: center; gap: 24px;
-  padding: 14px 12px 6px;
+  display: flex; align-items: center; gap: 12px;
 }
-.lore-tv-controls .lore-tv-mute-btn {
-  margin-right: auto;
+.lore-tv-mute-btn {
+  all: unset;
+  width: 26px; height: 26px;
+  background: linear-gradient(180deg, #2e2e2e, #1a1a1a);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  transition: transform 0.15s;
 }
+.lore-tv-mute-btn:hover { transform: translateY(-1px); }
 .lore-tv-knob-group {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .lore-tv-knob-label {
-  font: 700 0.4rem/1 'SF Mono', monospace;
+  font: 700 0.38rem/1 'SF Mono', monospace;
   color: rgba(255,255,255,0.2);
   letter-spacing: 2px;
 }
-/* Outer ring — embossed base */
 .lore-tv-knob {
   all: unset;
-  width: 44px; height: 44px;
+  width: 26px; height: 26px;
   border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #2a2a2a 0deg, #3a3a3a 15deg, #222 30deg,
-    #3a3a3a 45deg, #222 60deg, #3a3a3a 75deg,
-    #222 90deg, #3a3a3a 105deg, #222 120deg,
-    #3a3a3a 135deg, #222 150deg, #3a3a3a 165deg,
-    #222 180deg, #3a3a3a 195deg, #222 210deg,
-    #3a3a3a 225deg, #222 240deg, #3a3a3a 255deg,
-    #222 270deg, #3a3a3a 285deg, #222 300deg,
-    #3a3a3a 315deg, #222 330deg, #3a3a3a 345deg,
-    #2a2a2a 360deg
-  );
-  box-shadow:
-    0 3px 8px rgba(0,0,0,0.6),
-    0 0 0 1px rgba(255,255,255,0.04),
-    inset 0 0 0 1px rgba(0,0,0,0.4);
+  background: linear-gradient(180deg, #2e2e2e, #1a1a1a);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   cursor: pointer;
-  position: relative;
   display: flex; align-items: center; justify-content: center;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  transition: transform 0.3s ease;
 }
-/* Inner cap — brushed metal look */
 .lore-tv-knob-inner {
-  width: 30px; height: 30px;
+  width: 16px; height: 16px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 32%, #666 0%, #444 40%, #2a2a2a 100%);
-  box-shadow:
-    inset 0 2px 3px rgba(255,255,255,0.12),
-    inset 0 -2px 3px rgba(0,0,0,0.3),
-    0 1px 2px rgba(0,0,0,0.3);
+  background: radial-gradient(circle at 38% 32%, #555 0%, #2a2a2a 100%);
   position: relative;
 }
-/* Notch indicator */
 .lore-tv-knob-notch {
   position: absolute;
-  top: 3px; left: 50%;
-  width: 2.5px; height: 10px;
-  background: rgba(255,255,255,0.45);
-  border-radius: 1.5px;
+  top: 2px; left: 50%;
+  width: 2px; height: 6px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 1px;
   transform: translateX(-50%);
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s;
 }
-/* Hover — green glow on notch + lift shadow */
-.lore-tv-knob:hover {
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.7),
-    0 0 0 1px rgba(255,255,255,0.06),
-    0 0 16px rgba(200,255,0,0.08);
-}
-.lore-tv-knob:hover .lore-tv-knob-notch {
-  background: rgba(200,255,0,0.7);
-  box-shadow: 0 0 6px rgba(200,255,0,0.4);
-}
-/* Active press — push down */
-.lore-tv-knob:active {
-  box-shadow:
-    0 1px 3px rgba(0,0,0,0.8),
-    0 0 0 1px rgba(255,255,255,0.03),
-    inset 0 1px 3px rgba(0,0,0,0.3);
-  transform: scale(0.93);
-}
-/* Turning animation — set via JS inline transform */
+.lore-tv-knob:hover .lore-tv-knob-notch { background: rgba(200,255,0,0.8); }
+.lore-tv-knob:active { transform: scale(0.9); }
 .lore-tv-knob.turning {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ── TV legs ── */
-.lore-tv-legs {
-  display: flex; gap: 240px;
-  margin-top: -2px;
+/* ── Center pedestal stand ── */
+.lore-tv-stand {
+  display: flex; flex-direction: column; align-items: center;
 }
-.lore-tv-leg {
-  width: 3px; height: 24px;
-  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
-  border-radius: 0 0 2px 2px;
+.lore-tv-stand-neck {
+  width: 90px; height: 22px;
+  background: linear-gradient(180deg, #181818, #222);
+}
+.lore-tv-stand-base {
+  width: 240px; height: 10px;
+  background: linear-gradient(180deg, #222, #1a1a1a);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
-/* ════════════════════════════════════
-   THE CHANNEL — Standalone TV Section
-   ════════════════════════════════════ */
-.gta-section-tv {
-  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
-  padding: 60px 0 80px;
+/* ── Caption below TV ── */
+.lore-tv-caption {
+  margin-top: 24px;
+  max-width: 760px; width: 100%;
+  text-align: center;
+  font: italic 400 0.95rem/1.8 -apple-system, sans-serif;
+  color: rgba(255,255,255,0.75);
+  padding: 14px 20px;
+  min-height: 2.4em;
+  background: rgba(255,255,255,0.04);
+  border-left: 2px solid rgba(200,255,0,0.4);
+  border-right: 2px solid rgba(200,255,0,0.4);
 }
-.gta-section-tv .gta-section-title {
-  color: #e0e0e0;
-}
+.lore-tv-caption::before { content: '\201C'; margin-right: 2px; }
+.lore-tv-caption::after  { content: '\201D'; margin-left: 2px; }
+
 .tv-subtitle {
   font: 400 1.1rem/1.5 -apple-system, sans-serif;
   color: #888;
@@ -2527,7 +2522,12 @@
   border: 1px solid var(--gta-card-border);
   border-radius: 10px;
   padding: 12px 14px;
-  box-shadow: var(--gta-shadow-sm);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cardgen-feat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 .cardgen-feat-icon { font-size: 1.1rem; }
 .cardgen-feat-text {
@@ -2741,19 +2741,45 @@
    RESPONSIVE
    ════════════════════════════════════ */
 @media (max-width: 768px) {
+  /* ── Pentagon canvas — scales with container ── */
+  #gta-stat-pentagon { width: 100% !important; height: auto !important; max-width: 280px; }
+  .stats-pentagon-wrap { width: 100%; max-width: 280px; margin: 0 auto; }
+
+  /* ── Kitchen polaroid images ── */
+  .kitchen-pol-photo { height: 150px; width: 100%; object-fit: cover; }
+  .kitchen-polaroid { width: 100%; }
+  .kitchen-polaroid-inner { width: 100%; }
+  .kitchen-pol-front, .kitchen-pol-back { width: 100%; }
+
+  /* ── Wanted poster mugshot — proper height on mobile ── */
+  .wanted-mugshot { aspect-ratio: 3/4; max-height: 220px; }
+  .wanted-mugshot-img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+
+  /* ── Reveal photos ── */
+  .reveal-photo-main { aspect-ratio: 4/3; min-height: 180px; object-fit: cover; }
+  .reveal-photo-sm   { aspect-ratio: 1;   min-height: 120px; object-fit: cover; }
+  .reveal-photo-wide { aspect-ratio: 16/9; min-height: 160px; object-fit: cover; }
+
+  /* ── Cover flow images ── */
+  .cf-card img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── TV ── */
+  .lore-tv-wrap { padding: 20px 12px 16px; }
+  .lore-tv-video { object-fit: cover; object-position: center; }
+
+  /* ── Section images don't overflow ── */
+  img { max-width: 100%; height: auto; }
+
   .gta-checkpoint { padding: 16px 24px; }
   .gta-checkpoint-label { font-size: 0.6rem; letter-spacing: 2px; }
   .gta-intro-logo { font-size: 2.5rem; }
   .gta-intro-bar { width: 240px; }
 
   .gta-hero { padding: 40px 24px; }
-  .gta-hero-inner { grid-template-columns: 1fr; gap: 28px; text-align: center; }
-  .gta-hero-art { order: -1; }
-  .gta-photo-hero { max-width: 220px; margin: 0 auto; }
-  .gta-hero-name { font-size: 3.5rem; }
-  .gta-hero-traits { justify-content: center; }
-  .gta-hero-divider { margin: 0 auto 16px; }
-  .gta-hero-tagline { margin: 0 auto 20px; }
+  .gta-hero-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .gta-hero-art { order: 0; }
+  .gta-photo-hero { max-width: 220px; }
+  .gta-hero-name { font-size: 3rem; }
   .gta-loading-bar { left: 24px; right: 24px; }
   .gta-tip { left: 24px; right: 24px; }
 
@@ -2778,20 +2804,6 @@
 
   .gta-currently-grid { grid-template-columns: 1fr 1fr; }
 
-  .cf-card { width: 260px; height: 135px; }
-  .cf-stage { height: 160px; }
-  .cf-viewport { height: 240px; }
-  .cf-reflection { top: 155px; }
-
-  .kitchen-wall { grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
-  .kitchen-pol-name { font-size: 1.05rem; }
-
-  .lore-phone { max-width: 100%; }
-  .lore-tv-bezel { width: 100%; }
-  .lore-tv-legs { gap: 120px; }
-  .lore-tv-show { font-size: 1.3rem; }
-  .lore-tv-quote { font-size: 0.8rem; }
-
   .cf-card { width: 220px; height: 115px; }
   .cf-stage { height: 140px; }
   .cf-viewport { height: 210px; }
@@ -2799,11 +2811,28 @@
   .cf-title { font-size: 1.2rem; }
   .cf-footer { flex-wrap: wrap; gap: 8px; justify-content: center; padding: 12px 16px 0; }
 
+  .kitchen-wall { grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
+  .kitchen-pol-name { font-size: 1.05rem; }
+
+  .lore-phone { max-width: 100%; }
+  .lore-tv-bezel { width: 100%; }
+  .lore-tv-show { font-size: 1.3rem; }
+  .lore-tv-quote { font-size: 0.8rem; }
 
   .gta-wheel-trigger { bottom: 16px; left: 16px; width: 42px; height: 42px; }
   .am-jukebox { bottom: 16px; right: 16px; }
   .am-jb-expanded { width: 290px; }
   .am-jb-speaker { width: 40px; height: 40px; }
+
+  .gta-wheel { width: 260px; height: 260px; }
+  .gta-wheel-seg { width: 65px; height: 65px; margin: -32px 0 0 -32px; }
+  .gta-wheel-seg { transform: rotate(var(--seg-angle)) translateY(-90px) rotate(calc(-1 * var(--seg-angle))); }
+  .gta-wheel-trigger { bottom: 80px; left: 16px; }
+
+  .am-jukebox { bottom: env(safe-area-inset-bottom, 8px); right: 50%; left: auto; transform: translateX(50%); z-index: 9999; }
+  .am-jb-pill { min-width: unset; width: auto; max-width: 280px; border-radius: 24px; padding: 10px 18px; }
+  .am-jb-expanded { width: 92vw; max-width: 340px; position: fixed; bottom: env(safe-area-inset-bottom, 8px); left: 50%; right: auto; transform: translateX(-50%) scale(0.92) translateY(8px); }
+  .am-jukebox.expanded .am-jb-expanded { transform: translateX(-50%) scale(1); }
 }
 
 @media (max-width: 480px) {

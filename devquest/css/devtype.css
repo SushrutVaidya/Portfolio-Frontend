@@ -729,6 +729,16 @@ body {
 }
 .dt-lb-row-me .dt-lb-score { color: var(--accent); }
 
+.dt-lb-full-link {
+  display: block; text-align: center; padding: 12px 0 4px;
+  font: 500 0.7rem/1 -apple-system, 'SF Pro Text', sans-serif;
+  color: rgba(255,255,255,0.4); text-decoration: none;
+  letter-spacing: 0.3px; transition: color 0.2s;
+}
+.dt-lb-full-link:hover { color: var(--accent); }
+[data-theme="light"] .dt-lb-full-link { color: rgba(60,60,67,0.4); }
+[data-theme="light"] .dt-lb-full-link:hover { color: var(--accent); }
+
 
 
 .dt-hidden { display: none !important; }

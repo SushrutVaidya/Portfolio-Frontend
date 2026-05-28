@@ -578,6 +578,75 @@
   .badge-gta .gta-id { font: 500 0.6rem/1 monospace; letter-spacing: 1px; color: #444; margin-top: auto; align-self: flex-end; }
 
   /* ═══════════════════════════
+     9. ROYAL WHITE
+     ═══════════════════════════ */
+  .badge-royal {
+    background: linear-gradient(170deg, #fefefe, #f9f7f3, #fefefe);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(180,155,100,0.15);
+    display: flex; flex-direction: column; padding: 0;
+    position: relative;
+  }
+  .badge-royal::before {
+    content: ''; position: absolute; inset: 0;
+    border: 1.5px solid rgba(200,170,100,0.18);
+    border-radius: 22px; pointer-events: none; z-index: 2;
+  }
+  .badge-royal::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg,
+      rgba(210,180,120,0.04) 0%, transparent 40%,
+      rgba(210,180,120,0.03) 70%, transparent 100%);
+    pointer-events: none; z-index: 1; border-radius: 22px;
+  }
+  .badge-royal:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 0 40px rgba(200,170,100,0.06);
+  }
+  .badge-royal .royal-photo {
+    width: 100%; height: 260px;
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #f5f0e8, #ede8df);
+  }
+  .badge-royal .royal-photo::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(transparent, #faf8f4);
+  }
+  .badge-royal .royal-content {
+    padding: 24px 32px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 1; width: 100%;
+  }
+  .badge-royal .royal-name { font-size: 1.6rem; font-weight: 800; letter-spacing: 3px; color: #2a2520; text-align: center; line-height: 1.15; }
+  .badge-royal .royal-class { font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #b49a6a; text-transform: uppercase; }
+  .badge-royal .royal-bio { font-size: 0.7rem; color: #8a8078; text-align: center; line-height: 1.6; }
+  .badge-royal .royal-motto { font-size: 0.65rem; color: #a09488; font-style: italic; text-align: center; }
+  .badge-royal .royal-motto::before, .badge-royal .royal-motto::after { content: ' \u201C '; color: #c8b898; }
+  .badge-royal .royal-motto::after { content: ' \u201D '; }
+  .badge-royal .royal-divider { width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,170,100,0.3), transparent); }
+  .badge-royal .royal-stats {
+    display: flex; gap: 0; width: 100%; justify-content: center;
+  }
+  .badge-royal .royal-stat {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 0 14px;
+  }
+  .badge-royal .royal-stat:not(:last-child) { border-right: 1px solid rgba(180,155,100,0.12); }
+  .badge-royal .royal-stat-val { font-size: 1.15rem; font-weight: 800; color: #2a2520; }
+  .badge-royal .royal-stat-lbl { font-size: 0.65rem; font-weight: 600; letter-spacing: 1px; color: #b49a6a; text-transform: uppercase; }
+  .badge-royal .royal-wanted { display: flex; align-items: center; gap: 10px; }
+  .badge-royal .royal-stars { display: flex; gap: 5px; font-size: 1rem; color: #c8a84e; }
+  .badge-royal .royal-stars .off { opacity: 0.2; }
+  .badge-royal .royal-xp { width: 100%; }
+  .badge-royal .royal-xp-label { font-size: 0.6rem; font-weight: 600; color: #a09488; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+  .badge-royal .royal-xp-bar { width: 100%; height: 5px; background: rgba(200,170,100,0.1); border-radius: 3px; overflow: hidden; }
+  .badge-royal .royal-xp-fill { height: 100%; background: linear-gradient(90deg, #c8a84e, #dcc088); border-radius: 3px; }
+  .badge-royal .royal-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .badge-royal .royal-chip {
+    font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 8px;
+    background: rgba(200,170,100,0.06); color: #b49a6a; border: 1px solid rgba(200,170,100,0.15);
+  }
+  .badge-royal .royal-id { font: 500 0.6rem/1 monospace; letter-spacing: 2px; color: #c8c0b4; margin-top: auto; text-align: center; }
+
+  /* ═══════════════════════════
      ZOOM OVERLAY
      ═══════════════════════════ */
   .overlay {
@@ -695,6 +764,16 @@
   .btn-save:hover { background: #7c5cff; transform: translateY(-1px); }
   .btn-save:active { transform: translateY(0); }
   .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-download {
+    background: #30d158; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 32px; font-family: 'Inter', sans-serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-download:hover { background: #34d860; transform: translateY(-1px); }
+  .btn-download:active { transform: translateY(0); }
+  .btn-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .save-status {
     font-size: 0.75rem; font-weight: 600; transition: opacity 0.3s;
   }
@@ -709,6 +788,142 @@
     display: none;
   }
   .completeness-nudge.visible { display: block; }
+
+  /* ── Nav ── */
+  .dq-nav {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+    background: rgba(28,28,30,0.72);
+    backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .dq-nav-brand {
+    font-family: -apple-system, 'SF Pro Display', sans-serif; font-size: 0.82rem;
+    font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.5px; text-decoration: none;
+  }
+  .dq-brand-dot { color: #0a84ff; }
+  .dq-nav-links { display: flex; align-items: center; gap: 24px; }
+  .dq-nav-link {
+    font-family: -apple-system, 'SF Pro Text', sans-serif; font-size: 0.72rem; font-weight: 500;
+    color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px; transition: color 0.2s;
+  }
+  .dq-nav-link:hover { color: rgba(255,255,255,0.92); }
+  .dq-nav-link.active { color: rgba(255,255,255,0.92); font-weight: 600; }
+  .dq-nav-right-group { display: flex; align-items: center; gap: 10px; }
+  .dq-theme-toggle {
+    display: flex; align-items: center; gap: 6px; padding: 5px 12px 5px 8px;
+    border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08); backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    cursor: pointer; font-size: 0.65rem; font-family: -apple-system, 'SF Pro Text', sans-serif;
+    color: rgba(255,255,255,0.65); letter-spacing: 0.3px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s; flex-shrink: 0; white-space: nowrap;
+  }
+  .dq-toggle-icon { font-size: 0.8rem; line-height: 1; display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .dq-theme-toggle:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.25); }
+  .ce-content { padding: 48px 20px 0; }
+  @media (max-width: 768px) { .dq-nav-links { display: none; } }
+
+  /* ── Registration bar ── */
+  .reg-bar {
+    width: 100%; padding: 16px 24px;
+    background: rgba(48,209,88,0.08); border-bottom: 0.5px solid rgba(48,209,88,0.2);
+    position: relative; z-index: 99;
+  }
+  .reg-bar-inner {
+    max-width: 720px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 12px; align-items: center;
+  }
+  .reg-bar-text {
+    font: 500 0.78rem/1.4 'Inter', -apple-system, sans-serif;
+    color: #fff; text-align: center;
+  }
+  .reg-bar-wave { margin-right: 6px; }
+  .reg-bar-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .reg-input {
+    font: 500 0.75rem/1 'Inter', sans-serif;
+    padding: 8px 14px; border-radius: 8px;
+    border: 0.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
+    color: #fff; outline: none; width: 140px; transition: border-color 0.2s;
+  }
+  .reg-input:focus { border-color: #30d158; }
+  .reg-input::placeholder { color: rgba(255,255,255,0.28); }
+  .reg-btn {
+    font: 600 0.72rem/1 'Inter', sans-serif;
+    padding: 8px 20px; border-radius: 8px;
+    border: none; background: #30d158; color: #fff;
+    cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+  }
+  .reg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .reg-btn:not(:disabled):hover { opacity: 0.85; }
+  .reg-bar-nudge {
+    font: 400 0.65rem/1.4 'Inter', sans-serif;
+    color: rgba(255,255,255,0.55); text-align: center;
+  }
+  .reg-bar-nudge a { color: #30d158; text-decoration: none; }
+  .reg-bar-nudge a:hover { text-decoration: underline; }
+
+  /* ── What's Next (post-save) ── */
+  .card-next {
+    max-width: 520px;
+    margin: 48px auto 0;
+    text-align: center;
+    padding: 32px 24px;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-next-eyebrow {
+    font: 600 0.65rem/1 'Inter', sans-serif;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #30d158;
+    margin-bottom: 8px;
+  }
+  .card-next-title {
+    font: 700 1.4rem/1.2 'Inter', sans-serif;
+    color: #f5f5f7;
+    margin: 0 0 8px;
+  }
+  .card-next-desc {
+    font: 400 0.85rem/1.5 'Inter', sans-serif;
+    color: rgba(245,245,247,0.5);
+    margin: 0 0 24px;
+  }
+  .card-next-links {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .card-next-primary {
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 10px 24px;
+    border-radius: 980px;
+    font: 600 0.8rem/1 'Inter', sans-serif;
+    text-decoration: none;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .card-next-primary:hover {
+    transform: scale(1.02);
+    opacity: 0.92;
+  }
+  .card-next-secondary {
+    color: rgba(245,245,247,0.5);
+    padding: 10px 24px;
+    font: 500 0.8rem/1 'Inter', sans-serif;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .card-next-secondary:hover {
+    color: #f5f5f7;
+  }
 </style>
 </head>
 <body>
@@ -836,6 +1051,7 @@
         <!-- Save -->
         <div class="editor-actions">
           <button class="btn-save" id="btnSave" onclick="saveCard()">Save Card</button>
+          <button class="btn-download" id="btnDownload" onclick="downloadCard()">Download Card</button>
           <span class="save-status" id="saveStatus"></span>
         </div>
 
@@ -886,12 +1102,9 @@ async function fetchCard() {
   const userId = localStorage.getItem('dq-user-id');
   if (!userId) return null;
   try {
-    console.log('[CardAPI] Fetching card for', userId);
     const res = await fetch(API_BASE + '/api/user/' + userId + '/card');
-    console.log('[CardAPI] Response status:', res.status);
     if (!res.ok) return null;
     const data = await res.json();
-    console.log('[CardAPI] Data:', data);
     return data;
   } catch (err) { console.error('[CardAPI] Fetch error:', err); return null; }
 }
@@ -922,7 +1135,7 @@ function applyApiResponse(data) {
   DATA.profileComplete = data.profileComplete !== false;
 
   // Match card style to index
-  const styleMap = { HOLOGRAPHIC: 0, CARBON_FIBER: 1, FROSTED_GLASS: 2, BRUSHED_METAL: 3, NEON_CYBERPUNK: 4, MINIMAL_CLEAN: 5, RETRO_VHS: 6, GTA_ORIGINAL: 7 };
+  const styleMap = { HOLOGRAPHIC: 0, CARBON_FIBER: 1, FROSTED_GLASS: 2, BRUSHED_METAL: 3, NEON_CYBERPUNK: 4, MINIMAL_CLEAN: 5, RETRO_VHS: 6, GTA_ORIGINAL: 7, ROYAL_WHITE: 8 };
   if (data.cardStyle && styleMap[data.cardStyle] != null) {
     selectedStyleIndex = styleMap[data.cardStyle];
   }
@@ -1155,8 +1368,35 @@ function buildGTA(zoomed) {
   </div>`;
 }
 
+// ── 9. Royal White — Prestige ──
+function buildRoyal(zoomed) {
+  return `<div class="badge badge-royal">
+    <div class="royal-photo">${photoImg()}</div>
+    <div class="royal-content">
+      <div class="royal-name">${DATA.name}</div>
+      <div class="royal-class">${DATA.classRole}</div>
+      ${zoomed ? `<div class="royal-bio">${DATA.bio}</div><div class="royal-motto">${DATA.motto}</div>` : ''}
+      <div class="royal-divider"></div>
+      <div class="royal-stats">
+        ${DATA.stats.map(s => `<div class="royal-stat"><span class="royal-stat-val">${s.val}</span><span class="royal-stat-lbl">${s.lbl}</span></div>`).join('')}
+      </div>
+      <div class="royal-wanted">
+        <div class="royal-stars">${stars('', 'off')}</div>
+      </div>
+      <div class="royal-xp">
+        <div class="royal-xp-label">LVL ${DATA.level} — ${DATA.xpPercent}% XP</div>
+        <div class="royal-xp-bar"><div class="royal-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+      </div>
+      <div class="royal-traits">
+        ${DATA.traits.map(t => `<span class="royal-chip">${t}</span>`).join('')}
+      </div>
+      <div class="royal-id">${cardTag(DATA.cardId)}</div>
+    </div>
+  </div>`;
+}
+
 // ── Style registry ──
-const STYLE_NAMES = ['HOLOGRAPHIC', 'CARBON_FIBER', 'FROSTED_GLASS', 'BRUSHED_METAL', 'NEON_CYBERPUNK', 'MINIMAL_CLEAN', 'RETRO_VHS', 'GTA_ORIGINAL'];
+const STYLE_NAMES = ['HOLOGRAPHIC', 'CARBON_FIBER', 'FROSTED_GLASS', 'BRUSHED_METAL', 'NEON_CYBERPUNK', 'MINIMAL_CLEAN', 'RETRO_VHS', 'GTA_ORIGINAL', 'ROYAL_WHITE'];
 const CARD_STYLES = [
   { name: 'Holographic',    build: buildHolo,    wrapper: '' },
   { name: 'Carbon Fiber',   build: buildCarbon,  wrapper: '' },
@@ -1166,6 +1406,7 @@ const CARD_STYLES = [
   { name: 'Minimal Clean',  build: buildMinimal,  wrapper: '' },
   { name: 'Retro VHS',      build: buildVHS,      wrapper: '' },
   { name: 'GTA Original',   build: buildGTA,      wrapper: '' },
+  { name: 'Royal White',    build: buildRoyal,    wrapper: '' },
 ];
 
 // ── Build grid ──
@@ -1344,6 +1585,10 @@ function showSaveStatus(msg, type) {
   el.textContent = msg;
   el.className = 'save-status ' + type;
   setTimeout(() => { el.textContent = ''; el.className = 'save-status'; }, 3000);
+  if (type === 'success') {
+    const next = document.getElementById('cardNext');
+    if (next) next.style.display = '';
+  }
 }
 
 // ── Completeness nudge ──
@@ -1379,5 +1624,82 @@ async function init() {
 
 init();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+async function downloadCard() {
+  const btn = document.getElementById('btnDownload');
+  btn.disabled = true;
+  btn.textContent = 'Exporting...';
+
+  try {
+    // Create hidden off-screen container
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+    document.body.appendChild(container);
+
+    // Render the selected card style into it
+    const style = CARD_STYLES[selectedStyleIndex];
+    container.innerHTML = style.build(true);
+
+    // Add crossorigin to all images for CORS
+    const imgs = container.querySelectorAll('img');
+    imgs.forEach(img => {
+      if (img.src && !img.src.startsWith('data:')) {
+        img.crossOrigin = 'anonymous';
+      }
+    });
+
+    // Wait for all images to load
+    await Promise.all(Array.from(imgs).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve; // continue even if image fails
+      });
+    }));
+
+    // Get the card element (first child of container)
+    const cardEl = container.firstElementChild;
+
+    const canvas = await html2canvas(cardEl, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+    });
+
+    // Convert to blob and trigger download
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `devquest-card-${style.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showSaveStatus('Downloaded!', 'success');
+    }, 'image/png');
+
+    // Clean up
+    document.body.removeChild(container);
+  } catch (err) {
+    console.error('Download failed:', err);
+    showSaveStatus(err.message || 'Download failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Download Card';
+  }
+}
+</script>
+
+<!-- ── What's Next ── -->
+<div class="card-next" id="cardNext" style="display:none;">
+  <p class="card-next-eyebrow">Card saved</p>
+  <h3 class="card-next-title">See how you stack up.</h3>
+  <p class="card-next-desc">Your card is ready. Check out the leaderboard to see where you rank against other developers.</p>
+  <div class="card-next-links">
+    <a href="leaderboard.html" class="card-next-primary">View Leaderboard &rarr;</a>
+    <a href="aboutme.html" class="card-next-secondary">Behind DevQuest</a>
+  </div>
+</div>
+
 </body>
 </html>

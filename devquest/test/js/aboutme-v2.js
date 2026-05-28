@@ -1,6 +1,8 @@
 // About Me v2 — GTA V Light + Bold
 (() => {
-  const API_BASE = 'http://localhost:8081';
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8081'
+    : '';
 
   async function apiFetch(path) {
     const res = await fetch(API_BASE + path);
@@ -196,10 +198,7 @@
     const step = (Math.PI * 2) / n;
     const startAngle = -Math.PI / 2;
 
-    console.log('[Pentagon] Drawing — n:', n, 'cx:', cx, 'cy:', cy, 'r:', r);
-    console.log('[Pentagon] Values:', values);
-
-    // Draw static final frame immediately to test
+    // Draw static final frame
     ctx.clearRect(0, 0, w, h);
 
     // Grid rings
@@ -236,7 +235,6 @@
       const v = (values[idx] / 100) * r;
       const x = cx + Math.cos(a) * v;
       const y = cy + Math.sin(a) * v;
-      console.log('[Pentagon] Point', idx, ':', x.toFixed(1), y.toFixed(1), 'val:', values[idx], 'v:', v.toFixed(1));
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.closePath();
@@ -260,21 +258,21 @@
       ctx.stroke();
 
       // Label
-      const lr = r + 24;
+      const lr = r + 28;
+      const lx = cx + Math.cos(a) * lr;
+      const ly = cy + Math.sin(a) * lr;
       ctx.font = '700 11px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillText(labels[i], cx + Math.cos(a) * lr, cy + Math.sin(a) * lr);
+      ctx.fillText(labels[i], lx, ly);
 
-      // Value
-      const vr = r + 38;
+      // Value — stacked below label
       ctx.font = '800 10px -apple-system, sans-serif';
       ctx.fillStyle = colors[i];
-      ctx.fillText(values[i], cx + Math.cos(a) * vr, cy + Math.sin(a) * vr);
+      ctx.fillText(values[i], lx, ly + 14);
     }
 
-    console.log('[Pentagon] Draw complete');
     canvas.classList.add('glow');
     const wrap = canvas.closest('.stats-pentagon-wrap');
     if (wrap) wrap.classList.add('pulse');
@@ -562,11 +560,11 @@
   //  RETRO TV (The Channel)
   // ════════════════════════════════════
   const TV_CHANNELS = [
-    { show: 'FAMILY GUY', emoji: '📺', quote: "I've watched every episode. Multiple times. Peter Griffin is a lifestyle. Giggity.", clip: API_BASE + '/clips/familyguy.mp4' },
-    { show: 'GINTAMA', emoji: '🎌', quote: "The anime that made me realize a show about a lazy samurai could have the best fight scenes AND the best toilet humor.", clip: API_BASE + '/clips/gintama.mp4' },
-    { show: 'SOUTH PARK', emoji: '🏔️', quote: "Respect it. Don't worship it. But when Cartman has a plan, you listen. Or don't. Probably don't.", clip: API_BASE + '/clips/southpark.mp4' },
-    { show: 'DOOM ETERNAL', emoji: '💀', quote: "This isn't a game. It's a lifestyle. Rip and tear until you forget what day it is.", clip: API_BASE + '/clips/doom.mp4' },
-    { show: 'DETROIT: BECOME HUMAN', emoji: '🤖', quote: "28 STAB WOUNDS. I just wanted to see what happens. The game judged me. I judged it back.", clip: API_BASE + '/clips/detroit.mp4' },
+    { show: 'FAMILY GUY', emoji: '📺', quote: "I've watched every episode. Multiple times. Peter Griffin is a lifestyle. Giggity.", clips: [API_BASE + '/clips/familyguy1.mp4', API_BASE + '/clips/familyguy2.mp4'] },
+    { show: 'GINTAMA', emoji: '🎌', quote: "The anime that made me realize a show about a lazy samurai could have the best fight scenes AND the best toilet humor.", clips: [API_BASE + '/clips/gintama1.mp4', API_BASE + '/clips/gintama2.mp4'] },
+    { show: 'DOOM ETERNAL', emoji: '💀', quote: "This isn't a game. It's a lifestyle. Rip and tear until you forget what day it is.", clips: [API_BASE + '/clips/doom1.mp4', API_BASE + '/clips/doom2.mp4'] },
+    { show: 'GTA V', emoji: '🚗', quote: "The reason this whole portfolio exists. Los Santos never gets old.", clips: [API_BASE + '/clips/gtav1.mp4', API_BASE + '/clips/gtav2.mp4'] },
+    { show: 'COUNTER-STRIKE 2', emoji: '💣', quote: "1500 hours. PS4 controller. Zero regrets. Valorant players can look away.", clips: [API_BASE + '/clips/cs21.mp4', API_BASE + '/clips/cs22.mp4'] },
   ];
 
   function initTV() {
@@ -575,6 +573,7 @@
     const staticEl = document.getElementById('tv-static');
     const channelEl = document.getElementById('tv-channel');
     const showEl = document.getElementById('tv-show');
+    const emojiEl = document.getElementById('tv-emoji');
     const quoteEl = document.getElementById('tv-quote');
     const videoEl = document.getElementById('tv-video');
     const muteBtn = document.getElementById('tv-mute');
@@ -593,17 +592,25 @@
     const VOL_ICONS = ['\u{1F507}', '\u{1F508}', '\u{1F509}', '\u{1F50A}'];
     let volIdx = 0; // start muted
 
-    const clipLoaded = {};
+    const clipLoaded = {};   // keyed by URL
+    const channelClipIdx = {}; // tracks which clip to play next per channel
 
-    function tryLoadClip(idx) {
-      if (clipLoaded[idx] !== undefined) return;
-      const ch = TV_CHANNELS[idx];
-      if (!ch.clip) { clipLoaded[idx] = false; return; }
+    function tryLoadClip(url) {
+      if (!url || clipLoaded[url] !== undefined) return;
       const tester = document.createElement('video');
-      tester.src = ch.clip;
-      tester.addEventListener('canplaythrough', () => { clipLoaded[idx] = true; }, { once: true });
-      tester.addEventListener('error', () => { clipLoaded[idx] = false; }, { once: true });
+      tester.src = url;
+      tester.addEventListener('canplaythrough', () => { clipLoaded[url] = true; }, { once: true });
+      tester.addEventListener('error', () => { clipLoaded[url] = false; }, { once: true });
       tester.load();
+    }
+
+    function getNextClip(chIdx) {
+      const clips = TV_CHANNELS[chIdx].clips || [];
+      if (!clips.length) return null;
+      if (channelClipIdx[chIdx] === undefined) channelClipIdx[chIdx] = 0;
+      const url = clips[channelClipIdx[chIdx]];
+      channelClipIdx[chIdx] = (channelClipIdx[chIdx] + 1) % clips.length;
+      return url;
     }
 
     function applyVolume() {
@@ -617,11 +624,13 @@
     function display(idx) {
       const ch = TV_CHANNELS[idx];
       channelEl.textContent = 'CH ' + String(idx + 1).padStart(2, '0');
-      showEl.innerHTML = '<span class="lore-tv-emoji">' + ch.emoji + '</span>' + ch.show;
-      quoteEl.textContent = ch.quote;
+      if (emojiEl) emojiEl.textContent = ch.emoji;
+      showEl.textContent = ch.show;
+      if (quoteEl) quoteEl.textContent = ch.quote;
 
-      if (clipLoaded[idx] === true && videoEl) {
-        videoEl.src = ch.clip;
+      const clipUrl = getNextClip(idx);
+      if (clipUrl && clipLoaded[clipUrl] === true && videoEl) {
+        videoEl.src = clipUrl;
         applyVolume();
         videoEl.classList.add('active');
         videoEl.play().catch(() => {});
@@ -712,13 +721,20 @@
         if (e.isIntersecting && !warmedUp) {
           warmedUp = true;
           screen.classList.add('warming-up');
-          tvObs.disconnect();
+        }
+        // Pause video when TV is off screen, resume when back
+        if (videoEl) {
+          if (e.isIntersecting) {
+            videoEl.play().catch(() => {});
+          } else {
+            videoEl.pause();
+          }
         }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.1 });
     tvObs.observe(screen);
 
-    TV_CHANNELS.forEach((_, i) => tryLoadClip(i));
+    TV_CHANNELS.forEach(ch => ch.clips.forEach(url => tryLoadClip(url)));
     display(0);
   }
 
@@ -737,45 +753,95 @@
   const MOCK_DISHES = [
     {
       name: 'Hyderabadi Biryani',
-      photo: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f4?w=400&h=300&fit=crop',
-      spice: 4,
-      tag: 'SIGNATURE DISH',
-      story: 'The one dish that took 47 failed attempts to get right. Dum method, whole spices, zero shortcuts. The neighbours know when biryani day hits.'
-    },
-    {
-      name: 'Fresh Pasta Aglio e Olio',
-      photo: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop',
-      spice: 2,
-      tag: 'CURRENT OBSESSION',
-      story: 'Hand-rolled, no machine. Just flour, eggs, and main character energy. The key is toasting the garlic low and slow until it whispers back at you.'
-    },
-    {
-      name: 'Butter Chicken',
-      photo: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=300&fit=crop',
-      spice: 3,
-      tag: 'CROWD PLEASER',
-      story: 'The "play it safe" pick that never fails. Overnight marinade, cashew paste, stupid amounts of butter. Tastes like a warm hug from a desi auntie.'
-    },
-    {
-      name: 'Spicy Ramen',
-      photo: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop',
+      photo: API_BASE + '/kitchen/biryani.jpg',
       spice: 5,
-      tag: 'LATE NIGHT FUEL',
-      story: 'Tonkotsu base simmered for 8 hours. Chili oil homemade. Soft-boiled egg with the perfect jammy center. Anime-accurate slurping is mandatory.'
+      tag: 'SIGNATURE DISH',
+      story: 'Dum method. Foil seal, wet cloth, full patience. The cashews and mint on top mean it\'s done — not plated, done. Neighbours two floors down have opinions about when I make this.'
     },
     {
-      name: 'Chocolate Lava Cake',
-      photo: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop',
-      spice: 0,
-      tag: 'DESSERT BOSS',
-      story: 'The timing is everything — 12 minutes, not 11, not 13. Pull it out and flip it with unearned confidence. The molten center is either perfect or a crime scene.'
+      name: 'The White Bowl',
+      photo: API_BASE + '/kitchen/murgh-malai.jpg',
+      photoPosition: 'center 70%',
+      spice: 2,
+      tag: 'WEEKNIGHT FLEX',
+      story: 'Herby fried rice, cheese sauce with mushrooms and zucchini, pan-fried paneer on top. A cat showed up, rated it 4/5 without being asked, and received nothing in return.'
     },
     {
-      name: 'Chicken Tikka Tacos',
-      photo: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop',
+      name: 'Chilli Oil Noodles',
+      photo: API_BASE + '/kitchen/chilli-noodles.jpg',
+      spice: 4,
+      tag: 'MIDNIGHT SPECIAL',
+      story: 'Master Chow 2x spicy chilli oil + udon + 8 minutes. The bottle costs more than the noodles and that is the correct order of priorities. No notes.'
+    },
+    {
+      name: 'Paneer Fried Rice',
+      photo: API_BASE + '/kitchen/paneer-fried-rice.jpg',
       spice: 3,
-      tag: 'FUSION EXPERIMENT',
-      story: 'Desi meets Mexican in the most chaotic crossover episode. Tikka-marinated chicken, pickled onions, mint chutney, flour tortilla. Geneva Convention pending.'
+      tag: 'TUESDAY AT 12AM',
+      story: 'Indo-Chinese fried rice with paneer. Made this on a Tuesday midnight for no reason. The map placemat adds nothing. The rice adds everything. This is a vibe meal, not a recipe.'
+    },
+    {
+      name: 'Fusilli Arrabbiata',
+      photo: API_BASE + '/kitchen/penne.jpg',
+      spice: 3,
+      tag: 'NO JAR SAUCE',
+      story: 'Crushed tomatoes, garlic, red chilli, olive oil. That\'s it. That\'s the whole recipe and the whole personality. Anyone using jar sauce can leave.'
+    },
+    {
+      name: 'BBQ Night',
+      photo: API_BASE + '/kitchen/bbq-night.jpg',
+      spice: 4,
+      tag: 'CHARCOAL CERTIFIED',
+      story: 'Paneer tikka and tangdi on live charcoal. Old Monk was present in an advisory capacity. The grill was a ₹400 Amazon purchase. It cooked exactly as well as a tandoor. It did not.'
+    },
+    {
+      name: 'The Spread',
+      photo: API_BASE + '/kitchen/the-spread.jpg',
+      spice: 3,
+      tag: 'FULL SEND',
+      story: 'Paneer, pav, green chutney, fried stuff, charcoal grill going. No recipe. No plan. Just vibes and questionable decisions made at speed. Everyone ate well.'
+    },
+    {
+      name: 'Ramen',
+      photo: API_BASE + '/kitchen/ramen.jpg',
+      spice: 4,
+      tag: 'BUILT FROM SCRATCH',
+      story: 'Broth, tofu, mushrooms, noodles — all in. Not instant. Not a shortcut. The kind of bowl you make when you want to feel like you have your life together. Debatable.'
+    },
+    {
+      name: 'Black Bean Noodles',
+      photo: API_BASE + '/kitchen/black-bean-noodles.jpg',
+      spice: 3,
+      tag: 'CHAOS BUILD',
+      story: 'Black bean sauce, baby corn, mushrooms, and whatever else survived the fridge audit. Hakka style. No measurements. Turned out better than it had any right to.'
+    },
+    {
+      name: 'American Chopsuey',
+      photo: API_BASE + '/kitchen/american-chopsuey.jpg',
+      spice: 2,
+      tag: 'NOT AMERICAN. NOT CHINESE.',
+      story: 'Crispy noodles, sweet tangy sauce, caramelised onions. A dish that belongs to no country and every Indian household. Made it from memory. Memory was correct.'
+    },
+    {
+      name: 'Kung Pao Paneer',
+      photo: API_BASE + '/kitchen/kungpao-paneer.jpg',
+      spice: 4,
+      tag: 'INDO-CHINESE',
+      story: 'Paneer cubes, bell peppers, dried chillies, soy sauce. The wok was screaming. The kitchen smelled incredible. Went hard on the chilli. Zero regrets.'
+    },
+    {
+      name: 'Mango Cheesecake',
+      photo: API_BASE + '/kitchen/mango-cheesecake.jpg',
+      spice: 0,
+      tag: 'NO BAKE. ALL FLEX.',
+      story: 'Mango glaze on top, biscuit base, cream cheese filling. No oven. Just patience and a fridge. Took it out and held it like it was the World Cup. It was.'
+    },
+    {
+      name: 'Chilli Oil Dan Dan',
+      photo: API_BASE + '/kitchen/restaurant-noodles.jpg',
+      spice: 4,
+      tag: 'RESTAURANT RECON',
+      story: 'Ordered this at a restaurant just to reverse engineer it at home. White noodles, crispy chilli oil, vegetables, spring onion. Notes were taken. Mission ongoing.'
     },
   ];
 
@@ -798,7 +864,7 @@
         '<div class="kitchen-polaroid-inner" style="transform:rotate(' + angle + 'deg)">' +
           '<div class="kitchen-pol-front">' +
             '<div class="kitchen-tape"></div>' +
-            '<img class="kitchen-pol-photo" src="' + dish.photo + '" alt="' + dish.name + '" loading="lazy">' +
+            '<img class="kitchen-pol-photo" src="' + dish.photo + '" alt="' + dish.name + '" loading="lazy"' + (dish.photoPosition ? ' style="object-position:' + dish.photoPosition + '"' : '') + '>' +
             '<div class="kitchen-pol-bottom">' +
               '<div class="kitchen-pol-name">' + dish.name + '</div>' +
               '<div class="kitchen-pol-spice">' + spiceIcons + '</div>' +
@@ -1320,7 +1386,21 @@
 
   // ── Init ──
   function init() {
-    runIntro();
+    const skipIntro = new URLSearchParams(window.location.search).get('skip_intro');
+    if (skipIntro) {
+      const overlay = document.getElementById('intro-overlay');
+      if (overlay) overlay.style.display = 'none';
+      document.body.classList.remove('loading');
+      // Fade in smoothly from black
+      requestAnimationFrame(() => {
+        document.documentElement.style.transition = 'opacity 1s ease';
+        requestAnimationFrame(() => {
+          document.documentElement.style.opacity = '1';
+        });
+      });
+    } else {
+      runIntro();
+    }
     try { initScrollProgress(); } catch(e) { console.error('initScrollProgress failed:', e); }
     try { initTips(); } catch(e) { console.error('initTips failed:', e); }
     try { initWheel(); } catch(e) { console.error('initWheel failed:', e); }

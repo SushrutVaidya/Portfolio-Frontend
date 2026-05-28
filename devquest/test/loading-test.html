@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Animations — Test</title>
+  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: #111;
+      border-bottom: 1px solid #222;
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-bar h1 {
+      font-family: 'Pricedown', sans-serif;
+      font-size: 1rem;
+      color: #c8ff00;
+      letter-spacing: 4px;
+    }
+    .top-bar p {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    /* ── STRIP ── */
+    .strip {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      border-bottom: 1px solid #1a1a1a;
+      min-height: 200px;
+    }
+
+    .strip-label {
+      padding: 0 32px;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+      background: #111;
+      border-right: 1px solid #1a1a1a;
+      gap: 6px;
+    }
+
+    .strip-num {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: #333;
+    }
+
+    .strip-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c8ff00;
+    }
+
+    .strip-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      padding: 20px 40px;
+    }
+
+    /* ── SHARED TEXT STYLES ── */
+    .anim-name {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    .anim-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #c8ff00;
+      margin-top: 12px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .anim-sub.show { opacity: 1; }
+
+    /* ═══════════════════════
+       1. SCRAMBLE
+    ═══════════════════════ */
+    #s1-name { color: #fff; }
+
+    /* ═══════════════════════
+       2. SPLIT REVEAL
+    ═══════════════════════ */
+    .split-row { overflow: hidden; display: block; }
+    #s2-first {
+      display: inline-block;
+      transform: translateX(-110%);
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    #s2-second {
+      display: inline-block;
+      transform: translateX(110%);
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s;
+    }
+    #s2-first.in  { transform: translateX(0); }
+    #s2-second.in { transform: translateX(0); }
+
+    /* ═══════════════════════
+       3. STAMP IN
+    ═══════════════════════ */
+    .stamp-letter {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 3px;
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(-50px) scale(1.3);
+      transition: opacity 0.15s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .stamp-letter.in { opacity: 1; transform: translateY(0) scale(1); }
+    .stamp-space { display: inline-block; width: 0.5em; }
+
+    /* ═══════════════════════
+       4. OUTLINE → FILL
+    ═══════════════════════ */
+    .fill-wrap { position: relative; display: inline-block; }
+    .fill-outline {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.5);
+    }
+    .fill-solid {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      color: #fff;
+      position: absolute;
+      top: 0; left: 0;
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 1.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fill-solid.in { clip-path: inset(0 0% 0 0); }
+
+    /* ═══════════════════════
+       5. GLITCH
+    ═══════════════════════ */
+    .glitch-wrap { position: relative; display: inline-block; }
+    .glitch-base {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      position: relative;
+    }
+    .glitch-base::before, .glitch-base::after {
+      content: attr(data-text);
+      position: absolute; top: 0; left: 0;
+      white-space: nowrap;
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+    }
+    .glitch-base::before {
+      color: #ff375f;
+      animation: glitch-r 2.5s infinite;
+      clip-path: polygon(0 0,100% 0,100% 38%,0 38%);
+    }
+    .glitch-base::after {
+      color: #0a84ff;
+      animation: glitch-b 2.5s infinite 0.07s;
+      clip-path: polygon(0 62%,100% 62%,100% 100%,0 100%);
+    }
+    @keyframes glitch-r {
+      0%,84%,100%{transform:translate(0);opacity:0}
+      86%{transform:translate(-4px,1px);opacity:.9}
+      88%{transform:translate(4px,-1px);opacity:.9}
+      90%{transform:translate(0);opacity:0}
+      92%{transform:translate(-2px);opacity:.6}
+      94%{transform:translate(0);opacity:0}
+    }
+    @keyframes glitch-b {
+      0%,84%,100%{transform:translate(0);opacity:0}
+      86%{transform:translate(4px,-1px);opacity:.9}
+      88%{transform:translate(-4px,1px);opacity:.9}
+      90%{transform:translate(0);opacity:0}
+      92%{transform:translate(2px);opacity:.6}
+      94%{transform:translate(0);opacity:0}
+    }
+
+    /* ═══════════════════════
+       6. TYPEWRITER
+    ═══════════════════════ */
+    #s6-text {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+    }
+    .cursor {
+      display: inline-block;
+      width: 3px; height: 0.8em;
+      background: #c8ff00;
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 0.7s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ═══════════════════════
+       7. NEON FLICKER
+    ═══════════════════════ */
+    #s7-name {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.05s;
+      text-shadow:
+        0 0 10px #fff,
+        0 0 30px #c8ff00,
+        0 0 60px #c8ff00,
+        0 0 100px #c8ff00;
+    }
+
+    /* ═══════════════════════
+       8. SPLIT-FLAP BOARD
+    ═══════════════════════ */
+    .flap-letter {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 3px;
+      display: inline-block;
+      width: 0.75em;
+      text-align: center;
+    }
+    .flap-space { display: inline-block; width: 0.4em; }
+
+    /* ═══════════════════════
+       9. WAVE BOUNCE
+    ═══════════════════════ */
+    .wave-letter {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 3px;
+      display: inline-block;
+      animation: wave 1.8s ease-in-out infinite;
+    }
+    .wave-space { display: inline-block; width: 0.5em; }
+    @keyframes wave {
+      0%,100%{transform:translateY(0);color:#fff}
+      50%{transform:translateY(-18px);color:#c8ff00}
+    }
+
+    /* ═══════════════════════
+       10. CINEMATIC
+    ═══════════════════════ */
+    .cinema-bar {
+      position: absolute; left: 0; right: 0;
+      background: #000; z-index: 2;
+      transition: height 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .cinema-bar.top { top: 0; height: 0; }
+    .cinema-bar.bot { bottom: 0; height: 0; }
+    .cinema-bar.in  { height: 30%; }
+    #s10-name {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(1.06);
+      transition: opacity 0.7s ease 0.5s, transform 0.7s ease 0.5s;
+      z-index: 1;
+    }
+    #s10-name.in { opacity: 1; transform: scale(1); }
+
+    /* ═══════════════════════
+       11. BLUR → FOCUS
+    ═══════════════════════ */
+    #s11-name {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 6px;
+      white-space: nowrap;
+      filter: blur(24px);
+      opacity: 0;
+      transition: filter 1.6s ease, opacity 0.3s ease;
+    }
+    #s11-name.in { filter: blur(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <h1>LOADING ANIMATIONS</h1>
+    <p>Scroll down to compare — all loop continuously</p>
+  </div>
+
+  <!-- 1. SCRAMBLE -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">01</span>
+      <span class="strip-name">Scramble<br>→ Resolve</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div class="anim-name" id="s1-name"></div>
+        <div class="anim-sub" id="s1-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. SPLIT REVEAL -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">02</span>
+      <span class="strip-name">Split<br>Reveal</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div class="split-row"><span class="anim-name" id="s2-first">SUSHRUT</span></div>
+        <div class="split-row"><span class="anim-name" id="s2-second">VAIDYA</span></div>
+        <div class="anim-sub" id="s2-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. STAMP IN -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">03</span>
+      <span class="strip-name">Stamp<br>In</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div id="s3-letters"></div>
+        <div class="anim-sub" id="s3-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. OUTLINE → FILL -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">04</span>
+      <span class="strip-name">Outline<br>→ Fill</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div class="fill-wrap">
+          <div class="fill-outline">SUSHRUT VAIDYA</div>
+          <div class="fill-solid" id="s4-fill">SUSHRUT VAIDYA</div>
+        </div>
+        <div class="anim-sub" id="s4-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. GLITCH -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">05</span>
+      <span class="strip-name">Glitch<br>Flash</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div class="glitch-wrap">
+          <div class="glitch-base" data-text="SUSHRUT VAIDYA">SUSHRUT VAIDYA</div>
+        </div>
+        <div class="anim-sub show">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. TYPEWRITER -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">06</span>
+      <span class="strip-name">Typewriter<br>+ Cursor</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div><span id="s6-text"></span><span class="cursor"></span></div>
+        <div class="anim-sub" id="s6-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. NEON FLICKER -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">07</span>
+      <span class="strip-name">Neon<br>Flicker</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div id="s7-name">SUSHRUT VAIDYA</div>
+        <div class="anim-sub" id="s7-sub" style="text-shadow:0 0 8px #c8ff00">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. SPLIT-FLAP -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">08</span>
+      <span class="strip-name">Split-Flap<br>Board</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div id="s8-letters"></div>
+        <div class="anim-sub" id="s8-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. WAVE BOUNCE -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">09</span>
+      <span class="strip-name">Wave<br>Bounce</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div id="s9-letters"></div>
+        <div class="anim-sub show">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. CINEMATIC -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">10</span>
+      <span class="strip-name">Cinematic<br>Letterbox</span>
+    </div>
+    <div class="strip-stage">
+      <div class="cinema-bar top" id="s10-top"></div>
+      <div class="cinema-bar bot" id="s10-bot"></div>
+      <div id="s10-name">SUSHRUT VAIDYA</div>
+    </div>
+  </div>
+
+  <!-- 11. BLUR FOCUS -->
+  <div class="strip">
+    <div class="strip-label">
+      <span class="strip-num">11</span>
+      <span class="strip-name">Blur<br>→ Focus</span>
+    </div>
+    <div class="strip-stage">
+      <div style="text-align:center">
+        <div id="s11-name">SUSHRUT VAIDYA</div>
+        <div class="anim-sub" id="s11-sub">── Platform Engineer ──</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const NAME = 'SUSHRUT VAIDYA';
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
+
+    /* ── 1. SCRAMBLE ── */
+    function runScramble() {
+      const el = document.getElementById('s1-name');
+      const sub = document.getElementById('s1-sub');
+      sub.classList.remove('show');
+      let iter = 0;
+      const iv = setInterval(() => {
+        el.textContent = NAME.split('').map((c, i) => {
+          if (c === ' ') return ' ';
+          if (i < iter) return NAME[i];
+          return CHARS[Math.floor(Math.random() * CHARS.length)];
+        }).join('');
+        if (iter >= NAME.length) {
+          clearInterval(iv);
+          el.textContent = NAME;
+          sub.classList.add('show');
+          setTimeout(runScramble, 2400);
+        }
+        iter += 0.45;
+      }, 40);
+    }
+    runScramble();
+
+    /* ── 2. SPLIT ── */
+    function runSplit() {
+      const f = document.getElementById('s2-first');
+      const s = document.getElementById('s2-second');
+      const sub = document.getElementById('s2-sub');
+      f.classList.remove('in'); s.classList.remove('in'); sub.classList.remove('show');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        f.classList.add('in'); s.classList.add('in');
+        setTimeout(() => sub.classList.add('show'), 800);
+        setTimeout(runSplit, 3000);
+      }));
+    }
+    setTimeout(runSplit, 400);
+
+    /* ── 3. STAMP ── */
+    function runStamp() {
+      const wrap = document.getElementById('s3-letters');
+      const sub = document.getElementById('s3-sub');
+      sub.classList.remove('show');
+      wrap.innerHTML = NAME.split('').map((c, i) =>
+        c === ' '
+          ? '<span class="stamp-space"></span>'
+          : `<span class="stamp-letter" style="transition-delay:${i*65}ms">${c}</span>`
+      ).join('');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        wrap.querySelectorAll('.stamp-letter').forEach(l => l.classList.add('in'));
+        setTimeout(() => sub.classList.add('show'), NAME.length * 65 + 200);
+        setTimeout(runStamp, 3400);
+      }));
+    }
+    runStamp();
+
+    /* ── 4. FILL ── */
+    function runFill() {
+      const fill = document.getElementById('s4-fill');
+      const sub = document.getElementById('s4-sub');
+      fill.classList.remove('in'); sub.classList.remove('show');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        fill.classList.add('in');
+        setTimeout(() => sub.classList.add('show'), 1200);
+        setTimeout(runFill, 3200);
+      }));
+    }
+    runFill();
+
+    /* ── 6. TYPEWRITER ── */
+    function runType() {
+      const el = document.getElementById('s6-text');
+      const sub = document.getElementById('s6-sub');
+      el.textContent = ''; sub.classList.remove('show');
+      let i = 0;
+      const iv = setInterval(() => {
+        el.textContent = NAME.slice(0, ++i);
+        if (i >= NAME.length) {
+          clearInterval(iv);
+          sub.classList.add('show');
+          setTimeout(() => { sub.classList.remove('show'); setTimeout(runType, 500); }, 2200);
+        }
+      }, 90);
+    }
+    runType();
+
+    /* ── 7. NEON FLICKER ── */
+    function runNeon() {
+      const el = document.getElementById('s7-name');
+      const sub = document.getElementById('s7-sub');
+      el.style.opacity = '0'; sub.classList.remove('show');
+      const seq = [180, 60, 200, 80, 160, 60, 120, 400];
+      let t = 0;
+      seq.forEach((dur, i) => {
+        t += dur;
+        setTimeout(() => { el.style.opacity = i % 2 === 0 ? '0.85' : '0'; }, t);
+      });
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transition = 'opacity 0.1s';
+        sub.classList.add('show');
+        setTimeout(runNeon, 3200);
+      }, t + 150);
+    }
+    runNeon();
+
+    /* ── 8. FLAP ── */
+    function runFlap() {
+      const wrap = document.getElementById('s8-letters');
+      const sub = document.getElementById('s8-sub');
+      sub.classList.remove('show');
+      wrap.innerHTML = NAME.split('').map((c, i) =>
+        c === ' '
+          ? '<span class="flap-space"></span>'
+          : `<span class="flap-letter" id="fl${i}">?</span>`
+      ).join('');
+      let delay = 0;
+      NAME.split('').forEach((char, i) => {
+        if (char === ' ') return;
+        delay += 85;
+        let cycles = 0, maxC = 4 + Math.floor(Math.random() * 4);
+        setTimeout(() => {
+          const iv = setInterval(() => {
+            const el = document.getElementById(`fl${i}`);
+            if (!el) return clearInterval(iv);
+            if (cycles++ >= maxC) { el.textContent = char; clearInterval(iv); }
+            else el.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+          }, 55);
+        }, delay);
+      });
+      setTimeout(() => { sub.classList.add('show'); setTimeout(runFlap, 3600); }, delay + 500);
+    }
+    runFlap();
+
+    /* ── 9. WAVE ── */
+    (function() {
+      const wrap = document.getElementById('s9-letters');
+      wrap.innerHTML = NAME.split('').map((c, i) =>
+        c === ' '
+          ? '<span class="wave-space"></span>'
+          : `<span class="wave-letter" style="animation-delay:${i * 90}ms">${c}</span>`
+      ).join('');
+    })();
+
+    /* ── 10. CINEMATIC ── */
+    function runCinema() {
+      const top = document.getElementById('s10-top');
+      const bot = document.getElementById('s10-bot');
+      const name = document.getElementById('s10-name');
+      top.classList.remove('in'); bot.classList.remove('in'); name.classList.remove('in');
+      setTimeout(() => {
+        top.classList.add('in'); bot.classList.add('in');
+        setTimeout(() => {
+          name.classList.add('in');
+          setTimeout(() => {
+            name.classList.remove('in');
+            setTimeout(() => { top.classList.remove('in'); bot.classList.remove('in'); setTimeout(runCinema, 700); }, 600);
+          }, 2200);
+        }, 700);
+      }, 200);
+    }
+    runCinema();
+
+    /* ── 11. BLUR ── */
+    function runBlur() {
+      const el = document.getElementById('s11-name');
+      const sub = document.getElementById('s11-sub');
+      el.classList.remove('in'); sub.classList.remove('show');
+      setTimeout(() => {
+        el.classList.add('in');
+        setTimeout(() => sub.classList.add('show'), 1400);
+        setTimeout(runBlur, 3400);
+      }, 300);
+    }
+    runBlur();
+  </script>
+
+</body>
+</html>

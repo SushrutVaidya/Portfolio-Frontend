@@ -924,10 +924,79 @@
   .card-next-secondary:hover {
     color: #f5f5f7;
   }
+
+  /* ── Earned-stats banners ── */
+  .path-banner {
+    display: none;
+    max-width: 720px;
+    margin: 0 auto 32px;
+    padding: 20px 24px;
+    border-radius: 14px;
+    border-left: 3px solid #c8ff00;
+    background: rgba(200,255,0,0.04);
+  }
+  .path-banner.visible { display: block; }
+  .path-banner-title {
+    font: 700 0.6rem/1 'Inter', sans-serif;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #c8ff00;
+    margin-bottom: 10px;
+  }
+  .path-banner-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .stat-pill {
+    font: 700 0.7rem/1 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
+    color: #c8ff00;
+    border: 1px solid rgba(200,255,0,0.2);
+  }
+  .stat-pill span { color: #ff6600; margin-left: 4px; }
+  .path-banner-sub {
+    font: 400 0.7rem/1.4 'Inter', sans-serif;
+    color: rgba(255,255,255,0.35);
+  }
+  .path-banner-sub a { color: #ff6600; text-decoration: none; }
+  .path-banner-sub a:hover { text-decoration: underline; }
+
+  /* Locked stat slider */
+  .stat-slider-earned {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .earned-badge {
+    font: 700 0.52rem/1 'Inter', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c8ff00;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
 </style>
 </head>
 <body>
-  <h1>PLAYER CARD — STYLE OPTIONS</h1>
+  <!-- Game-path: earned stats banner -->
+  <div class="path-banner" id="gamePath-banner">
+    <div class="path-banner-title">Your stats — earned in the field</div>
+    <div class="path-banner-pills" id="earnedPills"></div>
+    <div class="path-banner-sub">These values are locked — you played for them. Choose your style below.</div>
+  </div>
+
+  <!-- Fast-path: free mode banner -->
+  <div class="path-banner" id="fastPath-banner" style="border-left-color:#ff6600;background:rgba(255,102,0,0.04);">
+    <div class="path-banner-title" style="color:#ff6600;">Free mode — stats not yet earned</div>
+    <div class="path-banner-sub">Set your own stats below, or <a href="../landing.html">take the challenge →</a> to earn real ones.</div>
+  </div>
+
+  <h1 id="page-title">PLAYER CARD — STYLE OPTIONS</h1>
   <p class="subtitle">Click any card to zoom (bio + motto revealed). Hover to interact.</p>
 
   <!-- Completeness nudge -->
@@ -1530,10 +1599,32 @@ function syncEditorToData() {
 
 // ── Save flow ──
 async function saveCard() {
-  const userId = localStorage.getItem('dq-user-id');
+  let userId = localStorage.getItem('dq-user-id');
+
+  // If no user ID, prompt for name and register on the spot
   if (!userId) {
-    showSaveStatus('No user ID found — register first', 'error');
-    return;
+    const first = prompt('Enter your first name to save your card:');
+    if (!first || first.trim().length < 2) { showSaveStatus('Need a name to save — minimum 2 characters', 'error'); return; }
+    const last  = prompt('Enter your last name:');
+    if (!last  || last.trim().length  < 2) { showSaveStatus('Need a last name too — minimum 2 characters', 'error'); return; }
+    try {
+      const reg = await fetch(API_BASE + '/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName: first.trim(), lastName: last.trim() })
+      });
+      const data = await reg.json();
+      userId = data.id;
+      localStorage.setItem('dq-user-id',      userId);
+      localStorage.setItem('dq-player-first',  first.trim());
+      localStorage.setItem('dq-player-last',   last.trim());
+      localStorage.setItem('dq-player-name',   first.trim());
+      localStorage.setItem('lb_uuid',          userId);
+      localStorage.setItem('lb_name',          `${first.trim()} ${last.trim()}`);
+    } catch {
+      showSaveStatus('Could not register — check your connection', 'error');
+      return;
+    }
   }
 
   const btn = document.getElementById('btnSave');
@@ -1610,6 +1701,62 @@ function updateNudge(apiData) {
   nudge.classList.add('visible');
 }
 
+// ── Earned stats: pre-fill + lock for game path ──
+function applyEarnedStats() {
+  const isGamePath = localStorage.getItem('dq-game-path') === 'true';
+
+  if (isGamePath) {
+    const earned = {
+      DEV:    parseInt(localStorage.getItem('dq-stat-dev')    || '0'),
+      DESIGN: parseInt(localStorage.getItem('dq-stat-design') || '0'),
+      BRAIN:  parseInt(localStorage.getItem('dq-stat-brain')  || '0'),
+      SOCIAL: parseInt(localStorage.getItem('dq-stat-social') || '70'),
+      GRIND:  parseInt(localStorage.getItem('dq-stat-grind')  || '0'),
+    };
+
+    // Override DATA.stats with earned values
+    STAT_KEYS.forEach((k, i) => { DATA.stats[i].val = earned[k]; });
+
+    // Lock each slider and annotate its label
+    STAT_KEYS.forEach(k => {
+      const key    = 'stat' + k.charAt(0) + k.slice(1).toLowerCase();
+      const slider = document.getElementById('ed-' + key);
+      const valSpan = document.getElementById('val-' + key);
+      if (slider) {
+        slider.value = earned[k];
+        slider.classList.add('stat-slider-earned');
+        slider.disabled = true;
+      }
+      if (valSpan) valSpan.textContent = earned[k];
+      // Add EARNED badge to label
+      const label = slider?.closest('.editor-field')?.querySelector('label');
+      if (label && !label.querySelector('.earned-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'earned-badge';
+        badge.textContent = 'earned';
+        label.appendChild(badge);
+      }
+    });
+
+    // Show game-path banner with stat pills
+    const banner = document.getElementById('gamePath-banner');
+    const pills  = document.getElementById('earnedPills');
+    if (banner && pills) {
+      pills.innerHTML = STAT_KEYS.map(k =>
+        `<div class="stat-pill">${k}<span>${earned[k]}</span></div>`
+      ).join('');
+      banner.classList.add('visible');
+    }
+
+    document.getElementById('page-title').textContent = 'BUILD YOUR CARD';
+
+  } else {
+    // Fast path — show free mode banner
+    const banner = document.getElementById('fastPath-banner');
+    if (banner) banner.classList.add('visible');
+  }
+}
+
 // ── Init ──
 async function init() {
   const apiData = await fetchCard();
@@ -1618,6 +1765,7 @@ async function init() {
     updateNudge(apiData);
   }
   populateEditor();
+  applyEarnedStats();
   bindEditorInputs();
   renderGrid();
 }

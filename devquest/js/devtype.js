@@ -35,7 +35,15 @@ async function fetchLeaderboard() {
   try {
     const res = await fetch(API_BASE + '/api/leaderboard');
     if (!res.ok) throw new Error(res.status);
-    return await res.json();
+    const data = await res.json();
+    // Transform backend response { rank, id, firstName, lastName, level, createdAt }
+    // into the shape renderLeaderboard expects: { rank, name, score }
+    return data.map(u => ({
+      rank:  u.rank,
+      id:    u.id,
+      name:  `${u.firstName} ${u.lastName}`,
+      score: u.level > 1 ? u.level * 1000 : '—'
+    }));
   } catch {
     return MOCK_LEADERBOARD;
   }
@@ -45,10 +53,12 @@ function renderLeaderboard(rows) {
   const container = document.getElementById('dt-lb-rows');
   if (!container) return;
   container.innerHTML = '';
-  const playerName = (localStorage.getItem('dq-player-first') || '').trim();
+  const myId = localStorage.getItem('dq-user-id');
+  const playerName = (localStorage.getItem('dq-player-first') || '').trim().toLowerCase();
 
   rows.forEach(row => {
-    const isMe = playerName && row.name.toLowerCase() === playerName.toLowerCase();
+    const isMe = (myId && row.id === myId) ||
+                 (playerName && row.name.toLowerCase().startsWith(playerName));
     const div = document.createElement('div');
     div.className = 'dt-lb-row' + (isMe ? ' dt-lb-row-me' : '');
 
@@ -781,6 +791,15 @@ function endGame() {
   rTimeEl.textContent = wordsCorrect;
   rAccEl.textContent  = Math.min(acc, 100) + '%';
   rBugsEl.textContent = errorCount;
+
+  const grindStat = Math.min(100, Math.max(10, Math.round((wpm / 120) * 100)));
+  const brainStat = Math.min(100, Math.max(0, (acc - 50) * 2));
+  localStorage.setItem('dq-stat-grind', grindStat);
+  localStorage.setItem('dq-stat-brain', brainStat);
+  if (typeof showStatUnlocked === 'function') {
+    showStatUnlocked('GRIND', grindStat);
+    setTimeout(() => showStatUnlocked('BRAIN', brainStat), 1800);
+  }
 
   passBadge.textContent = passed ? '✓  challenge passed' : `✗  need ${config.passAcc}% accuracy to pass`;
   passBadge.className   = passed ? 'pass' : 'fail';

@@ -76,6 +76,7 @@ async function startChallenge() {
   localStorage.setItem('dq-player-name', firstName);
   localStorage.setItem('dq-player-first', firstName);
   localStorage.setItem('dq-player-last', lastName);
+  localStorage.setItem('dq-game-path', 'true');
 
   // Register with backend (non-blocking — don't prevent game start if backend is down)
   try {
@@ -103,3 +104,29 @@ if (savedFirst) {
   if (savedLast) lastInput.value = savedLast;
   validate();
 }
+
+// Card teaser — live suspect count + style cycling
+(async function initTeaser() {
+  const countEl = document.getElementById('teaser-count');
+  const cardEl  = document.getElementById('teaser-card');
+  const THEMES  = ['theme-gta', 'theme-holo', 'theme-neon'];
+  let themeIdx  = 0;
+
+  if (countEl) {
+    try {
+      const res  = await fetch(API_BASE + '/api/leaderboard');
+      const data = await res.json();
+      if (data.length > 0) {
+        countEl.textContent = `${data.length} suspect${data.length !== 1 ? 's' : ''} identified`;
+      }
+    } catch { /* backend offline — keep placeholder */ }
+  }
+
+  if (cardEl) {
+    setInterval(() => {
+      cardEl.classList.remove(...THEMES);
+      themeIdx = (themeIdx + 1) % THEMES.length;
+      cardEl.classList.add(THEMES[themeIdx]);
+    }, 4000);
+  }
+})();

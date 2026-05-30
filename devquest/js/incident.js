@@ -712,6 +712,10 @@ function endGame() {
     `<span class="rd ${r ? 'rd-pass' : 'rd-fail'}" title="Round ${i+1}">${r ? '✓' : '✗'}</span>`
   ).join('');
 
+  const devStat = Math.round((correctCount / 5) * 100);
+  localStorage.setItem('dq-stat-dev', devStat);
+  if (typeof showStatUnlocked === 'function') showStatUnlocked('DEV', devStat);
+
   const badge = document.getElementById('inc-pass-badge');
   badge.textContent = passed ? '✓  incident resolved' : '✗  need 3/5 bugs found to pass';
   badge.className   = passed ? 'pass' : 'fail';

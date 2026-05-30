@@ -4,6 +4,10 @@
     ? 'http://localhost:8081'
     : '';
 
+  if (!localStorage.getItem('dq-stat-social')) {
+    localStorage.setItem('dq-stat-social', '70');
+  }
+
   async function apiFetch(path) {
     const res = await fetch(API_BASE + path);
     if (!res.ok) throw new Error(res.status);
@@ -1385,22 +1389,47 @@
   }
 
   // ── Init ──
+  async function fetchCurrently() {
+    try {
+      const data = await apiFetch('/api/stats');
+      const playing  = document.getElementById('currently-playing');
+      const learning = document.getElementById('currently-learning');
+      if (playing  && data.game)     playing.textContent  = data.game;
+      if (learning && data.bookName) learning.textContent = data.bookName;
+    } catch { /* keep hardcoded fallback values */ }
+  }
+
+  function fixMediaUrls() {
+    if (!API_BASE) return; // production — relative URLs work via Nginx
+    const prefixes = ['/kitchen/', '/social/', '/gamer/', '/clips/'];
+    document.querySelectorAll('img[src], video[src]').forEach(el => {
+      const src = el.getAttribute('src');
+      if (src && prefixes.some(p => src.startsWith(p))) {
+        el.setAttribute('src', API_BASE + src);
+      }
+    });
+  }
+
   function init() {
     const skipIntro = new URLSearchParams(window.location.search).get('skip_intro');
     if (skipIntro) {
       const overlay = document.getElementById('intro-overlay');
       if (overlay) overlay.style.display = 'none';
       document.body.classList.remove('loading');
-      // Fade in smoothly from black
+      // Fade in smoothly from black, then clear inline styles so fixed positioning works normally
       requestAnimationFrame(() => {
         document.documentElement.style.transition = 'opacity 1s ease';
         requestAnimationFrame(() => {
           document.documentElement.style.opacity = '1';
+          setTimeout(() => {
+            document.documentElement.style.cssText = '';
+          }, 1100);
         });
       });
     } else {
       runIntro();
     }
+    try { fixMediaUrls(); }         catch(e) { console.error('fixMediaUrls failed:', e); }
     try { initScrollProgress(); } catch(e) { console.error('initScrollProgress failed:', e); }
     try { initTips(); } catch(e) { console.error('initTips failed:', e); }
     try { initWheel(); } catch(e) { console.error('initWheel failed:', e); }
@@ -1414,6 +1443,118 @@
     try { initJukebox(); } catch(e) { console.error('initJukebox failed:', e); }
     try { renderKitchen(); } catch(e) { console.error('renderKitchen failed:', e); }
     try { renderGamingSections(); } catch(e) { console.error('renderGamingSections failed:', e); }
+    try { fetchCurrently(); }       catch(e) { console.error('fetchCurrently failed:', e); }
+    try { initKonami(); }           catch(e) { console.error('initKonami failed:', e); }
+    try { initCardCTA(); }          catch(e) { console.error('initCardCTA failed:', e); }
+  }
+
+  function showToast(html) {
+    const t = document.createElement('div');
+    t.setAttribute('style', [
+      'position:fixed',
+      'bottom:24px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'background:#0f0f0f',
+      'color:#fff',
+      'border:1.5px solid #c8ff00',
+      'padding:12px 20px',
+      'border-radius:4px',
+      'z-index:2147483647',
+      'font-size:clamp(0.6rem,2.5vw,0.72rem)',
+      'letter-spacing:0.1em',
+      'text-transform:uppercase',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.6)',
+      'white-space:normal',
+      'max-width:88vw',
+      'text-align:center',
+      'line-height:1.5',
+      'display:block',
+      'opacity:1',
+      'visibility:visible'
+    ].join(';'));
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.5s'; setTimeout(()=>t.remove(),500); }, 7000);
+  }
+
+  function initCardCTA() {
+    const cta = document.querySelector('.cardgen-cta');
+    if (!cta) return;
+
+    const isGamePath = localStorage.getItem('dq-game-path') === 'true';
+    const btn     = cta.querySelector('.cardgen-btn');
+    const btnText = cta.querySelector('.cardgen-btn-text');
+    const title   = cta.querySelector('.cardgen-cta-title');
+    const desc    = cta.querySelector('.cardgen-cta-desc');
+
+    if (isGamePath) {
+      const earned = {
+        DEV:    localStorage.getItem('dq-stat-dev')    || '—',
+        DESIGN: localStorage.getItem('dq-stat-design') || '—',
+        BRAIN:  localStorage.getItem('dq-stat-brain')  || '—',
+        GRIND:  localStorage.getItem('dq-stat-grind')  || '—',
+        SOCIAL: localStorage.getItem('dq-stat-social') || '70',
+      };
+
+      if (title) title.textContent = 'Your stats are ready.';
+      if (desc)  desc.textContent  = 'You earned these in the challenges. Choose a card style and claim yours.';
+
+      const pills = document.createElement('div');
+      pills.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;';
+      pills.innerHTML = Object.entries(earned).map(([k, v]) =>
+        `<span style="font:700 0.66rem/1 Inter,sans-serif;letter-spacing:.08em;padding:4px 10px;border-radius:6px;background:rgba(0,0,0,0.06);color:#1a1a1a;border:1px solid rgba(0,0,0,0.1);">${k} <span style="color:#ff6600;">${v}</span></span>`
+      ).join('');
+      if (btn) btn.before(pills);
+
+      if (btnText) btnText.textContent = 'BUILD YOUR CARD →';
+
+    } else {
+      const nudge = document.createElement('p');
+      nudge.style.cssText = 'font-size:0.65rem;color:rgba(0,0,0,0.38);margin-top:14px;line-height:1.5;';
+      nudge.innerHTML = 'Or <a href="../landing.html" style="color:#ff6600;text-decoration:none;font-weight:600;">play DevQuest →</a> to earn your real stats.';
+      if (btn) btn.after(nudge);
+    }
+  }
+
+  function initKonami() {
+    const CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let pos = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === CODE[pos]) {
+        pos++;
+        if (pos === CODE.length) {
+          pos = 0;
+          apiFetch('/api/rickroll').catch(() => {});
+          // Play a quick descending "game over" tone then rickroll in new tab
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523, 415, 330, 262];
+            notes.forEach((freq, i) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.connect(gain); gain.connect(ctx.destination);
+              osc.frequency.value = freq;
+              osc.type = 'square';
+              gain.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.1);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.09);
+              osc.start(ctx.currentTime + i * 0.1);
+              osc.stop(ctx.currentTime + i * 0.1 + 0.1);
+            });
+          } catch {}
+          setTimeout(async () => {
+            showToast('🎵 you got rickrolled');
+            try {
+              const data = await apiFetch('/api/rickroll/count');
+              if (data && data.count) showToast(`🎵 you got rickrolled — <b style="color:#c8ff00">${data.count}</b> people have fallen for this`);
+            } catch {}
+            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+          }, 500);
+        }
+      } else {
+        pos = e.key === CODE[0] ? 1 : 0;
+      }
+    });
   }
 
   if (document.readyState === 'loading') {

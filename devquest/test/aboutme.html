@@ -12,7 +12,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/aboutme-v2.css">
-  <script>if(new URLSearchParams(location.search).get('skip_intro')){document.documentElement.classList.add('skip-intro');document.documentElement.style.cssText='background:#000;opacity:0';}</script>
+  <script>
+    if(new URLSearchParams(location.search).get('skip_intro')){
+      document.documentElement.classList.add('skip-intro');
+      // Only apply dark fade-in if navigating forward (not back/reload)
+      const navType = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]?.type;
+      if(navType !== 'back_forward') {
+        document.documentElement.style.cssText='background:#000;opacity:0';
+      }
+    }
+  </script>
   <script src="js/theme.js" defer></script>
 </head>
 <body class="gta-page loading">
@@ -436,12 +445,12 @@
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#127918;</span>
           <span class="gta-currently-label">PLAYING</span>
-          <span class="gta-currently-value">Detroit: Become Human + Death Stranding</span>
+          <span class="gta-currently-value" id="currently-playing">Detroit: Become Human + Death Stranding</span>
         </div>
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#128268;</span>
           <span class="gta-currently-label">LEARNING</span>
-          <span class="gta-currently-value">Arduino + Breadboard Circuits</span>
+          <span class="gta-currently-value" id="currently-learning">Arduino + Breadboard Circuits</span>
         </div>
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#127859;</span>

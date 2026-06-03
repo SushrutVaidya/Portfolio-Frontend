@@ -569,6 +569,7 @@
     { show: 'DOOM ETERNAL', emoji: '💀', quote: "This isn't a game. It's a lifestyle. Rip and tear until you forget what day it is.", clips: [API_BASE + '/clips/doom1.mp4', API_BASE + '/clips/doom2.mp4'] },
     { show: 'GTA V', emoji: '🚗', quote: "The reason this whole portfolio exists. Los Santos never gets old.", clips: [API_BASE + '/clips/gtav1.mp4', API_BASE + '/clips/gtav2.mp4'] },
     { show: 'COUNTER-STRIKE 2', emoji: '💣', quote: "1500 hours. PS4 controller. Zero regrets. Valorant players can look away.", clips: [API_BASE + '/clips/cs21.mp4', API_BASE + '/clips/cs22.mp4'] },
+    { show: 'SPACE MARINE 2', emoji: '⚔️', quote: "For the Emperor. No notes.", clips: [API_BASE + '/clips/sm21.mp4', API_BASE + '/clips/sm22.mp4'] },
   ];
 
   function initTV() {
@@ -1204,18 +1205,52 @@
       });
     }
 
-    function selectTrack(index) { currentTrack = index; updateDisplay(); renderTracks(); if (!isPlaying) togglePlay(); }
+    function selectTrack(index) {
+      currentTrack = index;
+      updateDisplay(); renderTracks();
+      var t = tracks[index];
+      if (t && t.audioURL) {
+        audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
+        audio.load();
+        isPlaying = true;
+        audio.play().catch(function() {});
+        jukebox.classList.toggle('paused', false);
+        playCompact.textContent = '\u23F8';
+        playBtn.textContent = '\u23F8';
+      }
+    }
+
+    // Audio playback
+    var audio = new Audio();
+    audio.volume = 0.7;
+
+    function loadTrack(index) {
+      var t = tracks[index];
+      if (!t || !t.audioURL) return;
+      var wasPlaying = isPlaying;
+      audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
+      audio.load();
+      if (wasPlaying) audio.play().catch(function() {});
+    }
+
+    audio.addEventListener('ended', function() {
+      currentTrack = (currentTrack + 1) % tracks.length;
+      updateDisplay(); renderTracks(); loadTrack(currentTrack);
+    });
 
     function togglePlay() {
+      if (!tracks[currentTrack] || !tracks[currentTrack].audioURL) return;
+      if (!audio.src || audio.src === window.location.href) loadTrack(currentTrack);
       isPlaying = !isPlaying;
+      isPlaying ? audio.play().catch(function() {}) : audio.pause();
       jukebox.classList.toggle('paused', !isPlaying);
       var icon = isPlaying ? '\u23F8' : '\u25B6';
       playCompact.textContent = icon;
       playBtn.textContent = icon;
     }
 
-    function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); }
-    function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); }
+    function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
+    function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
 
     pill.addEventListener('click', function(e) {
       if (e.target === playCompact) { e.stopPropagation(); togglePlay(); return; }
@@ -1230,7 +1265,7 @@
 
     var tlToggle = document.getElementById('jb-tl-toggle');
     if (tlToggle) { tlToggle.addEventListener('click', function() { jukebox.classList.toggle('expanded-full'); }); }
-    volSlider.addEventListener('input', function() { volVal.textContent = volSlider.value; });
+    volSlider.addEventListener('input', function() { audio.volume = volSlider.value / 100; volVal.textContent = volSlider.value; });
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && jukebox.classList.contains('expanded')) {

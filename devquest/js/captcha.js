@@ -456,7 +456,9 @@ resetBtn.addEventListener('click', () => {
 });
 
 verifyBtn.addEventListener('click', () => {
-  window.location.href = 'devtype.html';
+  typeof window.pageTransition === 'function'
+    ? window.pageTransition('devtype.html')
+    : (window.location.href = 'devtype.html');
 });
 
 window.addEventListener('load', () => {

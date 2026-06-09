@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Illuminate</title>
+  <script src="../js/transitions.js"></script>
+  <script src="../js/cursor.js"></script>
   <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -407,7 +409,9 @@
           clearInterval(barIv);
           loadTip.textContent = 'Ready.';
           setTimeout(() => {
-            window.location.href = 'aboutme.html?skip_intro=1';
+            typeof window.pageTransition === 'function'
+              ? window.pageTransition('aboutme.html?skip_intro=1')
+              : (window.location.href = 'aboutme.html?skip_intro=1');
           }, 600);
         }
         loadBarFill.style.width = prog + '%';

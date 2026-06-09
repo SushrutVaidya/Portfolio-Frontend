@@ -1233,18 +1233,22 @@
     // Audio playback
     var audio = new Audio();
     audio.volume = 0.7;
+    var _trackLoading = false;
     window._dqJukeboxAudio = audio; // expose for TV mute coordination
 
     function loadTrack(index) {
       var t = tracks[index];
       if (!t || !t.audioURL) return;
       var wasPlaying = isPlaying;
+      _trackLoading = true;
       audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
       audio.load();
+      _trackLoading = false;
       if (wasPlaying) audio.play().catch(function() {});
     }
 
     audio.addEventListener('ended', function() {
+      if (_trackLoading) return;
       currentTrack = (currentTrack + 1) % tracks.length;
       updateDisplay(); renderTracks(); loadTrack(currentTrack);
     });
@@ -1276,7 +1280,7 @@
 
     var tlToggle = document.getElementById('jb-tl-toggle');
     if (tlToggle) { tlToggle.addEventListener('click', function() { jukebox.classList.toggle('expanded-full'); }); }
-    volSlider.addEventListener('input', function() { audio.volume = volSlider.value / 100; volVal.textContent = volSlider.value; });
+    volSlider.addEventListener('input', function(e) { e.stopPropagation(); audio.volume = volSlider.value / 100; volVal.textContent = volSlider.value; });
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && jukebox.classList.contains('expanded')) {

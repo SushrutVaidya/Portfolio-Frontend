@@ -553,7 +553,7 @@
       if (msg.label) div.innerHTML = '<span class="lore-msg-label">' + msg.label + '</span>' + msg.text;
       else div.textContent = msg.text;
       chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+      requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
     }
   }
 
@@ -639,11 +639,21 @@
         applyVolume();
         videoEl.classList.add('active');
         videoEl.play().catch(() => {});
+        // Pause jukebox while TV is playing
+        if (window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+          window._dqJukeboxAudio.pause();
+          window._tvPausedJukebox = true;
+        }
       } else {
         if (videoEl) {
           videoEl.classList.remove('active');
           videoEl.pause();
           videoEl.removeAttribute('src');
+          // Resume jukebox if TV paused it
+          if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+            window._dqJukeboxAudio.play().catch(() => {});
+            window._tvPausedJukebox = false;
+          }
         }
       }
     }
@@ -1223,6 +1233,7 @@
     // Audio playback
     var audio = new Audio();
     audio.volume = 0.7;
+    window._dqJukeboxAudio = audio; // expose for TV mute coordination
 
     function loadTrack(index) {
       var t = tracks[index];

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/landing.css">
   <link rel="stylesheet" href="css/shared.css">
   <link rel="stylesheet" href="css/sprites.css">
+  <script src="js/mobile-banner.js"></script>
   <script src="js/transitions.js"></script>
   <script src="js/cursor.js"></script>
   <script src="js/theme.js" defer></script>
@@ -50,30 +51,11 @@
       </p>
 
       <!-- Card teaser — earn your card -->
-      <div class="hero-teaser">
-        <div class="teaser-card theme-gta" id="teaser-card">
-          <div class="tc-photo"></div>
-          <div class="tc-body">
-            <div class="tc-name"></div>
-            <div class="tc-role"></div>
-            <div class="tc-stats">
-              <div class="tc-stat-bar" style="--h:62%"></div>
-              <div class="tc-stat-bar" style="--h:74%"></div>
-              <div class="tc-stat-bar" style="--h:45%"></div>
-              <div class="tc-stat-bar" style="--h:88%"></div>
-              <div class="tc-stat-bar" style="--h:56%"></div>
-            </div>
-            <div class="tc-stars">★★★☆☆</div>
-          </div>
-          <div class="tc-hover-label">Claim yours →</div>
-        </div>
-        <div class="teaser-meta">
-          <div class="teaser-count">
-            <span class="teaser-count-dot"></span>
-            <span id="teaser-count">— suspects identified</span>
-          </div>
-          <div class="teaser-copy">Complete 3 challenges · earn your stats · build your card</div>
-        </div>
+      <div class="hero-teaser-pill">
+        <span class="teaser-count-dot"></span>
+        <span id="teaser-count">— suspects identified</span>
+        <span class="teaser-pill-sep">·</span>
+        <span class="teaser-pill-copy">complete 3 challenges · earn your card</span>
       </div>
 
       <div class="hero-actions">

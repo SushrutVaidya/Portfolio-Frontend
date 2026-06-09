@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Known Suspects — DevQuest</title>
+  <script src="../js/mobile-banner.js"></script>
   <script src="../js/transitions.js"></script>
   <script src="../js/cursor.js"></script>
   <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
@@ -500,6 +501,15 @@
       .podium-name { font-size: 0.72rem; }
       .lb-row { grid-template-columns: 36px 1fr auto; gap: 10px; padding: 12px 14px; }
       .lb-bottom-cta { padding: 0 20px 60px; }
+      .toast { max-width: calc(100vw - 40px); white-space: normal; text-align: center; }
+    }
+    @media (max-width: 390px) {
+      nav { padding: 0 16px; }
+      .hero { padding: 32px 16px 24px; }
+      .register-wrap { padding: 0 16px 40px; }
+      .lb-wrap { padding: 0 16px 40px; }
+      .register-card { padding: 20px 16px; }
+      .hero-title { font-size: clamp(2.2rem, 10vw, 3rem); }
     }
 
     /* ── Exhibit headers ── */

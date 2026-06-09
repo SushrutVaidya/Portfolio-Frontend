@@ -107,13 +107,9 @@ if (savedFirst) {
   validate();
 }
 
-// Card teaser — live suspect count + style cycling
+// Card teaser — live suspect count
 (async function initTeaser() {
   const countEl = document.getElementById('teaser-count');
-  const cardEl  = document.getElementById('teaser-card');
-  const THEMES  = ['theme-gta', 'theme-holo', 'theme-neon'];
-  let themeIdx  = 0;
-
   if (countEl) {
     try {
       const res  = await fetch(API_BASE + '/api/leaderboard');
@@ -121,14 +117,6 @@ if (savedFirst) {
       if (data.length > 0) {
         countEl.textContent = `${data.length} suspect${data.length !== 1 ? 's' : ''} identified`;
       }
-    } catch { /* backend offline — keep placeholder */ }
-  }
-
-  if (cardEl) {
-    setInterval(() => {
-      cardEl.classList.remove(...THEMES);
-      themeIdx = (themeIdx + 1) % THEMES.length;
-      cardEl.classList.add(THEMES[themeIdx]);
-    }, 4000);
+    } catch { /* keep placeholder */ }
   }
 })();

@@ -10,7 +10,7 @@
       opacity: 0;
       z-index: 9999;
       min-width: 280px;
-      max-width: 360px;
+      max-width: min(360px, calc(100vw - 32px));
       padding: 18px 24px 16px;
       background: #0f0f0f;
       border: 1.5px solid #c8ff00;

@@ -1,6 +1,8 @@
 // DevQuest Landing — name input + user registration + flow
 
-const API_BASE = 'http://localhost:8081';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8081'
+  : '';
 
 const enterBtn    = document.getElementById('enter-devquest');
 const backdrop    = document.getElementById('modal-backdrop');

@@ -738,11 +738,22 @@
           screen.classList.add('warming-up');
         }
         // Pause video when TV is off screen, resume when back
+        // Also coordinate with jukebox
         if (videoEl) {
           if (e.isIntersecting) {
             videoEl.play().catch(() => {});
+            // Pause jukebox when TV section is in view
+            if (window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+              window._dqJukeboxAudio.pause();
+              window._tvPausedJukebox = true;
+            }
           } else {
             videoEl.pause();
+            // Resume jukebox when TV scrolls out of view
+            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+              window._dqJukeboxAudio.play().catch(() => {});
+              window._tvPausedJukebox = false;
+            }
           }
         }
       });

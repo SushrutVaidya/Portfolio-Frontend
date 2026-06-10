@@ -212,6 +212,17 @@ body::after { display: none; }
   letter-spacing: 0.5px;
 }
 
+.dq-nav-exit {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.dq-nav-exit:hover { color: rgba(255, 255, 255, 0.7); }
+
 /* ==========================================
    FOOTER
    ========================================== */

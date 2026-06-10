@@ -1768,6 +1768,12 @@ function applyEarnedStats() {
 
 // ── Init ──
 async function init() {
+  // Support ?id= URL param for shared card links
+  const urlId = new URLSearchParams(window.location.search).get('id');
+  if (urlId) {
+    localStorage.setItem('dq-user-id', urlId);
+  }
+
   const apiData = await fetchCard();
   if (apiData) {
     applyApiResponse(apiData);
@@ -1777,6 +1783,19 @@ async function init() {
   applyEarnedStats();
   bindEditorInputs();
   renderGrid();
+}
+
+function shareCard() {
+  const userId = localStorage.getItem('dq-user-id');
+  if (!userId) return;
+  const base = window.location.origin + window.location.pathname;
+  const url  = `${base}?id=${userId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('shareCardBtn');
+    if (btn) { btn.textContent = 'Link Copied!'; setTimeout(() => { btn.textContent = 'Share My Card'; }, 2500); }
+  }).catch(() => {
+    prompt('Copy this link:', url);
+  });
 }
 
 init();
@@ -1854,6 +1873,7 @@ async function downloadCard() {
   <p class="card-next-desc">Your card is ready. Check out the leaderboard to see where you rank against other developers.</p>
   <div class="card-next-links">
     <a href="leaderboard.html" class="card-next-primary">View Leaderboard &rarr;</a>
+    <button class="card-next-secondary" id="shareCardBtn" onclick="shareCard()">Share My Card</button>
     <a href="aboutme.html" class="card-next-secondary">Behind DevQuest</a>
   </div>
 </div>

@@ -1507,6 +1507,7 @@
     try { fetchCurrently(); }       catch(e) { console.error('fetchCurrently failed:', e); }
     try { initKonami(); }           catch(e) { console.error('initKonami failed:', e); }
     try { initCardCTA(); }          catch(e) { console.error('initCardCTA failed:', e); }
+    try { fetchSuspectCount(); }    catch(e) { /* silent */ }
   }
 
   function showToast(html) {
@@ -1576,6 +1577,15 @@
       nudge.innerHTML = 'Or <a href="../landing.html" style="color:#ff6600;text-decoration:none;font-weight:600;">play DevQuest →</a> to earn your real stats.';
       if (btn) btn.after(nudge);
     }
+  }
+
+  async function fetchSuspectCount() {
+    const el = document.getElementById('cardgen-suspect-count');
+    if (!el) return;
+    try {
+      const data = await apiFetch('/api/leaderboard');
+      el.textContent = `${data.length} suspect${data.length !== 1 ? 's' : ''}`;
+    } catch { /* keep placeholder */ }
   }
 
   function initKonami() {

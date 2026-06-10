@@ -752,3 +752,15 @@ body {
   #skip-btn.terminal-active { min-width: unset; min-height: 90px; }
   #terminal-lines { font-size: 0.6rem; }
 }
+
+@media (max-width: 390px) {
+  #box-container { width: 98vw; }
+  #box-front { padding: 8px 2px; gap: 1px; }
+  .hole { width: 48px; height: 48px; }
+  .circle-hole     { width: 22px; height: 18px; }
+  .rectangle-hole  { width: 10px; height: 26px; }
+  .square-hole     { width: 22px; height: 22px; }
+  .semicircle-hole { width: 26px; height: 13px; }
+  .triangle-hole   { border-left-width: 11px; border-right-width: 11px; border-bottom-width: 20px; }
+  #active-shape    { width: 90px; height: 90px; }
+}

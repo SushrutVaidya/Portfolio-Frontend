@@ -472,7 +472,7 @@
 
     /* ── SUCCESS TOAST ── */
     .toast {
-      position: fixed; bottom: 24px; left: 50%;
+      position: fixed; bottom: calc(24px + env(safe-area-inset-bottom,0px)); left: 50%;
       transform: translateX(-50%) translateY(80px);
       background: #1a1a1a;
       border: 1px solid rgba(255,255,255,0.1);
@@ -510,6 +510,10 @@
       .lb-wrap { padding: 0 16px 40px; }
       .register-card { padding: 20px 16px; }
       .hero-title { font-size: clamp(2.2rem, 10vw, 3rem); }
+      .podium { gap: 4px; }
+      .podium-item { padding: 12px 6px 10px; }
+      .podium-name { font-size: 0.65rem; }
+      .podium-role { font-size: 0.5rem; }
     }
 
     /* ── Exhibit headers ── */

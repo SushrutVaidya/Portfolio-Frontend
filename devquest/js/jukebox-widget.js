@@ -81,7 +81,7 @@
     .am-jb-footer { display:flex; justify-content:center; padding:8px 14px 10px; border-top:1px solid rgba(255,255,255,.04); }
     .am-jb-footer span { font:600 .45rem/1 'SF Mono',monospace; letter-spacing:2px; color:rgba(200,255,0,.15); animation:insertCoin 2s ease-in-out infinite; }
     @keyframes insertCoin { 0%,100%{opacity:.3} 50%{opacity:.8} }
-    @media(max-width:600px){ .am-jukebox{bottom:80px;right:16px;} .am-jb-pill{min-width:180px;padding:8px 12px;} }
+    @media(max-width:600px){ .am-jukebox{bottom:calc(80px + env(safe-area-inset-bottom,0px));right:16px;} .am-jb-pill{min-width:180px;padding:8px 12px;} }
   `;
   document.head.appendChild(style);
 

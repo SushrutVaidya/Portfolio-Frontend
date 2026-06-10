@@ -461,6 +461,12 @@ verifyBtn.addEventListener('click', () => {
     : (window.location.href = 'devtype.html');
 });
 
+window.dqCheat = () => {
+  currentIndex = shuffledShapes.length;
+  lives = 3;
+  showSuccess();
+};
+
 window.addEventListener('load', () => {
   initSkipTroll();
   startGame();

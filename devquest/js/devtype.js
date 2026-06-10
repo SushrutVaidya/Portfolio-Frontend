@@ -1103,3 +1103,14 @@ window.addEventListener('load', () => {
   setDifficulty('easy');
   inputEl.focus();
 });
+
+window.dqCheat = () => {
+  correctChars = 480;
+  totalChars   = 490;
+  wordsCorrect = 96;
+  errorCount   = 1;
+  timeLeft     = 1;
+  if (!gameStarted) { gameStarted = true; }
+  clearInterval(timerInterval);
+  endGame();
+};

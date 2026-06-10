@@ -942,3 +942,17 @@ document.getElementById('inc-retry-btn').addEventListener('click', resetGame);
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+window.dqCheat = () => {
+  if (!currentLang) {
+    currentLang = 'javascript';
+    rounds      = SNIPPETS[currentLang];
+  }
+  correctCount  = 5;
+  roundResults  = [true, true, true, true, true];
+  roundIdx      = 5;
+  lives         = 3;
+  clearInterval(timerInterval);
+  clearQuirks();
+  endGame();
+};

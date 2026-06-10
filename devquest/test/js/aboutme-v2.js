@@ -1616,7 +1616,7 @@
     if (!el) return;
     try {
       const data = await apiFetch('/api/leaderboard');
-      el.textContent = `${data.length} suspect${data.length !== 1 ? 's' : ''}`;
+      el.textContent = data.length + (data.length !== 1 ? ' suspects' : ' suspect');
     } catch { /* keep placeholder */ }
   }
 

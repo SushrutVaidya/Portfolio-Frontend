@@ -725,6 +725,10 @@ body {
   .semicircle-hole { width: 32px; height: 16px; }
   .triangle-hole   { border-left-width: 14px; border-right-width: 14px; border-bottom-width: 26px; }
 
+  /* Prevent box overflow on narrow screens */
+  #box-front { padding: 10px 4px; gap: 2px; }
+  .hole      { flex-shrink: 1; min-width: 0; }
+
   #active-shape         { width: 110px; height: 110px; }
   #active-shape.drop-in { left: calc(50% - 55px); }
 

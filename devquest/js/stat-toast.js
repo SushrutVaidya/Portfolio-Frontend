@@ -2,6 +2,18 @@
 
 (function () {
   const CSS = `
+    @media (max-width: 600px) {
+      #dq-stat-toast {
+        bottom: auto !important;
+        top: 70px;
+        min-width: 240px;
+        max-width: calc(100vw - 32px);
+        padding: 12px 16px 10px;
+      }
+      .toast-value { font-size: 1.6rem !important; }
+      .toast-header { font-size: 0.52rem !important; }
+    }
+
     #dq-stat-toast {
       position: fixed;
       bottom: 32px;

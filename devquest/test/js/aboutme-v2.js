@@ -1360,18 +1360,18 @@
     jukebox.classList.add('paused');
     renderTracks();
 
-    // Auto-resume if coming from bulb-loading
+    // Auto-resume if coming from bulb-lighting
     if (savedTrack !== null) {
-      setTimeout(function() {
-        loadTrack(currentTrack);
+      loadTrack(currentTrack);
+      audio.play().then(function() {
         isPlaying = true;
-        audio.play().catch(function() {});
         jukebox.classList.remove('paused');
-        playCompact.textContent = '⏸';
-        playBtn.textContent = '⏸';
-        // Save state so card editor also resumes
+        playCompact.textContent = '\u23F8';
+        playBtn.textContent = '\u23F8';
         sessionStorage.setItem('dq-jb-track', currentTrack);
-      }, 400);
+      }).catch(function() {
+        // Autoplay blocked — vinyl stays paused, user clicks to play
+      });
     }
   }
 

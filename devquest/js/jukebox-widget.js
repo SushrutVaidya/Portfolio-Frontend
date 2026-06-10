@@ -171,9 +171,19 @@
       .then(function(r){ return r.json(); })
       .then(function(data){
         tracks = data;
-        // Resume previously playing track if user navigated from another page
+        // Auto-play: triggered by bulb lighting up or resuming from previous page
         var savedTrack = sessionStorage.getItem('dq-jb-track');
-        if (savedTrack !== null) {
+        var autoplay   = sessionStorage.getItem('dq-jb-autoplay');
+        if (autoplay === '1') {
+          sessionStorage.removeItem('dq-jb-autoplay');
+          currentTrack = Math.min(parseInt(savedTrack) || 0, tracks.length - 1);
+          setTimeout(function() {
+            loadTrack(currentTrack);
+            isPlaying = true;
+            audio.play().catch(function(){});
+            setPlayState(true);
+          }, 300);
+        } else if (savedTrack !== null) {
           currentTrack = Math.min(parseInt(savedTrack) || 0, tracks.length - 1);
           setTimeout(function() {
             loadTrack(currentTrack);

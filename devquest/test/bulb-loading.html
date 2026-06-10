@@ -7,6 +7,7 @@
   <script src="../js/mobile-banner.js"></script>
   <script src="../js/transitions.js"></script>
   <script src="../js/cursor.js"></script>
+  <script src="../js/jukebox-widget.js" defer></script>
   <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -382,6 +383,9 @@
     function trigger() {
       done = true;
       clearTimeout(decayTimer);
+      // Start Welcome to Los Santos when bulb is lit
+      sessionStorage.setItem('dq-jb-track', '0');
+      sessionStorage.setItem('dq-jb-autoplay', '1');
       // Small hold at full brightness, then loading screen fades in over the top
       setTimeout(startLoadingScreen, 400);
     }

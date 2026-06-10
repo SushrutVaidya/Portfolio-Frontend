@@ -42,10 +42,19 @@
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
+  /* Force GPU compositing layer for smoother scroll */
+  transform: translateZ(0);
+}
+
+/* GPU accelerate all animated sections */
+.gta-section {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .gta-section-lore {
   min-height: 100vh;
+  padding-bottom: 15vh;
 }
 
 /* ── Reveal ── */
@@ -2580,18 +2589,61 @@
 }
 
 .cardgen-leaderboard-nudge {
-  margin-top: 14px;
-  font-size: 0.72rem;
-  color: rgba(0,0,0,0.4);
-  line-height: 1.5;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
+
+.cardgen-suspect-count {
+  font-size: 0.7rem;
+  color: rgba(0,0,0,0.4);
+}
+
 .cardgen-lb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  border: 1.5px solid var(--gta-orange);
   color: var(--gta-orange);
   text-decoration: none;
-  font-weight: 600;
-  transition: opacity 0.2s;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  animation: lbPulse 2.5s ease-in-out infinite;
 }
-.cardgen-lb-link:hover { opacity: 0.7; }
+
+.cardgen-lb-link:hover {
+  background: var(--gta-orange);
+  color: #fff;
+  transform: scale(1.04);
+  animation: none;
+}
+
+.cardgen-lb-arrow {
+  display: inline-block;
+  transition: transform 0.2s;
+  animation: arrowBounce 1.2s ease-in-out infinite;
+}
+
+.cardgen-lb-link:hover .cardgen-lb-arrow {
+  animation: none;
+  transform: translateX(4px);
+}
+
+@keyframes lbPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,102,0,0.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(255,102,0,0); }
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(4px); }
+}
 .cardgen-btn-badge {
   font: 700 0.5rem/1 -apple-system, sans-serif;
   color: #fff;

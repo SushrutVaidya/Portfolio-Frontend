@@ -32,6 +32,16 @@
     attachOverlay();
   }
 
+  // Fix back/forward bfcache restore — overlay gets stuck black
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      overlay.classList.remove('is-exit');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { overlay.classList.add('is-out'); });
+      });
+    }
+  });
+
   window.pageTransition = function (href) {
     if (!href) return;
     overlay.classList.remove('is-out');

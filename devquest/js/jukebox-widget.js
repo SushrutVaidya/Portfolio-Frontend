@@ -170,6 +170,17 @@
       .then(function(r){ return r.json(); })
       .then(function(data){
         tracks = data;
+        // Resume previously playing track if user navigated from another page
+        var savedTrack = sessionStorage.getItem('dq-jb-track');
+        if (savedTrack !== null) {
+          currentTrack = Math.min(parseInt(savedTrack) || 0, tracks.length - 1);
+          setTimeout(function() {
+            loadTrack(currentTrack);
+            isPlaying = true;
+            audio.play().catch(function(){});
+            setPlayState(true);
+          }, 300);
+        }
         updateDisplay();
         renderTracks();
       })
@@ -217,6 +228,9 @@
       playCompact.textContent = icon;
       playBtn.textContent = icon;
       jukebox.classList.toggle('paused', !playing);
+      // Persist track state across page navigations
+      if (playing) sessionStorage.setItem('dq-jb-track', currentTrack);
+      else sessionStorage.removeItem('dq-jb-track');
     }
 
     function togglePlay() {

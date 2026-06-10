@@ -2,23 +2,12 @@
 
 (function () {
   const CSS = `
-    @media (max-width: 600px) {
-      #dq-stat-toast {
-        bottom: auto !important;
-        top: 70px;
-        min-width: 240px;
-        max-width: calc(100vw - 32px);
-        padding: 12px 16px 10px;
-      }
-      .toast-value { font-size: 1.6rem !important; }
-      .toast-header { font-size: 0.52rem !important; }
-    }
-
     #dq-stat-toast {
       position: fixed;
-      bottom: 32px;
+      bottom: auto;
+      top: 72px;
       left: 50%;
-      transform: translateX(-50%) translateY(80px) scale(0.9);
+      transform: translateX(-50%) translateY(-40px) scale(0.9);
       opacity: 0;
       z-index: 9999;
       min-width: 280px;
@@ -36,7 +25,7 @@
       opacity: 1;
     }
     #dq-stat-toast.toast-out {
-      transform: translateX(-50%) translateY(20px) scale(0.95);
+      transform: translateX(-50%) translateY(-20px) scale(0.95);
       opacity: 0;
       transition: transform 0.3s ease, opacity 0.3s ease;
     }

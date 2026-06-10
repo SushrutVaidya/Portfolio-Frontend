@@ -184,6 +184,22 @@
         }
         updateDisplay();
         renderTracks();
+        // Auto-play on first scroll if no saved track (first visit)
+        if (savedTrack === null) {
+          var _played = false;
+          var onFirst = function() {
+            if (_played) return;
+            _played = true;
+            document.removeEventListener('scroll', onFirst);
+            document.removeEventListener('click', onFirst);
+            loadTrack(0);
+            isPlaying = true;
+            audio.play().catch(function(){});
+            setPlayState(true);
+          };
+          document.addEventListener('scroll', onFirst, { once: true, passive: true });
+          document.addEventListener('click',  onFirst, { once: true });
+        }
       })
       .catch(function(){ trackNameEl.textContent = 'Jukebox'; });
 

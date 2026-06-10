@@ -57,6 +57,7 @@
         href.startsWith('#') ||
         href.startsWith('mailto:') ||
         href.startsWith('http') ||
+        href.startsWith('//') ||
         link.target === '_blank' ||
         link.hasAttribute('download')) return;
     e.preventDefault();

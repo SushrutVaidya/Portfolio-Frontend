@@ -1514,19 +1514,19 @@
       runIntro();
     }
     try { fixMediaUrls(); }         catch(e) { console.error('fixMediaUrls failed:', e); }
-    try { initScrollProgress(); } catch(e) { console.error('initScrollProgress failed:', e); }
-    try { initTips(); } catch(e) { console.error('initTips failed:', e); }
-    try { initWheel(); } catch(e) { console.error('initWheel failed:', e); }
-    try { initStatPentagon(); } catch(e) { console.error('initStatPentagon failed:', e); }
-    try { initReveal(); } catch(e) { console.error('initReveal failed:', e); }
-    try { animateStatBars(); } catch(e) { console.error('animateStatBars failed:', e); }
-    try { animateWantedStars(); } catch(e) { console.error('animateWantedStars failed:', e); }
-    try { initLore(); } catch(e) { console.error('initLore failed:', e); }
-    try { initWantedPosters(); } catch(e) { console.error('initWantedPosters failed:', e); }
-    try { initCardTilt(); } catch(e) { console.error('initCardTilt failed:', e); }
-    try { initJukebox(); } catch(e) { console.error('initJukebox failed:', e); }
-    try { renderKitchen(); } catch(e) { console.error('renderKitchen failed:', e); }
-    try { renderGamingSections(); } catch(e) { console.error('renderGamingSections failed:', e); }
+    try { initScrollProgress(); } catch(e) {}
+    try { initTips(); } catch(e) {}
+    try { initWheel(); } catch(e) {}
+    try { initStatPentagon(); } catch(e) {}
+    try { initReveal(); } catch(e) {}
+    try { animateStatBars(); } catch(e) {}
+    try { animateWantedStars(); } catch(e) {}
+    try { initLore(); } catch(e) {}
+    try { initWantedPosters(); } catch(e) {}
+    try { initCardTilt(); } catch(e) {}
+    try { initJukebox(); } catch(e) {}
+    try { renderKitchen(); } catch(e) {}
+    try { renderGamingSections(); } catch(e) {}
     try { fetchCurrently(); }       catch(e) { console.error('fetchCurrently failed:', e); }
     try { initKonami(); }           catch(e) { console.error('initKonami failed:', e); }
     try { initCardCTA(); }          catch(e) { console.error('initCardCTA failed:', e); }

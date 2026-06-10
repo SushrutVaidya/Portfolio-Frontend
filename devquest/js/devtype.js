@@ -25,11 +25,12 @@ async function submitScore(wpm, accuracy, difficulty) {
   const userId = localStorage.getItem('dq-user-id');
   if (!userId) return;
   try {
-    await fetch(API_BASE + '/api/score', {
+    const res = await fetch(API_BASE + '/api/score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, game: 'devtype', wpm, accuracy, difficulty }),
     });
+    if (!res.ok) throw new Error(res.status);
   } catch { /* backend offline — silent fail */ }
 }
 

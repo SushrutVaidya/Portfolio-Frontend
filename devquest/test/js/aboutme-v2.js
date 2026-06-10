@@ -1220,15 +1220,7 @@
     let isPlaying = false;
     var SEP = '  \u00b7  ';
 
-    // Resume track from bulb-loading or previous page
-    const savedTrack  = sessionStorage.getItem('dq-jb-track');
-    const shouldPlay  = sessionStorage.getItem('dq-jb-autoplay');
-    if (savedTrack !== null) {
-      currentTrack = Math.min(parseInt(savedTrack) || 0, tracks.length - 1);
-    }
-    if (shouldPlay === '1') {
-      sessionStorage.removeItem('dq-jb-autoplay');
-    }
+
 
     function updateDisplay() {
       var t = tracks[currentTrack];
@@ -1360,19 +1352,7 @@
     jukebox.classList.add('paused');
     renderTracks();
 
-    // Auto-resume if coming from bulb-lighting
-    if (savedTrack !== null) {
-      loadTrack(currentTrack);
-      audio.play().then(function() {
-        isPlaying = true;
-        jukebox.classList.remove('paused');
-        playCompact.textContent = '\u23F8';
-        playBtn.textContent = '\u23F8';
-        sessionStorage.setItem('dq-jb-track', currentTrack);
-      }).catch(function() {
-        // Autoplay blocked — vinyl stays paused, user clicks to play
-      });
-    }
+
   }
 
   // ════════════════════════════════════

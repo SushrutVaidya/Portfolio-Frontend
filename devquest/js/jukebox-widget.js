@@ -255,9 +255,7 @@
       playCompact.textContent = icon;
       playBtn.textContent = icon;
       jukebox.classList.toggle('paused', !playing);
-      // Persist track state across page navigations
-      if (playing) sessionStorage.setItem('dq-jb-track', currentTrack);
-      else sessionStorage.removeItem('dq-jb-track');
+
     }
 
     function togglePlay() {

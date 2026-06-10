@@ -42,14 +42,6 @@
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
-  /* Force GPU compositing layer for smoother scroll */
-  transform: translateZ(0);
-}
-
-/* GPU accelerate all animated sections */
-.gta-section {
-  will-change: transform;
-  transform: translateZ(0);
 }
 
 .gta-section-lore {

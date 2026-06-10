@@ -1358,7 +1358,6 @@
     });
 
     jukebox.classList.add('paused');
-    updateDisplay();
     renderTracks();
 
     // Auto-resume if coming from bulb-loading

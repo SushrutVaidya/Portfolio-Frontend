@@ -757,8 +757,25 @@
           }
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0, rootMargin: '0px' });
     tvObs.observe(screen);
+
+    // Also pause TV when card section comes into view
+    var cardgenEl = document.getElementById('cardgen');
+    if (cardgenEl) {
+      var cardObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting && videoEl) {
+            videoEl.pause();
+            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+              window._dqJukeboxAudio.play().catch(function() {});
+              window._tvPausedJukebox = false;
+            }
+          }
+        });
+      }, { threshold: 0.1 });
+      cardObs.observe(cardgenEl);
+    }
 
     TV_CHANNELS.forEach(ch => ch.clips.forEach(url => tryLoadClip(url)));
     display(0);
@@ -1243,9 +1260,24 @@
 
     // Audio playback
     var audio = new Audio();
-    audio.volume = 0.7;
+    audio.volume = 0.3; // low volume for autoplay
     var _trackLoading = false;
     window._dqJukeboxAudio = audio; // expose for TV mute coordination
+
+    // Auto-play on first user interaction
+    var _autoPlayed = false;
+    function tryAutoPlay() {
+      if (_autoPlayed || isPlaying || !tracks.length || !tracks[0].audioURL) return;
+      _autoPlayed = true;
+      loadTrack(0);
+      isPlaying = true;
+      audio.play().catch(function() { _autoPlayed = false; });
+      jukebox.classList.toggle('paused', false);
+      playCompact.textContent = '\u23F8';
+      playBtn.textContent = '\u23F8';
+    }
+    document.addEventListener('scroll', tryAutoPlay, { once: true, passive: true });
+    document.addEventListener('click',  tryAutoPlay, { once: true });
 
     function loadTrack(index) {
       var t = tracks[index];

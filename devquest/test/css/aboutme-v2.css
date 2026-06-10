@@ -41,6 +41,11 @@
   font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+.gta-section-lore {
+  min-height: 100vh;
 }
 
 /* ── Reveal ── */

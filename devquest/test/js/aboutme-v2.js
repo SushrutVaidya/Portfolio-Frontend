@@ -1264,20 +1264,7 @@
     var _trackLoading = false;
     window._dqJukeboxAudio = audio; // expose for TV mute coordination
 
-    // Auto-play on first user interaction
-    var _autoPlayed = false;
-    function tryAutoPlay() {
-      if (_autoPlayed || isPlaying || !tracks.length || !tracks[0].audioURL) return;
-      _autoPlayed = true;
-      loadTrack(0);
-      isPlaying = true;
-      audio.play().catch(function() { _autoPlayed = false; });
-      jukebox.classList.toggle('paused', false);
-      playCompact.textContent = '\u23F8';
-      playBtn.textContent = '\u23F8';
-    }
-    document.addEventListener('scroll', tryAutoPlay, { once: true, passive: true });
-    document.addEventListener('click',  tryAutoPlay, { once: true });
+    // No auto-play — user discovers jukebox naturally
 
     function loadTrack(index) {
       var t = tracks[index];

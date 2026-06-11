@@ -1828,7 +1828,7 @@ function applyEarnedStats() {
 async function init() {
   // Support ?id= URL param for shared card links
   const urlId = new URLSearchParams(window.location.search).get('id');
-  if (urlId) {
+  if (urlId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(urlId)) {
     localStorage.setItem('dq-user-id', urlId);
   }
 
@@ -1891,13 +1891,25 @@ async function submitPrintRequest(e) {
   btnText.style.display = 'none';
   btnLoad.style.display = '';
 
+  const fullName = document.getElementById('pr-name').value.trim();
+  const addr1    = document.getElementById('pr-addr1').value.trim();
+  const city     = document.getElementById('pr-city').value;
+  const pincode  = document.getElementById('pr-pincode').value.trim();
+  const phone    = document.getElementById('pr-phone').value.trim();
+
+  if (fullName.length < 2)            { alert('Name must be at least 2 characters'); btn.disabled = false; btnText.style.display = ''; btnLoad.style.display = 'none'; return; }
+  if (addr1.length < 5)               { alert('Please enter a valid address'); btn.disabled = false; btnText.style.display = ''; btnLoad.style.display = 'none'; return; }
+  if (!city)                          { alert('Please select your city'); btn.disabled = false; btnText.style.display = ''; btnLoad.style.display = 'none'; return; }
+  if (!/^\d{6}$/.test(pincode))       { alert('Pincode must be exactly 6 digits'); btn.disabled = false; btnText.style.display = ''; btnLoad.style.display = 'none'; return; }
+  if (!/^\d{10}$/.test(phone))        { alert('Phone must be exactly 10 digits'); btn.disabled = false; btnText.style.display = ''; btnLoad.style.display = 'none'; return; }
+
   const body = {
-    fullName:     document.getElementById('pr-name').value.trim(),
-    addressLine1: document.getElementById('pr-addr1').value.trim(),
+    fullName:     fullName,
+    addressLine1: addr1,
     addressLine2: document.getElementById('pr-addr2').value.trim(),
-    city:         document.getElementById('pr-city').value,
-    pincode:      document.getElementById('pr-pincode').value.trim(),
-    phone:        document.getElementById('pr-phone').value.trim(),
+    city:         city,
+    pincode:      pincode,
+    phone:        phone,
     cardId:       localStorage.getItem('dq-user-id') || '',
   };
 

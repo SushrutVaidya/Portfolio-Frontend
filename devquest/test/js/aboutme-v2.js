@@ -777,7 +777,7 @@
       cardObs.observe(cardgenEl);
     }
 
-    TV_CHANNELS.forEach(ch => ch.clips.forEach(url => tryLoadClip(url)));
+    TV_CHANNELS.forEach(ch => (ch.clips || []).forEach(url => tryLoadClip(url)));
     display(0);
   }
 
@@ -1214,7 +1214,7 @@
     const volVal = document.getElementById('jb-vol-val');
     const backdrop = document.getElementById('jb-backdrop');
 
-    if (!jukebox || !pill || !tracks.length) return;
+    if (!jukebox || !pill || !tracks || !tracks.length) return;
 
     let currentTrack = 0;
     let isPlaying = false;
@@ -1286,7 +1286,7 @@
     });
 
     function togglePlay() {
-      if (!tracks[currentTrack] || !tracks[currentTrack].audioURL) return;
+      if (!tracks || !tracks[currentTrack] || !tracks[currentTrack].audioURL) return;
       if (!audio.src || audio.src === window.location.href) loadTrack(currentTrack);
       isPlaying = !isPlaying;
       isPlaying ? audio.play().catch(function() {}) : audio.pause();

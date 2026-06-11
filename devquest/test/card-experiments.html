@@ -17,7 +17,7 @@
     background: #111;
     color: #fff;
     min-height: 100vh;
-    padding: 48px 20px;
+    padding: 48px 20px 100px;
   }
   h1 {
     text-align: center;
@@ -124,15 +124,15 @@
   .badge-holo .holo-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: #7c3aed; text-transform: uppercase; font-variant: small-caps; }
   .badge-holo .holo-bio { font-size: 0.7rem; color: #777; text-align: center; line-height: 1.6; }
   .badge-holo .holo-motto { font-size: 0.65rem; color: #999; font-style: italic; text-align: center; }
-  .badge-holo .holo-motto::before, .badge-holo .holo-motto::after { content: ' \u201C '; color: #ccc; }
-  .badge-holo .holo-motto::after { content: ' \u201D '; }
+  .badge-holo .holo-motto::before, .badge-holo .holo-motto::after { content: ' \201C '; color: #ccc; }
+  .badge-holo .holo-motto::after { content: ' \201D '; }
   .badge-holo .holo-divider { width: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(128,0,255,0.15), rgba(0,200,255,0.15), transparent); }
   .badge-holo .holo-stats {
-    display: flex; gap: 0; width: 100%; justify-content: center;
+    display: flex; gap: 0; width: 100%; justify-content: center; overflow: visible;
   }
   .badge-holo .holo-stat {
     display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 0 14px;
+    padding: 0 8px; flex: 1; min-width: 0;
   }
   .badge-holo .holo-stat:not(:last-child) { border-right: 1px solid rgba(0,0,0,0.06); }
   .badge-holo .holo-stat-val { font-size: 1.15rem; font-weight: 800; color: #1a1a2e; }
@@ -256,8 +256,8 @@
   .badge-glass .gl-class { font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: rgba(180,140,255,0.7); text-transform: uppercase; }
   .badge-glass .gl-bio { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.6; }
   .badge-glass .gl-motto { font-size: 0.6rem; color: rgba(255,255,255,0.3); font-style: italic; text-align: center; }
-  .badge-glass .gl-motto::before { content: '\u201C '; opacity: 0.5; }
-  .badge-glass .gl-motto::after { content: ' \u201D'; opacity: 0.5; }
+  .badge-glass .gl-motto::before { content: '\201C '; opacity: 0.5; }
+  .badge-glass .gl-motto::after { content: ' \201D'; opacity: 0.5; }
   .badge-glass .gl-stats { display: flex; gap: 24px; }
   .badge-glass .gl-stat { font-size: 1.3rem; font-weight: 800; color: rgba(255,255,255,0.85); }
   .badge-glass .gl-wanted { display: flex; align-items: center; gap: 8px; }
@@ -629,8 +629,8 @@
   .badge-royal .royal-class { font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #b49a6a; text-transform: uppercase; }
   .badge-royal .royal-bio { font-size: 0.7rem; color: #8a8078; text-align: center; line-height: 1.6; }
   .badge-royal .royal-motto { font-size: 0.65rem; color: #a09488; font-style: italic; text-align: center; }
-  .badge-royal .royal-motto::before, .badge-royal .royal-motto::after { content: ' \u201C '; color: #c8b898; }
-  .badge-royal .royal-motto::after { content: ' \u201D '; }
+  .badge-royal .royal-motto::before, .badge-royal .royal-motto::after { content: ' \201C '; color: #c8b898; }
+  .badge-royal .royal-motto::after { content: ' \201D '; }
   .badge-royal .royal-divider { width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,170,100,0.3), transparent); }
   .badge-royal .royal-stats {
     display: flex; gap: 0; width: 100%; justify-content: center;
@@ -1053,8 +1053,10 @@
           <div class="editor-section-title">Photo</div>
           <div class="editor-row">
             <div class="editor-field">
-              <label>Photo URL</label>
-              <input type="text" id="ed-photoUrl" maxlength="500" placeholder="https://example.com/photo.jpg">
+              <label>Upload Photo</label>
+              <input type="file" id="ed-photoFile" accept="image/*" style="padding:8px 0; cursor:pointer;">
+              <input type="hidden" id="ed-photoUrl">
+              <p style="font-size:0.6rem;color:#555;margin-top:4px;">JPG, PNG, WEBP — shown on your card</p>
             </div>
           </div>
         </div>
@@ -1567,13 +1569,29 @@ function populateEditor() {
 
 // ── Editor: live preview — bind input events ──
 function bindEditorInputs() {
-  const liveFields = ['ed-classRole', 'ed-bio', 'ed-motto', 'ed-photoUrl', 'ed-wantedText', 'ed-traits'];
+  const liveFields = ['ed-classRole', 'ed-bio', 'ed-motto', 'ed-wantedText', 'ed-traits'];
   liveFields.forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', syncEditorToData);
   });
 
   document.getElementById('ed-wantedLevel').addEventListener('change', syncEditorToData);
+
+  // Photo file upload
+  const photoFile = document.getElementById('ed-photoFile');
+  if (photoFile) {
+    photoFile.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        DATA.photo = e.target.result;
+        document.getElementById('ed-photoUrl').value = e.target.result;
+        renderGrid();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
   // Stat sliders
   STAT_KEYS.forEach(k => {

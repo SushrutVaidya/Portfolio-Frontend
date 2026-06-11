@@ -109,15 +109,15 @@ let currentDifficulty = 'easy';
 // WORD POOLS
 // ==========================================
 
-// Easy — Sushrut's bio (ordered, not shuffled)
+// Easy — Sushrut's bio (ordered, with punctuation)
 const EASY_TEXT = [
-  'Hi', 'I', 'am', 'Sushrut', 'a', 'backend', 'developer', 'from', 'Hyderabad',
-  'I', 'spend', 'my', 'days', 'writing', 'Java', 'and', 'my', 'nights', 'losing', 'in', 'CS2',
-  'I', 'built', 'DevQuest', 'to', 'gatekeep', 'my', 'portfolio', 'from', 'the', 'normies',
-  'My', 'stack', 'includes', 'Spring', 'Boot', 'Redis', 'Docker', 'and', 'questionable', 'decisions',
-  'I', 'enjoy', 'rickrolling', 'unsuspecting', 'visitors', 'and', 'shipping', 'hotfixes', 'at', '2am',
-  'If', 'you', 'made', 'it', 'this', 'far', 'you', 'are', 'probably', 'a', 'developer',
-  'or', 'very', 'very', 'lost', 'either', 'way', 'welcome', 'to', 'my', 'portfolio',
+  "Hi,", "I'm", "Sushrut", "—", "a", "backend", "developer", "from", "Hyderabad.",
+  "I", "spend", "my", "days", "writing", "Java", "and", "my", "nights", "losing", "in", "CS2.",
+  "I", "built", "DevQuest", "to", "gatekeep", "my", "portfolio", "from", "the", "normies.",
+  "My", "stack", "includes", "Spring", "Boot,", "Redis,", "Docker,", "and", "questionable", "decisions.",
+  "I", "enjoy", "rickrolling", "unsuspecting", "visitors", "and", "shipping", "hotfixes", "at", "2am.",
+  "If", "you", "made", "it", "this", "far,", "you're", "probably", "a", "developer", "—", "or", "very,", "very", "lost.",
+  "Either", "way,", "welcome", "to", "my", "portfolio.",
 ];
 
 // Medium — dev / cli word pool

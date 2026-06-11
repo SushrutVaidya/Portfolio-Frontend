@@ -149,7 +149,6 @@ songNameEl.addEventListener('mouseenter', () => {
       songAudio.volume = 0.5;
     }
     songAudio.play().catch(() => {});
-    });
   }
 });
 

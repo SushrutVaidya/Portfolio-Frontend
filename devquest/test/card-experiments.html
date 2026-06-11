@@ -668,6 +668,23 @@
     cursor: pointer;
   }
   .overlay.active { opacity: 1; pointer-events: all; }
+
+  /* X close button on overlay */
+  .overlay-close {
+    position: fixed; top: 24px; right: 24px;
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1001;
+    transition: background 0.2s;
+    pointer-events: all;
+  }
+  .overlay-close:hover { background: rgba(255,255,255,0.2); }
   .overlay .badge-zoom { transform: scale(1.5); pointer-events: none; cursor: default; }
   .overlay .badge-zoom .badge { cursor: default; }
   .overlay .badge-zoom .badge:hover { transform: none; box-shadow: none; }
@@ -1142,6 +1159,7 @@
 
   <div class="grid" id="cardGrid"></div>
   <div class="overlay" id="overlay">
+    <button class="overlay-close" id="overlayClose" title="Close">✕</button>
     <div class="badge-zoom" id="zoomTarget"></div>
     <div class="overlay-label" id="overlayLabel"></div>
   </div>
@@ -1512,11 +1530,22 @@ function openZoom(style, index) {
   zoomTarget.innerHTML = style.build(true);
   overlayLabel.textContent = `${index + 1}. ${style.name}`;
   overlay.classList.add('active');
+  // Hide jukebox while card is zoomed
+  var jb = document.getElementById('jukebox');
+  if (jb) jb.style.display = 'none';
   // Also select this style in the editor
   selectStyle(index);
 }
-overlay.addEventListener('click', () => overlay.classList.remove('active'));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('active'); });
+
+function closeOverlay() {
+  overlay.classList.remove('active');
+  var jb = document.getElementById('jukebox');
+  if (jb) jb.style.display = '';
+}
+
+overlay.addEventListener('click', closeOverlay);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+document.getElementById('overlayClose').addEventListener('click', e => { e.stopPropagation(); closeOverlay(); });
 
 // ── Editor: toggle ──
 function toggleEditor() {

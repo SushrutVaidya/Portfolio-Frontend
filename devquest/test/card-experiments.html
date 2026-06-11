@@ -1743,6 +1743,9 @@ function showSaveStatus(msg, type) {
   if (type === 'success') {
     const next = document.getElementById('cardNext');
     if (next) next.style.display = '';
+    // Show print section after save
+    const ps = document.getElementById('printSection');
+    if (ps) { ps.style.display = ''; loadPrintCount(); }
   }
 }
 
@@ -1854,6 +1857,69 @@ function shareCard() {
 }
 
 init();
+
+// ── Print Request ──
+function updatePrintUI(claimed, full) {
+  const fill    = document.getElementById('printCounterFill');
+  const claimed_ = document.getElementById('printClaimed');
+  const form    = document.getElementById('printForm');
+  const fullEl  = document.getElementById('printFull');
+
+  if (claimed_) claimed_.textContent = claimed;
+  if (fill)     setTimeout(() => { fill.style.width = Math.min((claimed / 25) * 100, 100) + '%'; }, 100);
+
+  if (full) {
+    if (form)   form.style.display = 'none';
+    if (fullEl) fullEl.style.display = '';
+  }
+}
+
+async function loadPrintCount() {
+  try {
+    const res  = await fetch(API_BASE + '/api/print-request/count');
+    const data = await res.json();
+    updatePrintUI(data.claimed || 0, data.full);
+  } catch { updatePrintUI(0, false); }
+}
+
+async function submitPrintRequest(e) {
+  e.preventDefault();
+  const btn     = document.getElementById('printSubmitBtn');
+  const btnText = btn.querySelector('.print-submit-text');
+  const btnLoad = btn.querySelector('.print-submit-loading');
+  btn.disabled  = true;
+  btnText.style.display = 'none';
+  btnLoad.style.display = '';
+
+  const body = {
+    fullName:     document.getElementById('pr-name').value.trim(),
+    addressLine1: document.getElementById('pr-addr1').value.trim(),
+    addressLine2: document.getElementById('pr-addr2').value.trim(),
+    city:         document.getElementById('pr-city').value,
+    pincode:      document.getElementById('pr-pincode').value.trim(),
+    phone:        document.getElementById('pr-phone').value.trim(),
+    cardId:       localStorage.getItem('dq-user-id') || '',
+  };
+
+  try {
+    const res  = await fetch(API_BASE + '/api/print-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+    document.getElementById('printForm').style.display = 'none';
+    document.getElementById('printSuccess').style.display = '';
+    updatePrintUI(data.claimed || 0, data.remaining <= 0);
+  } catch (err) {
+    btn.disabled = false;
+    btnText.style.display = '';
+    btnLoad.style.display = 'none';
+    alert(err.message || 'Could not submit. Try again.');
+  }
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -1932,6 +1998,260 @@ async function downloadCard() {
     <a href="aboutme.html" class="card-next-secondary">Behind DevQuest</a>
   </div>
 </div>
+
+<!-- ── Print My Card Section ── -->
+<div class="print-section" id="printSection" style="display:none;">
+  <div class="print-bg-dots"></div>
+
+  <div class="print-header">
+    <div class="print-stamp">LIMITED DROP</div>
+    <div class="print-emoji-row">🎴</div>
+    <h2 class="print-title">Want this in your wallet?</h2>
+    <p class="print-sub">We'll print your DevQuest card on actual PVC and ship it to you. <strong>Free.</strong> No catch.</p>
+
+    <div class="print-counter" id="printCounter">
+      <div class="print-counter-bar">
+        <div class="print-counter-fill" id="printCounterFill"></div>
+      </div>
+      <div class="print-counter-label">
+        <span class="print-claimed" id="printClaimed">—</span>
+        <span class="print-of"> / 25 claimed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL STATE -->
+  <div class="print-full-state" id="printFull" style="display:none;">
+    <div class="print-full-emoji">💀</div>
+    <div class="print-full-title">All 25 cards gone.</div>
+    <div class="print-full-sub">You just missed the first drop. Next one coming soon.</div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div class="print-success-state" id="printSuccess" style="display:none;">
+    <div class="print-success-emoji">🎉</div>
+    <div class="print-success-title">You're in!</div>
+    <div class="print-success-sub">We'll WhatsApp you to confirm delivery. Watch for a message from Sushrut.</div>
+  </div>
+
+  <!-- FORM STATE -->
+  <form class="print-form" id="printForm" onsubmit="submitPrintRequest(event)">
+    <div class="print-field">
+      <label class="print-label">Who do we address the package to?</label>
+      <input class="print-input" id="pr-name" type="text" placeholder="Your full name" maxlength="80" required>
+    </div>
+    <div class="print-field">
+      <label class="print-label">Drop your colony / street here</label>
+      <input class="print-input" id="pr-addr1" type="text" placeholder="House no., Street, Area" maxlength="120" required>
+    </div>
+    <div class="print-field">
+      <label class="print-label">Landmark? Flat no.? Help the delivery guy.</label>
+      <input class="print-input" id="pr-addr2" type="text" placeholder="Near XYZ, Apt 4B... (optional)" maxlength="120">
+    </div>
+    <div class="print-row">
+      <div class="print-field">
+        <label class="print-label">City — pick carefully</label>
+        <select class="print-input print-select" id="pr-city" required>
+          <option value="">Select your city</option>
+          <option value="HYDERABAD">Hyderabad 🌶️</option>
+          <option value="NAGPUR">Nagpur 🍊</option>
+        </select>
+      </div>
+      <div class="print-field">
+        <label class="print-label">Pincode (6 digits, not your ATM PIN)</label>
+        <input class="print-input" id="pr-pincode" type="text" placeholder="500001" maxlength="6" pattern="[0-9]{6}" required>
+      </div>
+    </div>
+    <div class="print-field">
+      <label class="print-label">Your digits — only for delivery updates, promise</label>
+      <input class="print-input" id="pr-phone" type="tel" placeholder="9876543210" maxlength="15" required>
+    </div>
+    <button class="print-submit" id="printSubmitBtn" type="submit">
+      <span class="print-submit-text">Print My Card 🎴</span>
+      <span class="print-submit-loading" style="display:none;">Sending...</span>
+    </button>
+    <p class="print-disclaimer">Only Hyderabad &amp; Nagpur for now. First 25 free, shipped within 7 days.</p>
+  </form>
+</div>
+
+<style>
+/* ── Print Section ── */
+.print-section {
+  max-width: 520px;
+  margin: 60px auto 40px;
+  padding: 40px 32px;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a0f2e 100%);
+  border: 1.5px solid rgba(200,255,0,0.2);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  animation: printReveal 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes printReveal {
+  from { opacity:0; transform: translateY(40px) scale(0.95); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* Animated dot grid background */
+.print-bg-dots {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(200,255,0,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  animation: dotsDrift 8s linear infinite;
+}
+@keyframes dotsDrift {
+  from { background-position: 0 0; }
+  to   { background-position: 24px 24px; }
+}
+
+.print-header { position: relative; z-index: 1; text-align: center; margin-bottom: 28px; }
+
+.print-stamp {
+  display: inline-block;
+  font: 700 0.56rem/1 'Inter', sans-serif;
+  letter-spacing: 0.28em;
+  color: #c8ff00;
+  border: 1.5px solid #c8ff00;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-bottom: 16px;
+  animation: stampPulse 2s ease-in-out infinite;
+}
+@keyframes stampPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.3); }
+  50%      { box-shadow: 0 0 0 6px rgba(200,255,0,0); }
+}
+
+.print-emoji-row { font-size: 2.4rem; margin-bottom: 12px; animation: cardFloat 3s ease-in-out infinite; }
+@keyframes cardFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-8px) rotate(2deg); }
+}
+
+.print-title {
+  font: 800 1.8rem/1.1 'Inter', sans-serif;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+.print-sub {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.print-sub strong { color: #c8ff00; }
+
+/* Counter bar */
+.print-counter { margin-bottom: 4px; }
+.print-counter-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.print-counter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c8ff00, #ff6600);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.print-counter-label {
+  text-align: center;
+  font: 600 0.68rem/1 'Inter', sans-serif;
+  letter-spacing: 0.1em;
+}
+.print-claimed { font-size: 1.1rem; color: #c8ff00; font-weight: 800; }
+.print-of { color: rgba(255,255,255,0.3); }
+
+/* Form */
+.print-form { position: relative; z-index: 1; }
+.print-field { margin-bottom: 16px; }
+.print-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.print-label {
+  display: block;
+  font: 600 0.62rem/1 'Inter', sans-serif;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.print-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font: 500 0.88rem/1 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+.print-input:focus { border-color: #c8ff00; background: rgba(200,255,0,0.04); }
+.print-input::placeholder { color: rgba(255,255,255,0.2); }
+.print-select { appearance: none; cursor: pointer; }
+.print-select option { background: #1a1a2e; color: #fff; }
+
+.print-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #c8ff00 0%, #a0d900 100%);
+  color: #0f0f0f;
+  border: none;
+  border-radius: 12px;
+  font: 800 0.9rem/1 'Inter', sans-serif;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(200,255,0,0.25);
+  position: relative; overflow: hidden;
+}
+.print-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(200,255,0,0.35); }
+.print-submit:active { transform: scale(0.98); }
+.print-submit::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+.print-disclaimer {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* Full / success states */
+.print-full-state, .print-success-state {
+  text-align: center; padding: 20px 0; position: relative; z-index: 1;
+}
+.print-full-emoji, .print-success-emoji { font-size: 3rem; margin-bottom: 12px; }
+.print-full-title, .print-success-title {
+  font: 800 1.4rem/1 'Inter', sans-serif; color: #fff; margin-bottom: 8px;
+}
+.print-full-sub, .print-success-sub {
+  font-size: 0.8rem; color: rgba(255,255,255,0.4); line-height: 1.6;
+}
+.print-success-emoji { animation: successBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes successBounce {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .print-section { padding: 28px 20px; margin: 40px 12px; }
+  .print-row { grid-template-columns: 1fr; }
+  .print-title { font-size: 1.4rem; }
+}
+</style>
 
 </body>
 </html>

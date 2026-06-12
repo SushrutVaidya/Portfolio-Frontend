@@ -2882,10 +2882,12 @@
   .gta-intro-bar { width: 240px; }
 
   .gta-hero { padding: 40px 24px; }
-  .gta-hero-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
-  .gta-hero-art { order: 0; }
+  .gta-hero-inner { grid-template-columns: 1fr; gap: 28px; text-align: center; }
+  .gta-hero-art { order: 0; display: flex; justify-content: center; }
   .gta-photo-hero { max-width: 220px; }
   .gta-hero-name { font-size: 3rem; }
+  .gta-hero-traits { justify-content: center; }
+  .gta-stats-layout { flex-direction: column; gap: 24px; padding: 24px 16px; }
   .gta-loading-bar { left: 24px; right: 24px; }
   .gta-tip { left: 24px; right: 24px; }
 

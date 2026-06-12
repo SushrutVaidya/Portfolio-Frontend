@@ -152,6 +152,8 @@ body {
   border-top: 0.5px solid rgba(255, 255, 255, 0.05);
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
   background: rgba(255, 255, 255, 0.01);
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 #dt-words {
@@ -161,6 +163,8 @@ body {
   transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   user-select: none;
   will-change: transform;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .dt-word {

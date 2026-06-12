@@ -634,13 +634,15 @@
       if (quoteEl) quoteEl.textContent = ch.quote;
 
       const clipUrl = getNextClip(idx);
-      if (clipUrl && clipLoaded[clipUrl] === true && videoEl) {
+      // Optimistically play unless we know the URL failed to load.
+      // Browsers allow muted autoplay; the play() promise rejects silently if blocked.
+      if (clipUrl && clipLoaded[clipUrl] !== false && videoEl) {
         videoEl.src = clipUrl;
         applyVolume();
         videoEl.classList.add('active');
         videoEl.play().catch(() => {});
-        // Pause jukebox while TV is playing
-        if (window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+        // Pause jukebox only if TV has audio on
+        if (volIdx > 0 && window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
           window._dqJukeboxAudio.pause();
           window._tvPausedJukebox = true;
         }
@@ -736,14 +738,19 @@
         if (e.isIntersecting && !warmedUp) {
           warmedUp = true;
           screen.classList.add('warming-up');
+          // Auto-start channel 1 muted so the TV looks alive on first arrival
+          // (browser autoplay policy allows muted playback without user gesture)
+          volIdx = 0;
+          applyVolume();
+          display(currentCh);
         }
         // Pause video when TV is off screen, resume when back
         // Also coordinate with jukebox
         if (videoEl) {
           if (e.isIntersecting) {
             videoEl.play().catch(() => {});
-            // Pause jukebox when TV section is in view
-            if (window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+            // Pause jukebox when TV section is in view (only if TV has audio on)
+            if (volIdx > 0 && window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
               window._dqJukeboxAudio.pause();
               window._tvPausedJukebox = true;
             }
@@ -1484,8 +1491,19 @@
   }
 
   function fixMediaUrls() {
-    if (!API_BASE) return; // production — relative URLs work via Nginx
-    const prefixes = ['/kitchen/', '/social/', '/gamer/', '/clips/'];
+    const prefixes = ['/kitchen/', '/social/', '/gamer/', '/clips/', '/otaku/', '/audio/'];
+
+    // Promote data-src → src for backend-served media (avoids 404s from browser
+    // fetching the path on the frontend host before JS runs).
+    document.querySelectorAll('img[data-src], video[data-src]').forEach(el => {
+      const path = el.getAttribute('data-src');
+      if (!path) return;
+      el.setAttribute('src', API_BASE ? API_BASE + path : path);
+      el.removeAttribute('data-src');
+    });
+
+    // Also fix any legacy src="/kitchen/..." absolute paths in dev (no-op in prod where API_BASE is '')
+    if (!API_BASE) return;
     document.querySelectorAll('img[src], video[src]').forEach(el => {
       const src = el.getAttribute('src');
       if (src && prefixes.some(p => src.startsWith(p))) {

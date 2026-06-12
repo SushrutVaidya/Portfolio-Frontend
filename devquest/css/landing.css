@@ -606,3 +606,10 @@ html, body {
   }
   .footer-center  { display: none; }
 }
+
+@media (max-width: 380px) {
+  .modal          { padding: 20px 14px 28px; }
+  .modal-title    { font-size: 0.96rem; }
+  .name-input     { padding: 11px 12px; font-size: 0.92rem; }
+  .modal-cancel, .modal-start { font-size: 0.88rem; min-height: 44px; }
+}

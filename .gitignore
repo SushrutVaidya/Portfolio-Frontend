@@ -2,3 +2,9 @@
 *.tar.gz
 node_modules/
 sprite-buffer/
+
+### Local test photos at repo root — not for git ###
+/photo.jpg
+/photo.jpeg
+/photo.png
+/devquest/test/photo.jpg

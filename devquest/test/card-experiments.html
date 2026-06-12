@@ -40,7 +40,8 @@
     max-width: 1700px;
     margin: 0 auto;
   }
-  @media (max-width: 1600px) { .grid { grid-template-columns: repeat(2, 360px); } }
+  @media (max-width: 1600px) { .grid { grid-template-columns: repeat(3, 360px); } }
+  @media (max-width: 1180px) { .grid { grid-template-columns: repeat(2, 360px); } }
   @media (max-width: 820px) {
     .grid { grid-template-columns: 360px; padding-bottom: 80px; }
     /* Compact jukebox on mobile — vinyl + play only, no track name */
@@ -48,12 +49,19 @@
     .am-jb-pill { min-width: unset !important; padding: 8px 12px !important; gap: 8px !important; }
     .am-jb-track-name { display: none !important; }
     .am-jb-vinyl { width: 24px !important; height: 24px !important; }
+    /* When sticky CTA is on, lift jukebox above it so they don't overlap */
+    body:has(.sticky-cta.visible:not(.hidden)) .am-jukebox { bottom: 96px !important; }
   }
   @media (max-width: 420px) {
     body { padding: 32px 12px; }
-    .grid { grid-template-columns: minmax(0, 360px); width: 100%; }
-    .badge { width: 100%; min-width: 0; }
+    .grid { grid-template-columns: minmax(280px, 360px); width: 100%; }
+    .badge { width: 100%; min-width: 280px; }
     h1 { font-size: 1.4rem; }
+  }
+  @media (max-width: 360px) {
+    body { padding: 28px 8px; }
+    .grid { grid-template-columns: minmax(260px, 100%); gap: 32px; }
+    .badge { min-width: 260px; min-height: 540px; border-radius: 18px; }
   }
   .card-col {
     display: flex;
@@ -77,7 +85,14 @@
     overflow: hidden;
     position: relative;
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Paint isolation — prevents one card's repaint from invalidating siblings */
+    contain: layout style paint;
+    /* Force its own compositor layer, avoid blocking main thread */
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
   }
+  /* Promote to GPU only while hovered, not always (perma will-change is memory-heavy) */
+  .badge:hover { will-change: transform; }
   .photo-img {
     width: 100%;
     height: 100%;
@@ -111,7 +126,7 @@
     100% { background-position: 0% 50%; }
   }
   .badge-holo:hover {
-    transform: translateY(-8px);
+    transform: translate3d(0, -8px, 0);
     box-shadow: 0 32px 80px rgba(0,0,0,0.2), 0 0 40px rgba(128,0,255,0.08), 0 0 80px rgba(0,200,255,0.04);
   }
   .badge-holo .holo-photo {
@@ -148,9 +163,15 @@
   .badge-holo .holo-stars { display: flex; gap: 5px; font-size: 1rem; color: #d4a017; }
   .badge-holo .holo-stars .off { opacity: 0.15; }
   .badge-holo .holo-xp { width: 100%; }
-  .badge-holo .holo-xp-label { font-size: 0.6rem; font-weight: 600; color: #999; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; text-align: center; }
-  .badge-holo .holo-xp-bar { width: 100%; height: 6px; background: rgba(128,0,255,0.06); border-radius: 3px; overflow: hidden; }
-  .badge-holo .holo-xp-fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #00c8ff); border-radius: 3px; }
+  .badge-holo .holo-ovr-row { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 12px; background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(0,200,255,0.06)); border-radius: 8px; border: 1px solid rgba(124,58,237,0.15); }
+  .badge-holo .holo-ovr-label { font-size: 0.6rem; font-weight: 700; color: #888; letter-spacing: 1.5px; }
+  .badge-holo .holo-ovr-val { font-size: 1.4rem; font-weight: 900; background: linear-gradient(90deg, #7c3aed, #00c8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+  .badge-holo .holo-ovr-tier { font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; color: #fff; letter-spacing: 0.5px; }
+  .badge-holo .holo-ovr-tier-S { background: linear-gradient(135deg, #ffd700, #ff8c00); box-shadow: 0 0 12px rgba(255,140,0,0.5); }
+  .badge-holo .holo-ovr-tier-A { background: linear-gradient(135deg, #7c3aed, #00c8ff); }
+  .badge-holo .holo-ovr-tier-B { background: #4a90e2; }
+  .badge-holo .holo-ovr-tier-C { background: #888; }
+  .badge-holo .holo-ovr-tier-D { background: #555; }
   .badge-holo .holo-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .badge-holo .holo-chip {
     font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 8px;
@@ -173,7 +194,7 @@
     height: 3px; background: linear-gradient(90deg, #ff4500, #ff6a00, #ff4500); z-index: 2;
   }
   .badge-carbon:hover {
-    transform: translateY(-6px);
+    transform: translate3d(0, -6px, 0);
     box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,69,0,0.12);
   }
   .badge-carbon .cb-photo-col {
@@ -202,11 +223,15 @@
   .badge-carbon .cb-stat-fill { height: 100%; background: linear-gradient(90deg, #ff4500, #ff6a00); border-radius: 2px; }
   .badge-carbon .cb-stat-val { font-size: 0.7rem; font-weight: 800; color: #ff6a00; width: 24px; text-align: right; }
   .badge-carbon .cb-xp { margin-top: auto; }
-  .badge-carbon .cb-xp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .badge-carbon .cb-xp-lbl { font-size: 0.6rem; font-weight: 800; color: #ff6a00; letter-spacing: 1px; }
-  .badge-carbon .cb-xp-lvl { font-size: 0.6rem; font-weight: 700; color: #555; }
-  .badge-carbon .cb-xp-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
-  .badge-carbon .cb-xp-fill { height: 100%; background: linear-gradient(90deg, #ff4500, #ff8c00); border-radius: 2px; }
+  .badge-carbon .cb-ovr-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,106,0,0.08); border-radius: 6px; border: 1px solid rgba(255,140,0,0.3); }
+  .badge-carbon .cb-ovr-lbl { font-size: 0.6rem; font-weight: 800; color: #ff6a00; letter-spacing: 2px; }
+  .badge-carbon .cb-ovr-val { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -1px; }
+  .badge-carbon .cb-ovr-tier { font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 3px; color: #0a0a0a; letter-spacing: 0.5px; }
+  .badge-carbon .cb-ovr-tier-S { background: linear-gradient(135deg, #ffd700, #ff4500); color: #fff; box-shadow: 0 0 12px rgba(255,69,0,0.6); }
+  .badge-carbon .cb-ovr-tier-A { background: linear-gradient(135deg, #ff8c00, #ff4500); color: #fff; }
+  .badge-carbon .cb-ovr-tier-B { background: #ff8c00; }
+  .badge-carbon .cb-ovr-tier-C { background: #888; color: #fff; }
+  .badge-carbon .cb-ovr-tier-D { background: #555; color: #fff; }
   .badge-carbon .cb-traits { display: flex; flex-wrap: wrap; gap: 5px; }
   .badge-carbon .cb-chip {
     font-size: 0.65rem; font-weight: 700; padding: 4px 12px;
@@ -229,14 +254,17 @@
   }
   .badge-glass {
     background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    /* Reduced blur radius (24px → 12px) — backdrop-filter cost scales with radius squared */
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
     display: flex; flex-direction: column; align-items: center;
     padding: 0 0 24px;
   }
+  /* Full blur only when zoomed/focused — not in the grid */
+  .zoom .badge-glass { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
   .badge-glass:hover {
-    transform: translateY(-8px);
+    transform: translate3d(0, -8px, 0);
     box-shadow: 0 32px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 50px rgba(128,0,255,0.06);
     border-color: rgba(255,255,255,0.18);
   }
@@ -300,7 +328,7 @@
     opacity: 0; transition: opacity 0.4s ease;
   }
   .badge-metal:hover {
-    transform: translateY(-6px);
+    transform: translate3d(0, -6px, 0);
     box-shadow: 0 28px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.4);
   }
   .badge-metal:hover::after { opacity: 1; }
@@ -358,7 +386,7 @@
   }
   .badge-neon:hover {
     box-shadow: 0 28px 80px rgba(0,0,0,0.7), 0 0 50px rgba(0,255,255,0.12), 0 0 50px rgba(255,0,255,0.12);
-    transform: translateY(-6px);
+    transform: translate3d(0, -6px, 0);
   }
   .badge-neon .nn-photo-wrap {
     position: relative; width: 100%; height: 200px;
@@ -430,7 +458,7 @@
   .badge-minimal:hover {
     box-shadow: 0 12px 40px rgba(0,0,0,0.1);
     border-color: #ccc;
-    transform: translateY(-4px);
+    transform: translate3d(0, -4px, 0);
   }
   .badge-minimal .mn-photo {
     width: 100%; height: 220px;
@@ -461,10 +489,15 @@
   .badge-minimal .mn-wanted-dot.on { background: #333; }
   .badge-minimal .mn-traits { font-size: 0.7rem; color: #888; line-height: 1.8; }
   .badge-minimal .mn-xp { margin-top: 8px; }
-  .badge-minimal .mn-xp-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
-  .badge-minimal .mn-xp-lbl { font-size: 0.6rem; font-weight: 500; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
-  .badge-minimal .mn-xp-bar { width: 100%; height: 3px; background: #f0f0f0; border-radius: 1px; overflow: hidden; }
-  .badge-minimal .mn-xp-fill { height: 100%; background: #333; border-radius: 1px; }
+  .badge-minimal .mn-ovr-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border: 1px solid #e0e0e0; border-radius: 4px; }
+  .badge-minimal .mn-ovr-lbl { font-size: 0.55rem; font-weight: 600; color: #999; letter-spacing: 1.5px; text-transform: uppercase; }
+  .badge-minimal .mn-ovr-val { font-size: 1.3rem; font-weight: 900; color: #1a1a1a; letter-spacing: -1px; }
+  .badge-minimal .mn-ovr-tier { font-size: 0.65rem; font-weight: 800; padding: 3px 7px; border-radius: 3px; letter-spacing: 0.5px; }
+  .badge-minimal .mn-ovr-tier-S { background: #1a1a1a; color: #fff; }
+  .badge-minimal .mn-ovr-tier-A { background: #333; color: #fff; }
+  .badge-minimal .mn-ovr-tier-B { background: #e0e0e0; color: #333; }
+  .badge-minimal .mn-ovr-tier-C { background: #f0f0f0; color: #666; }
+  .badge-minimal .mn-ovr-tier-D { background: #f5f5f5; color: #999; }
   .badge-minimal .mn-id { font: 400 0.6rem/1 monospace; letter-spacing: 2px; color: #ddd; margin-top: auto; }
 
   /* ═══════════════════════════
@@ -489,7 +522,7 @@
     pointer-events: none; z-index: 3; border-radius: 22px;
   }
   .badge-vhs:hover {
-    transform: translateY(-6px) skewX(-0.5deg);
+    transform: translate3d(0, -6px, 0) skewX(-0.5deg);
     box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,100,200,0.08), 0 0 30px rgba(100,200,255,0.06);
   }
   .badge-vhs .vhs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -530,7 +563,12 @@
   .badge-vhs .vhs-wanted-stars .off { opacity: 0.12; }
   .badge-vhs .vhs-xp { margin-bottom: 6px; font-family: monospace; }
   .badge-vhs .vhs-xp-text { font-size: 0.7rem; color: #00c8ff; }
-  .badge-vhs .vhs-xp-bar { letter-spacing: -1px; }
+  .badge-vhs .vhs-ovr-val { color: #ff6eb4; font-weight: 700; }
+  .badge-vhs .vhs-ovr-tier-S { color: #ffd700; font-weight: 900; text-shadow: 0 0 6px rgba(255,215,0,0.6); }
+  .badge-vhs .vhs-ovr-tier-A { color: #ff6eb4; font-weight: 900; }
+  .badge-vhs .vhs-ovr-tier-B { color: #00c8ff; font-weight: 900; }
+  .badge-vhs .vhs-ovr-tier-C { color: #888; font-weight: 700; }
+  .badge-vhs .vhs-ovr-tier-D { color: #555; font-weight: 700; }
   .badge-vhs .vhs-traits { font-size: 0.6rem; color: rgba(255,110,180,0.35); margin-bottom: 8px; }
   .badge-vhs .vhs-traits span { color: #ff6eb4; }
   .badge-vhs .vhs-bottom { margin-top: auto; text-align: center; font-size: 0.65rem; font-weight: 700; color: rgba(100,200,255,0.25); letter-spacing: 4px; }
@@ -553,7 +591,7 @@
     height: 3px; background: linear-gradient(90deg, transparent, #ff8c00, #ffb347, #ff8c00, transparent); z-index: 2;
   }
   .badge-gta:hover {
-    transform: translateY(-6px);
+    transform: translate3d(0, -6px, 0);
     box-shadow: 0 28px 80px rgba(0,0,0,0.6), 0 0 30px rgba(255,140,0,0.08);
   }
   .badge-gta .gta-photo-wrap {
@@ -581,11 +619,15 @@
   .badge-gta .gta-stat-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg, #ff8c00, #ffb347); border-radius: 3px; }
   .badge-gta .gta-stat-lbl { font-size: 0.65rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-gta .gta-xp { width: 100%; }
-  .badge-gta .gta-xp-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
-  .badge-gta .gta-xp-lbl { font-size: 0.6rem; font-weight: 800; color: #ff8c00; letter-spacing: 1px; text-transform: uppercase; }
-  .badge-gta .gta-xp-lvl { font-size: 0.6rem; font-weight: 700; color: #555; }
-  .badge-gta .gta-xp-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.04); border-radius: 2px; overflow: hidden; }
-  .badge-gta .gta-xp-fill { height: 100%; background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffb347); border-radius: 2px; }
+  .badge-gta .gta-ovr-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,140,0,0.08); border-radius: 4px; border: 1px solid rgba(255,140,0,0.3); }
+  .badge-gta .gta-ovr-lbl { font-size: 0.6rem; font-weight: 800; color: #ff8c00; letter-spacing: 1.5px; text-transform: uppercase; }
+  .badge-gta .gta-ovr-val { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -1px; }
+  .badge-gta .gta-ovr-tier { font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.5px; }
+  .badge-gta .gta-ovr-tier-S { background: linear-gradient(135deg, #ffd700, #ff6a00); color: #fff; box-shadow: 0 0 12px rgba(255,140,0,0.6); }
+  .badge-gta .gta-ovr-tier-A { background: linear-gradient(135deg, #ff8c00, #ff6a00); color: #fff; }
+  .badge-gta .gta-ovr-tier-B { background: #ff8c00; color: #1a1a1a; }
+  .badge-gta .gta-ovr-tier-C { background: #888; color: #fff; }
+  .badge-gta .gta-ovr-tier-D { background: #555; color: #fff; }
   .badge-gta .gta-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .badge-gta .gta-chip {
     font-size: 0.65rem; font-weight: 800; padding: 5px 12px;
@@ -616,7 +658,7 @@
     pointer-events: none; z-index: 1; border-radius: 22px;
   }
   .badge-royal:hover {
-    transform: translateY(-8px);
+    transform: translate3d(0, -8px, 0);
     box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 0 40px rgba(200,170,100,0.06);
   }
   .badge-royal .royal-photo {
@@ -653,9 +695,15 @@
   .badge-royal .royal-stars { display: flex; gap: 5px; font-size: 1rem; color: #c8a84e; }
   .badge-royal .royal-stars .off { opacity: 0.2; }
   .badge-royal .royal-xp { width: 100%; }
-  .badge-royal .royal-xp-label { font-size: 0.6rem; font-weight: 600; color: #a09488; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; text-align: center; }
-  .badge-royal .royal-xp-bar { width: 100%; height: 5px; background: rgba(200,170,100,0.1); border-radius: 3px; overflow: hidden; }
-  .badge-royal .royal-xp-fill { height: 100%; background: linear-gradient(90deg, #c8a84e, #dcc088); border-radius: 3px; }
+  .badge-royal .royal-ovr-row { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 12px; border: 1px solid rgba(200,170,100,0.3); border-radius: 4px; background: rgba(200,170,100,0.04); }
+  .badge-royal .royal-ovr-lbl { font-size: 0.6rem; font-weight: 600; color: #a09488; letter-spacing: 2px; text-transform: uppercase; }
+  .badge-royal .royal-ovr-val { font-size: 1.4rem; font-weight: 900; color: #c8a84e; letter-spacing: -1px; }
+  .badge-royal .royal-ovr-tier { font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.5px; }
+  .badge-royal .royal-ovr-tier-S { background: linear-gradient(135deg, #ffd700, #c8a84e); color: #1a1a1a; box-shadow: 0 0 10px rgba(200,168,78,0.5); }
+  .badge-royal .royal-ovr-tier-A { background: #c8a84e; color: #1a1a1a; }
+  .badge-royal .royal-ovr-tier-B { background: #dcc088; color: #1a1a1a; }
+  .badge-royal .royal-ovr-tier-C { background: #ada094; color: #1a1a1a; }
+  .badge-royal .royal-ovr-tier-D { background: #888; color: #fff; }
   .badge-royal .royal-traits { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .badge-royal .royal-chip {
     font-size: 0.65rem; font-weight: 600; padding: 5px 14px; border-radius: 8px;
@@ -949,15 +997,31 @@
     opacity: 0.92;
   }
   .card-next-secondary {
-    color: rgba(245,245,247,0.5);
-    padding: 10px 24px;
-    font: 500 0.8rem/1 'Inter', sans-serif;
+    display: inline-flex; align-items: center; gap: 8px;
+    color: #f5f5f7;
+    padding: 12px 22px;
+    font: 600 0.85rem/1 'Inter', sans-serif;
     text-decoration: none;
-    transition: color 0.2s;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .card-next-secondary::before {
+    content: '🔗';
+    font-size: 0.95rem;
+    line-height: 1;
   }
   .card-next-secondary:hover {
-    color: #f5f5f7;
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(200,255,0,0.55);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(200,255,0,0.12);
   }
+  .card-next-secondary:active { transform: translateY(0); }
 
   /* ── Earned-stats banners ── */
   .path-banner {
@@ -1173,7 +1237,9 @@
 
 <script>
 // ── API Config ──
-const API_BASE = 'http://localhost:8081';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8081'
+  : '';
 const DEFAULT_PHOTO = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
     <rect fill="#2a2a3e" width="200" height="200"/>
     <circle cx="100" cy="76" r="40" fill="#4a4a6a"/>
@@ -1253,13 +1319,33 @@ function barcodeHTML(cls) {
   return `<div class="${cls}">${BARCODE_WIDTHS.map(w => `<span style="width:${w}px"></span>`).join('')}</div>`;
 }
 function cardTag(id) { return `DEVQUEST #${id}`; }
+function esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function ovrRating() {
+  const total = DATA.stats.reduce((s, st) => s + (st.val || 0), 0);
+  return Math.round(total / DATA.stats.length);
+}
+function ovrTier(ovr) {
+  if (ovr >= 90) return 'S';
+  if (ovr >= 80) return 'A';
+  if (ovr >= 70) return 'B';
+  if (ovr >= 60) return 'C';
+  return 'D';
+}
 function stars(onClass, offClass) {
   return Array.from({length: 5}, (_, i) =>
     `<span class="${i < DATA.wanted ? (onClass || '') : (offClass || 'off')}">★</span>`
   ).join('');
 }
 function photoImg() {
-  return `<img class="photo-img" src="${DATA.photo}" alt="${DATA.name}">`;
+  return `<img class="photo-img" src="${esc(DATA.photo)}" alt="${esc(DATA.name)}">`;
 }
 
 // ── 1. Holographic — Premium Badge ──
@@ -1267,9 +1353,9 @@ function buildHolo(zoomed) {
   return `<div class="badge badge-holo">
     <div class="holo-photo">${photoImg()}</div>
     <div class="holo-content">
-      <div class="holo-name">${DATA.name}</div>
-      <div class="holo-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="holo-bio">${DATA.bio}</div><div class="holo-motto">${DATA.motto}</div>` : ''}
+      <div class="holo-name">${esc(DATA.name)}</div>
+      <div class="holo-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="holo-bio">${esc(DATA.bio)}</div><div class="holo-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="holo-divider"></div>
       <div class="holo-stats">
         ${DATA.stats.map(s => `<div class="holo-stat"><span class="holo-stat-val">${s.val}</span><span class="holo-stat-lbl">${s.lbl}</span></div>`).join('')}
@@ -1278,11 +1364,10 @@ function buildHolo(zoomed) {
         <div class="holo-stars">${stars('', 'off')}</div>
       </div>
       <div class="holo-xp">
-        <div class="holo-xp-label">LVL ${DATA.level} — ${DATA.xpPercent}% XP</div>
-        <div class="holo-xp-bar"><div class="holo-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+        <div class="holo-ovr-row"><span class="holo-ovr-label">OVR</span><span class="holo-ovr-val">${ovrRating()}</span><span class="holo-ovr-tier holo-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span></div>
       </div>
       <div class="holo-traits">
-        ${DATA.traits.map(t => `<span class="holo-chip">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="holo-chip">${esc(t)}</span>`).join('')}
       </div>
       <div class="holo-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1294,18 +1379,17 @@ function buildCarbon(zoomed) {
   return `<div class="badge badge-carbon">
     <div class="cb-photo-col">${photoImg()}</div>
     <div class="cb-info-col">
-      <div class="cb-name">${DATA.name}</div>
-      <div class="cb-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="cb-bio">${DATA.bio}</div><div class="cb-motto">${DATA.motto}</div>` : ''}
+      <div class="cb-name">${esc(DATA.name)}</div>
+      <div class="cb-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="cb-bio">${esc(DATA.bio)}</div><div class="cb-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="cb-stats">
         ${DATA.stats.map(s => `<div class="cb-stat-row"><span class="cb-stat-lbl">${s.lbl}</span><div class="cb-stat-bar"><div class="cb-stat-fill" style="width:${s.val}%"></div></div><span class="cb-stat-val">${s.val}</span></div>`).join('')}
       </div>
       <div class="cb-traits">
-        ${DATA.traits.map(t => `<span class="cb-chip">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="cb-chip">${esc(t)}</span>`).join('')}
       </div>
       <div class="cb-xp">
-        <div class="cb-xp-head"><span class="cb-xp-lbl">XP</span><span class="cb-xp-lvl">LVL ${DATA.level}</span></div>
-        <div class="cb-xp-bar"><div class="cb-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+        <div class="cb-ovr-row"><span class="cb-ovr-lbl">OVR</span><span class="cb-ovr-val">${ovrRating()}</span><span class="cb-ovr-tier cb-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span></div>
       </div>
       <div class="cb-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1319,9 +1403,9 @@ function buildGlass(zoomed) {
       <div class="gl-photo">${photoImg()}</div>
     </div>
     <div class="gl-content">
-      <div class="gl-name">${DATA.name}</div>
-      <div class="gl-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="gl-bio">${DATA.bio}</div><div class="gl-motto">${DATA.motto}</div>` : ''}
+      <div class="gl-name">${esc(DATA.name)}</div>
+      <div class="gl-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="gl-bio">${esc(DATA.bio)}</div><div class="gl-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="gl-stats">
         ${DATA.stats.map(s => `<span class="gl-stat">${s.val}</span>`).join('')}
       </div>
@@ -1329,7 +1413,7 @@ function buildGlass(zoomed) {
         <div class="gl-stars">${stars('', 'off')}</div>
       </div>
       <div class="gl-traits">
-        ${DATA.traits.map(t => `<span class="gl-pill">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="gl-pill">${esc(t)}</span>`).join('')}
       </div>
       <div class="gl-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1343,9 +1427,9 @@ function buildMetal(zoomed) {
     <div class="mt-body">
       <div class="mt-photo">${photoImg()}</div>
       <div class="mt-info">
-        <div class="mt-name">${DATA.name}</div>
-        <div class="mt-class">${DATA.classRole}</div>
-        ${zoomed ? `<div class="mt-bio">${DATA.bio}</div>` : ''}
+        <div class="mt-name">${esc(DATA.name)}</div>
+        <div class="mt-class">${esc(DATA.classRole)}</div>
+        ${zoomed ? `<div class="mt-bio">${esc(DATA.bio)}</div>` : ''}
       </div>
     </div>
     <div class="mt-hr"></div>
@@ -1357,10 +1441,10 @@ function buildMetal(zoomed) {
       <div class="mt-wanted-stars">${stars('', 'off')}</div>
     </div>
     <div class="mt-traits">
-      ${DATA.traits.map(t => `<div class="mt-trait">${t}</div>`).join('')}
+      ${DATA.traits.map(t => `<div class="mt-trait">${esc(t)}</div>`).join('')}
     </div>
     <div class="mt-bottom">
-      <div class="mt-serial">SN: DQ-${DATA.cardId}</div>
+      <div class="mt-serial">SN: DQ-${esc(DATA.cardId)}</div>
       ${barcodeHTML('mt-bars')}
     </div>
   </div>`;
@@ -1375,9 +1459,9 @@ function buildNeon(zoomed) {
       <div class="nn-photo">${photoImg()}</div>
     </div>
     <div class="nn-content">
-      <div class="nn-name">${DATA.name}</div>
-      <div class="nn-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="nn-bio">${DATA.bio}</div><div class="nn-motto">${DATA.motto}</div>` : ''}
+      <div class="nn-name">${esc(DATA.name)}</div>
+      <div class="nn-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="nn-bio">${esc(DATA.bio)}</div><div class="nn-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="nn-stats">
         ${DATA.stats.map(s => `<div class="nn-stat-row"><span class="nn-stat-lbl">${s.lbl}</span><div class="nn-stat-bar"><div class="nn-stat-fill" style="width:${s.val}%"></div></div><span class="nn-stat-val">${s.val}</span></div>`).join('')}
       </div>
@@ -1385,7 +1469,7 @@ function buildNeon(zoomed) {
         <div class="nn-wanted-stars">${stars('', 'off')}</div>
       </div>
       <div class="nn-traits">
-        ${DATA.traits.map(t => `<span class="nn-pill">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="nn-pill">${esc(t)}</span>`).join('')}
       </div>
       <div class="nn-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1397,9 +1481,9 @@ function buildMinimal(zoomed) {
   return `<div class="badge badge-minimal">
     <div class="mn-photo">${photoImg()}</div>
     <div class="mn-content">
-      <div class="mn-name">${DATA.name}</div>
-      <div class="mn-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="mn-bio">${DATA.bio}</div><div class="mn-motto">${DATA.motto}</div>` : ''}
+      <div class="mn-name">${esc(DATA.name)}</div>
+      <div class="mn-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="mn-bio">${esc(DATA.bio)}</div><div class="mn-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="mn-divider"></div>
       <div class="mn-stats">
         ${DATA.stats.map(s => `<div class="mn-stat"><span class="mn-stat-val">${s.val}</span><span class="mn-stat-lbl">${s.lbl}</span></div>`).join('')}
@@ -1409,8 +1493,7 @@ function buildMinimal(zoomed) {
       </div>
       <div class="mn-traits">${DATA.traits.join(', ')}</div>
       <div class="mn-xp">
-        <div class="mn-xp-head"><span class="mn-xp-lbl">LVL ${DATA.level}</span><span class="mn-xp-lbl">${DATA.xpPercent}%</span></div>
-        <div class="mn-xp-bar"><div class="mn-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+        <div class="mn-ovr-row"><span class="mn-ovr-lbl">OVERALL</span><span class="mn-ovr-val">${ovrRating()}</span><span class="mn-ovr-tier mn-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span></div>
       </div>
       <div class="mn-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1429,9 +1512,9 @@ function buildVHS(zoomed) {
       <div class="vhs-time">00:42:00</div>
     </div>
     <div class="vhs-screen">${photoImg()}</div>
-    <div class="vhs-name">${DATA.name}</div>
-    <div class="vhs-class">${DATA.classRole}</div>
-    ${zoomed ? `<div class="vhs-bio">${DATA.bio}</div><div class="vhs-motto">${DATA.motto}</div>` : ''}
+    <div class="vhs-name">${esc(DATA.name)}</div>
+    <div class="vhs-class">${esc(DATA.classRole)}</div>
+    ${zoomed ? `<div class="vhs-bio">${esc(DATA.bio)}</div><div class="vhs-motto">${esc(DATA.motto)}</div>` : ''}
     <div class="vhs-stats">
       ${DATA.stats.map(s => `<div class="vhs-stat"><span class="vhs-stat-lbl">${s.lbl}</span><span class="vhs-stat-bar">▕${vhsBar(s.val)}</span><span class="vhs-stat-val">${s.val}</span></div>`).join('')}
     </div>
@@ -1440,7 +1523,7 @@ function buildVHS(zoomed) {
       <div class="vhs-wanted-stars">${stars('', 'off')}</div>
     </div>
     <div class="vhs-xp">
-      <span class="vhs-xp-text">[<span class="vhs-xp-bar">${'█'.repeat(7)}${'░'.repeat(3)}</span>] LVL ${DATA.level}</span>
+      <span class="vhs-xp-text">[ OVR <span class="vhs-ovr-val">${ovrRating()}</span> · TIER <span class="vhs-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span> ]</span>
     </div>
     <div class="vhs-traits">CATEGORIES: <span>${DATA.traits.join(' / ')}</span></div>
     <div class="vhs-bottom">◀◀ REWIND — ${cardTag(DATA.cardId)}</div>
@@ -1452,9 +1535,9 @@ function buildGTA(zoomed) {
   return `<div class="badge badge-gta">
     <div class="gta-photo-wrap">${photoImg()}</div>
     <div class="gta-body">
-      <div class="gta-name">${DATA.name}</div>
-      <div class="gta-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="gta-bio">"${DATA.bio}"</div><div class="gta-motto">${DATA.motto}</div>` : ''}
+      <div class="gta-name">${esc(DATA.name)}</div>
+      <div class="gta-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="gta-bio">"${esc(DATA.bio)}"</div><div class="gta-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="gta-wanted">
         <div class="gta-wanted-label">Wanted Level</div>
         <div class="gta-wanted-stars">${stars('', 'off')}</div>
@@ -1463,11 +1546,10 @@ function buildGTA(zoomed) {
         ${DATA.stats.map(s => `<div class="gta-stat-col"><div class="gta-stat-bar-wrap"><div class="gta-stat-fill" style="height:${s.val}%"></div></div><span class="gta-stat-lbl">${s.lbl}</span></div>`).join('')}
       </div>
       <div class="gta-xp">
-        <div class="gta-xp-head"><span class="gta-xp-lbl">Mission Progress</span><span class="gta-xp-lvl">LVL ${DATA.level}</span></div>
-        <div class="gta-xp-bar"><div class="gta-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+        <div class="gta-ovr-row"><span class="gta-ovr-lbl">Overall Rating</span><span class="gta-ovr-val">${ovrRating()}</span><span class="gta-ovr-tier gta-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span></div>
       </div>
       <div class="gta-traits">
-        ${DATA.traits.map(t => `<span class="gta-chip">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="gta-chip">${esc(t)}</span>`).join('')}
       </div>
       <div class="gta-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1479,9 +1561,9 @@ function buildRoyal(zoomed) {
   return `<div class="badge badge-royal">
     <div class="royal-photo">${photoImg()}</div>
     <div class="royal-content">
-      <div class="royal-name">${DATA.name}</div>
-      <div class="royal-class">${DATA.classRole}</div>
-      ${zoomed ? `<div class="royal-bio">${DATA.bio}</div><div class="royal-motto">${DATA.motto}</div>` : ''}
+      <div class="royal-name">${esc(DATA.name)}</div>
+      <div class="royal-class">${esc(DATA.classRole)}</div>
+      ${zoomed ? `<div class="royal-bio">${esc(DATA.bio)}</div><div class="royal-motto">${esc(DATA.motto)}</div>` : ''}
       <div class="royal-divider"></div>
       <div class="royal-stats">
         ${DATA.stats.map(s => `<div class="royal-stat"><span class="royal-stat-val">${s.val}</span><span class="royal-stat-lbl">${s.lbl}</span></div>`).join('')}
@@ -1490,11 +1572,10 @@ function buildRoyal(zoomed) {
         <div class="royal-stars">${stars('', 'off')}</div>
       </div>
       <div class="royal-xp">
-        <div class="royal-xp-label">LVL ${DATA.level} — ${DATA.xpPercent}% XP</div>
-        <div class="royal-xp-bar"><div class="royal-xp-fill" style="width:${DATA.xpPercent}%"></div></div>
+        <div class="royal-ovr-row"><span class="royal-ovr-lbl">OVR</span><span class="royal-ovr-val">${ovrRating()}</span><span class="royal-ovr-tier royal-ovr-tier-${ovrTier(ovrRating())}">${ovrTier(ovrRating())}</span></div>
       </div>
       <div class="royal-traits">
-        ${DATA.traits.map(t => `<span class="royal-chip">${t}</span>`).join('')}
+        ${DATA.traits.map(t => `<span class="royal-chip">${esc(t)}</span>`).join('')}
       </div>
       <div class="royal-id">${cardTag(DATA.cardId)}</div>
     </div>
@@ -1526,6 +1607,14 @@ function renderGrid() {
     col.addEventListener('click', () => openZoom(style, i));
     grid.appendChild(col);
   });
+}
+
+// rAF-throttled re-render — collapses bursts of slider ticks into one paint per frame
+let _gridRenderQueued = false;
+function renderGridThrottled() {
+  if (_gridRenderQueued) return;
+  _gridRenderQueued = true;
+  requestAnimationFrame(() => { _gridRenderQueued = false; renderGrid(); });
 }
 
 // ── Zoom overlay ──
@@ -1616,16 +1705,54 @@ function bindEditorInputs() {
   // Photo file upload
   const photoFile = document.getElementById('ed-photoFile');
   if (photoFile) {
-    photoFile.addEventListener('change', function() {
+    photoFile.addEventListener('change', async function() {
       const file = this.files[0];
       if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { showSaveStatus('Image too large — max 10MB', 'error'); this.value = ''; return; }
+
+      // Local preview while upload runs
       const reader = new FileReader();
-      reader.onload = function(e) {
-        DATA.photo = e.target.result;
-        document.getElementById('ed-photoUrl').value = e.target.result;
-        renderGrid();
-      };
+      reader.onload = function(e) { DATA.photo = e.target.result; renderGrid(); };
       reader.readAsDataURL(file);
+
+      let userId = localStorage.getItem('dq-user-id');
+      if (!userId) {
+        const first = prompt('Enter your first name first — we need to register you before uploading a photo:');
+        if (!first || first.trim().length < 2) { showSaveStatus('Need a name first', 'error'); return; }
+        const last = prompt('Enter your last name:');
+        if (!last || last.trim().length < 2) { showSaveStatus('Need a last name first', 'error'); return; }
+        try {
+          const reg = await fetch(API_BASE + '/api/user', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName: first.trim(), lastName: last.trim() })
+          });
+          const data = await reg.json();
+          userId = data.id;
+          localStorage.setItem('dq-user-id', userId);
+          localStorage.setItem('dq-player-first', first.trim());
+          localStorage.setItem('dq-player-last', last.trim());
+          localStorage.setItem('dq-player-name', first.trim());
+        } catch { showSaveStatus('Could not register — check your connection', 'error'); return; }
+      }
+
+      try {
+        showSaveStatus('Uploading photo...', 'success');
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch(API_BASE + '/api/user/' + userId + '/photo', { method: 'POST', body: form });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || 'Upload failed');
+        }
+        const updated = await res.json();
+        const fullUrl = updated.photoUrl.startsWith('http') ? updated.photoUrl : API_BASE + updated.photoUrl;
+        DATA.photo = fullUrl;
+        document.getElementById('ed-photoUrl').value = fullUrl;
+        renderGrid();
+        showSaveStatus('Photo uploaded', 'success');
+      } catch (err) {
+        showSaveStatus(err.message || 'Photo upload failed', 'error');
+      }
     });
   }
 
@@ -1658,7 +1785,7 @@ function syncEditorToData() {
     DATA.stats[i].val = parseInt(document.getElementById('ed-' + key).value) || 0;
   });
 
-  renderGrid();
+  renderGridThrottled();
 }
 
 // ── Save flow ──
@@ -1743,9 +1870,8 @@ function showSaveStatus(msg, type) {
   if (type === 'success') {
     const next = document.getElementById('cardNext');
     if (next) next.style.display = '';
-    // Show print section after save
-    const ps = document.getElementById('printSection');
-    if (ps) { ps.style.display = ''; loadPrintCount(); }
+    // Pulse the sticky CTA — user just succeeded, this is the high-intent moment
+    pulseSticky();
   }
 }
 
@@ -1841,6 +1967,8 @@ async function init() {
   applyEarnedStats();
   bindEditorInputs();
   renderGrid();
+  initStickyCTA();
+  loadPrintCount();
 }
 
 function shareCard() {
@@ -1862,16 +1990,70 @@ init();
 function updatePrintUI(claimed, full) {
   const fill    = document.getElementById('printCounterFill');
   const claimed_ = document.getElementById('printClaimed');
+  const remaining = document.getElementById('printRemaining');
+  const stickyRem = document.getElementById('stickyRemaining');
   const form    = document.getElementById('printForm');
   const fullEl  = document.getElementById('printFull');
 
+  const left = Math.max(0, 25 - claimed);
   if (claimed_) claimed_.textContent = claimed;
+  if (remaining) remaining.textContent = left;
+  if (stickyRem) stickyRem.textContent = left;
   if (fill)     setTimeout(() => { fill.style.width = Math.min((claimed / 25) * 100, 100) + '%'; }, 100);
 
   if (full) {
     if (form)   form.style.display = 'none';
     if (fullEl) fullEl.style.display = '';
+    // Hide sticky CTA when no slots remain
+    const cta = document.getElementById('stickyCTA');
+    if (cta) cta.classList.add('hidden');
   }
+}
+
+// ── Sticky CTA Bar ──
+function initStickyCTA() {
+  const cta = document.getElementById('stickyCTA');
+  const ps  = document.getElementById('printSection');
+  if (!cta || !ps) return;
+
+  // Reveal after a beat — let the page settle, then catch attention
+  setTimeout(() => cta.classList.add('visible'), 1200);
+
+  // Click → smooth scroll to print section, then briefly highlight the form
+  const goToPrint = () => {
+    ps.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    ps.classList.add('print-section-highlight');
+    setTimeout(() => ps.classList.remove('print-section-highlight'), 1400);
+  };
+  cta.addEventListener('click', goToPrint);
+  cta.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToPrint(); } });
+
+  // Hide sticky bar when print section is in view (avoid duplication)
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) cta.classList.add('hidden');
+      else cta.classList.remove('hidden');
+    });
+  }, { threshold: 0.2 });
+  io.observe(ps);
+
+  // Intent signal — pulse when hovering Save or Download
+  ['btnSave', 'btnDownload'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener('mouseenter', pulseSticky);
+  });
+}
+
+let _pulseTimer = null;
+function pulseSticky() {
+  const cta = document.getElementById('stickyCTA');
+  if (!cta || cta.classList.contains('hidden')) return;
+  cta.classList.remove('pulse');
+  // force reflow so the animation restarts
+  void cta.offsetWidth;
+  cta.classList.add('pulse');
+  clearTimeout(_pulseTimer);
+  _pulseTimer = setTimeout(() => cta.classList.remove('pulse'), 1000);
 }
 
 async function loadPrintCount() {
@@ -2012,22 +2194,41 @@ async function downloadCard() {
 </div>
 
 <!-- ── Print My Card Section ── -->
-<div class="print-section" id="printSection" style="display:none;">
+<div class="print-section" id="printSection">
   <div class="print-bg-dots"></div>
+  <div class="print-bg-glow"></div>
+
+  <!-- Floating physical card mockup -->
+  <div class="print-mockup-stage">
+    <div class="print-mockup-card">
+      <div class="print-mockup-shine"></div>
+      <div class="print-mockup-chip"></div>
+      <div class="print-mockup-label">DEVQUEST</div>
+      <div class="print-mockup-id">CARD · 002</div>
+      <div class="print-mockup-emboss">PVC · MATTE FINISH</div>
+    </div>
+    <div class="print-mockup-shadow"></div>
+  </div>
 
   <div class="print-header">
-    <div class="print-stamp">LIMITED DROP</div>
-    <div class="print-emoji-row">🎴</div>
-    <h2 class="print-title">Want this in your wallet?</h2>
-    <p class="print-sub">We'll print your DevQuest card on actual PVC and ship it to you. <strong>Free.</strong> No catch.</p>
+    <div class="print-stamp">▸ LIMITED FIRST DROP ◂</div>
+    <h2 class="print-title">Hold your card<br><span class="print-title-accent">in real life.</span></h2>
+    <p class="print-sub">A physical PVC card with your stats, your style, your face — shipped to your door. <strong>Completely free.</strong> No payment, no catch.</p>
+
+    <div class="print-perks">
+      <div class="print-perk"><span class="print-perk-icon">⚡</span><span>Ships in 7 days</span></div>
+      <div class="print-perk"><span class="print-perk-icon">🆓</span><span>$0 — really</span></div>
+      <div class="print-perk"><span class="print-perk-icon">🎴</span><span>Matte PVC, embossed</span></div>
+    </div>
 
     <div class="print-counter" id="printCounter">
       <div class="print-counter-bar">
         <div class="print-counter-fill" id="printCounterFill"></div>
+        <div class="print-counter-pulse"></div>
       </div>
       <div class="print-counter-label">
         <span class="print-claimed" id="printClaimed">—</span>
-        <span class="print-of"> / 25 claimed</span>
+        <span class="print-of"> of 25 cards claimed · <strong id="printRemaining">—</strong> left</span>
       </div>
     </div>
   </div>
@@ -2036,221 +2237,364 @@ async function downloadCard() {
   <div class="print-full-state" id="printFull" style="display:none;">
     <div class="print-full-emoji">💀</div>
     <div class="print-full-title">All 25 cards gone.</div>
-    <div class="print-full-sub">You just missed the first drop. Next one coming soon.</div>
+    <div class="print-full-sub">You just missed the first drop. Next one coming soon — keep your card built and we'll notify the leaderboard.</div>
   </div>
 
   <!-- SUCCESS STATE -->
   <div class="print-success-state" id="printSuccess" style="display:none;">
     <div class="print-success-emoji">🎉</div>
-    <div class="print-success-title">You're in!</div>
-    <div class="print-success-sub">We'll WhatsApp you to confirm delivery. Watch for a message from Sushrut.</div>
+    <div class="print-success-title">You're in the print queue!</div>
+    <div class="print-success-sub">We'll WhatsApp you to confirm delivery details. Watch for a message from Sushrut within 24 hours.</div>
   </div>
 
   <!-- FORM STATE -->
   <form class="print-form" id="printForm" onsubmit="submitPrintRequest(event)">
+    <div class="print-form-header">
+      <div class="print-form-step">📮 SHIPPING DETAILS</div>
+      <div class="print-form-cities">HYD · NGP only</div>
+    </div>
+
     <div class="print-field">
-      <label class="print-label">Who do we address the package to?</label>
-      <input class="print-input" id="pr-name" type="text" placeholder="Your full name" maxlength="80" required>
+      <label class="print-label">Who do we ship it to?</label>
+      <input class="print-input print-input-lg" id="pr-name" type="text" placeholder="Your full name" maxlength="80" required>
     </div>
     <div class="print-field">
-      <label class="print-label">Drop your colony / street here</label>
-      <input class="print-input" id="pr-addr1" type="text" placeholder="House no., Street, Area" maxlength="120" required>
+      <label class="print-label">Street / Colony / Locality</label>
+      <input class="print-input print-input-lg" id="pr-addr1" type="text" placeholder="House no., Street, Area" maxlength="120" required>
     </div>
     <div class="print-field">
-      <label class="print-label">Landmark? Flat no.? Help the delivery guy.</label>
-      <input class="print-input" id="pr-addr2" type="text" placeholder="Near XYZ, Apt 4B... (optional)" maxlength="120">
+      <label class="print-label">Landmark, Flat no. — help the delivery guy</label>
+      <input class="print-input print-input-lg" id="pr-addr2" type="text" placeholder="Near XYZ, Apt 4B... (optional)" maxlength="120">
     </div>
     <div class="print-row">
       <div class="print-field">
-        <label class="print-label">City — pick carefully</label>
-        <select class="print-input print-select" id="pr-city" required>
-          <option value="">Select your city</option>
+        <label class="print-label">City</label>
+        <select class="print-input print-input-lg print-select" id="pr-city" required>
+          <option value="">Pick your city</option>
           <option value="HYDERABAD">Hyderabad 🌶️</option>
           <option value="NAGPUR">Nagpur 🍊</option>
         </select>
       </div>
       <div class="print-field">
-        <label class="print-label">Pincode (6 digits, not your ATM PIN)</label>
-        <input class="print-input" id="pr-pincode" type="text" placeholder="500001" maxlength="6" pattern="[0-9]{6}" required>
+        <label class="print-label">Pincode</label>
+        <input class="print-input print-input-lg" id="pr-pincode" type="text" placeholder="500001" maxlength="6" pattern="[0-9]{6}" required>
       </div>
     </div>
     <div class="print-field">
-      <label class="print-label">Your digits — only for delivery updates, promise</label>
-      <input class="print-input" id="pr-phone" type="tel" placeholder="9876543210" maxlength="15" required>
+      <label class="print-label">WhatsApp number (delivery updates only)</label>
+      <input class="print-input print-input-lg" id="pr-phone" type="tel" placeholder="+91 98765 43210" maxlength="15" required>
     </div>
     <button class="print-submit" id="printSubmitBtn" type="submit">
-      <span class="print-submit-text">Print My Card 🎴</span>
-      <span class="print-submit-loading" style="display:none;">Sending...</span>
+      <span class="print-submit-text">🎴  Claim My Physical Card  →</span>
+      <span class="print-submit-loading" style="display:none;">Sending your request...</span>
     </button>
-    <p class="print-disclaimer">Only Hyderabad &amp; Nagpur for now. First 25 free, shipped within 7 days.</p>
+    <p class="print-disclaimer">Hyderabad &amp; Nagpur only · First 25 free · Ships within 7 days · No spam, ever</p>
   </form>
 </div>
 
 <style>
-/* ── Print Section ── */
+/* ── Print Section — Show-stopping CTA ── */
 .print-section {
-  max-width: 520px;
-  margin: 60px auto 40px;
-  padding: 40px 32px;
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a0f2e 100%);
-  border: 1.5px solid rgba(200,255,0,0.2);
-  border-radius: 24px;
+  max-width: 760px;
+  margin: 80px auto 60px;
+  padding: 56px 48px 48px;
+  background:
+    radial-gradient(ellipse at top, rgba(200,255,0,0.08) 0%, transparent 60%),
+    linear-gradient(135deg, #0a0a14 0%, #15091f 50%, #1f0a14 100%);
+  border: 1.5px solid rgba(200,255,0,0.25);
+  border-radius: 28px;
   position: relative;
   overflow: hidden;
-  animation: printReveal 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+  box-shadow: 0 30px 80px -20px rgba(200,255,0,0.15), 0 0 0 1px rgba(255,255,255,0.03);
+  animation: printReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 @keyframes printReveal {
-  from { opacity:0; transform: translateY(40px) scale(0.95); }
+  from { opacity:0; transform: translateY(40px) scale(0.96); }
   to   { opacity:1; transform: translateY(0) scale(1); }
 }
 
-/* Animated dot grid background */
+/* Background layers */
 .print-bg-dots {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background-image: radial-gradient(circle, rgba(200,255,0,0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
-  animation: dotsDrift 8s linear infinite;
+  background-image: radial-gradient(circle, rgba(200,255,0,0.10) 1px, transparent 1px);
+  background-size: 28px 28px;
+  animation: dotsDrift 10s linear infinite;
+  opacity: 0.55;
 }
 @keyframes dotsDrift {
   from { background-position: 0 0; }
-  to   { background-position: 24px 24px; }
+  to   { background-position: 28px 28px; }
+}
+.print-bg-glow {
+  position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(255,102,0,0.25) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none; z-index: 0;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 0.9; transform: translateX(-50%) scale(1.08); }
 }
 
-.print-header { position: relative; z-index: 1; text-align: center; margin-bottom: 28px; }
+/* Floating physical card mockup */
+.print-mockup-stage {
+  position: relative; z-index: 1;
+  height: 200px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px;
+  perspective: 1000px;
+}
+.print-mockup-card {
+  position: relative;
+  width: 260px; height: 160px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, #c8ff00 0%, #f5a623 60%, #ff6600 100%);
+  box-shadow:
+    0 20px 40px -10px rgba(255,102,0,0.5),
+    0 0 0 1px rgba(255,255,255,0.1) inset,
+    0 2px 0 rgba(255,255,255,0.3) inset;
+  animation: cardFloat3D 5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+@keyframes cardFloat3D {
+  0%,100% { transform: rotateY(-12deg) rotateX(8deg) translateY(0); }
+  50%      { transform: rotateY(12deg) rotateX(-4deg) translateY(-10px); }
+}
+.print-mockup-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.6) 50%, transparent 65%);
+  border-radius: 14px;
+  animation: cardShine 3s ease-in-out infinite;
+}
+@keyframes cardShine {
+  0%,100% { transform: translateX(-30%); opacity: 0; }
+  50%      { transform: translateX(30%); opacity: 1; }
+}
+.print-mockup-chip {
+  position: absolute; top: 24px; left: 22px;
+  width: 32px; height: 24px;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d77a 50%, #d4af37 100%);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+}
+.print-mockup-label {
+  position: absolute; top: 22px; right: 22px;
+  font: 900 0.9rem/1 'Pricedown', 'Inter', sans-serif;
+  color: #0a0a14; letter-spacing: 1px;
+}
+.print-mockup-id {
+  position: absolute; bottom: 38px; left: 22px;
+  font: 700 0.95rem/1 'Inter', monospace;
+  color: rgba(10,10,20,0.9); letter-spacing: 2px;
+}
+.print-mockup-emboss {
+  position: absolute; bottom: 18px; left: 22px;
+  font: 600 0.5rem/1 'Inter', sans-serif;
+  color: rgba(10,10,20,0.5); letter-spacing: 1.5px;
+}
+.print-mockup-shadow {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 220px; height: 16px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+  filter: blur(8px);
+  animation: shadowPulse 5s ease-in-out infinite;
+}
+@keyframes shadowPulse {
+  0%,100% { width: 240px; opacity: 0.5; }
+  50%      { width: 200px; opacity: 0.3; }
+}
+
+.print-header { position: relative; z-index: 1; text-align: center; margin-bottom: 36px; }
 
 .print-stamp {
   display: inline-block;
-  font: 700 0.56rem/1 'Inter', sans-serif;
-  letter-spacing: 0.28em;
+  font: 700 0.62rem/1 'Inter', sans-serif;
+  letter-spacing: 0.32em;
   color: #c8ff00;
   border: 1.5px solid #c8ff00;
   border-radius: 4px;
-  padding: 4px 10px;
-  margin-bottom: 16px;
+  padding: 6px 14px;
+  margin-bottom: 20px;
   animation: stampPulse 2s ease-in-out infinite;
+  background: rgba(200,255,0,0.05);
 }
 @keyframes stampPulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.3); }
-  50%      { box-shadow: 0 0 0 6px rgba(200,255,0,0); }
-}
-
-.print-emoji-row { font-size: 2.4rem; margin-bottom: 12px; animation: cardFloat 3s ease-in-out infinite; }
-@keyframes cardFloat {
-  0%,100% { transform: translateY(0) rotate(-2deg); }
-  50%      { transform: translateY(-8px) rotate(2deg); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(200,255,0,0); }
 }
 
 .print-title {
-  font: 800 1.8rem/1.1 'Inter', sans-serif;
+  font: 900 2.6rem/1.05 'Inter', sans-serif;
   color: #fff;
-  margin-bottom: 10px;
-  letter-spacing: -0.5px;
+  margin: 0 0 14px;
+  letter-spacing: -1px;
+}
+.print-title-accent {
+  background: linear-gradient(135deg, #c8ff00 0%, #ff6600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .print-sub {
-  font-size: 0.82rem;
-  color: rgba(255,255,255,0.5);
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.55);
   line-height: 1.6;
-  margin-bottom: 24px;
+  margin: 0 auto 24px;
+  max-width: 480px;
 }
-.print-sub strong { color: #c8ff00; }
+.print-sub strong { color: #c8ff00; font-weight: 700; }
+
+/* Perks row */
+.print-perks {
+  display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 28px;
+}
+.print-perk {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 99px;
+  font: 600 0.72rem/1 'Inter', sans-serif;
+  color: rgba(255,255,255,0.85);
+}
+.print-perk-icon { font-size: 0.9rem; }
 
 /* Counter bar */
-.print-counter { margin-bottom: 4px; }
+.print-counter { margin-bottom: 4px; max-width: 420px; margin-left: auto; margin-right: auto; }
 .print-counter-bar {
-  height: 6px;
+  height: 8px;
   background: rgba(255,255,255,0.08);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  position: relative;
 }
 .print-counter-fill {
   height: 100%;
-  background: linear-gradient(90deg, #c8ff00, #ff6600);
-  border-radius: 3px;
+  background: linear-gradient(90deg, #c8ff00, #ff6600, #ff3b30);
+  border-radius: 4px;
   width: 0%;
-  transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+  transition: width 1.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 12px rgba(255,102,0,0.6);
 }
+.print-counter-pulse {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: counterShimmer 2.4s ease-in-out infinite;
+}
+@keyframes counterShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 .print-counter-label {
   text-align: center;
-  font: 600 0.68rem/1 'Inter', sans-serif;
-  letter-spacing: 0.1em;
+  font: 600 0.78rem/1 'Inter', sans-serif;
+  letter-spacing: 0.06em;
 }
-.print-claimed { font-size: 1.1rem; color: #c8ff00; font-weight: 800; }
-.print-of { color: rgba(255,255,255,0.3); }
+.print-claimed { font-size: 1.3rem; color: #c8ff00; font-weight: 900; }
+.print-of { color: rgba(255,255,255,0.4); }
+.print-of strong { color: #ff6600; font-weight: 800; }
 
 /* Form */
 .print-form { position: relative; z-index: 1; }
-.print-field { margin-bottom: 16px; }
-.print-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.print-form-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+.print-form-step {
+  font: 800 0.72rem/1 'Inter', sans-serif;
+  letter-spacing: 0.16em;
+  color: #c8ff00;
+}
+.print-form-cities {
+  font: 600 0.62rem/1 'Inter', sans-serif;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.35);
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.print-field { margin-bottom: 18px; }
+.print-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .print-label {
   display: block;
-  font: 600 0.62rem/1 'Inter', sans-serif;
-  letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 6px;
+  font: 600 0.66rem/1 'Inter', sans-serif;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 8px;
   text-transform: uppercase;
 }
 .print-input {
   width: 100%;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 12px 14px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
   color: #fff;
-  font: 500 0.88rem/1 'Inter', sans-serif;
+  font: 500 0.95rem/1 'Inter', sans-serif;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
-.print-input:focus { border-color: #c8ff00; background: rgba(200,255,0,0.04); }
-.print-input::placeholder { color: rgba(255,255,255,0.2); }
+.print-input-lg { padding: 16px 18px; font-size: 1rem; }
+.print-input:focus {
+  border-color: #c8ff00;
+  background: rgba(200,255,0,0.05);
+  box-shadow: 0 0 0 4px rgba(200,255,0,0.12);
+}
+.print-input::placeholder { color: rgba(255,255,255,0.22); }
 .print-select { appearance: none; cursor: pointer; }
 .print-select option { background: #1a1a2e; color: #fff; }
 
 .print-submit {
   width: 100%;
-  margin-top: 8px;
-  padding: 16px;
-  background: linear-gradient(135deg, #c8ff00 0%, #a0d900 100%);
+  margin-top: 14px;
+  padding: 20px;
+  background: linear-gradient(135deg, #c8ff00 0%, #ff6600 100%);
   color: #0f0f0f;
   border: none;
-  border-radius: 12px;
-  font: 800 0.9rem/1 'Inter', sans-serif;
-  letter-spacing: 0.05em;
+  border-radius: 14px;
+  font: 900 1rem/1 'Inter', sans-serif;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 8px 24px rgba(200,255,0,0.25);
+  box-shadow: 0 12px 32px rgba(255,102,0,0.35);
   position: relative; overflow: hidden;
 }
-.print-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(200,255,0,0.35); }
+.print-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(255,102,0,0.5); }
 .print-submit:active { transform: scale(0.98); }
 .print-submit::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: shimmer 2.5s ease-in-out infinite;
 }
 @keyframes shimmer { to { transform: translateX(100%); } }
 
 .print-disclaimer {
-  font-size: 0.6rem;
-  color: rgba(255,255,255,0.2);
+  font-size: 0.66rem;
+  color: rgba(255,255,255,0.25);
   text-align: center;
-  margin-top: 12px;
-  line-height: 1.5;
+  margin-top: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
 }
 
 /* Full / success states */
 .print-full-state, .print-success-state {
-  text-align: center; padding: 20px 0; position: relative; z-index: 1;
+  text-align: center; padding: 32px 0; position: relative; z-index: 1;
 }
-.print-full-emoji, .print-success-emoji { font-size: 3rem; margin-bottom: 12px; }
+.print-full-emoji, .print-success-emoji { font-size: 3.5rem; margin-bottom: 16px; }
 .print-full-title, .print-success-title {
-  font: 800 1.4rem/1 'Inter', sans-serif; color: #fff; margin-bottom: 8px;
+  font: 900 1.7rem/1.1 'Inter', sans-serif; color: #fff; margin-bottom: 10px;
 }
 .print-full-sub, .print-success-sub {
-  font-size: 0.8rem; color: rgba(255,255,255,0.4); line-height: 1.6;
+  font-size: 0.9rem; color: rgba(255,255,255,0.5); line-height: 1.6;
+  max-width: 440px; margin: 0 auto;
 }
 .print-success-emoji { animation: successBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
 @keyframes successBounce {
@@ -2258,10 +2602,99 @@ async function downloadCard() {
   to   { transform: scale(1); opacity: 1; }
 }
 
-@media (max-width: 600px) {
-  .print-section { padding: 28px 20px; margin: 40px 12px; }
+@media (max-width: 700px) {
+  .print-section { padding: 40px 22px 32px; margin: 50px 12px; border-radius: 22px; }
+  .print-title { font-size: 1.9rem; }
   .print-row { grid-template-columns: 1fr; }
-  .print-title { font-size: 1.4rem; }
+  .print-mockup-stage { height: 160px; }
+  .print-mockup-card { width: 210px; height: 130px; }
+  .print-mockup-label { font-size: 0.75rem; }
+  .print-mockup-id { font-size: 0.8rem; bottom: 32px; }
+  .print-perks { gap: 6px; }
+  .print-perk { font-size: 0.66rem; padding: 6px 10px; }
+}
+</style>
+
+<!-- ── Sticky Print CTA Bar ── -->
+<div class="sticky-cta" id="stickyCTA" role="button" tabindex="0" aria-label="Claim physical card">
+  <div class="sticky-cta-inner">
+    <span class="sticky-cta-emoji">🎴</span>
+    <div class="sticky-cta-text">
+      <strong>Want this printed on real PVC?</strong>
+      <span class="sticky-cta-meta"><span id="stickyRemaining">25</span> of 25 cards left · Free · HYD &amp; NGP</span>
+    </div>
+    <span class="sticky-cta-arrow">→</span>
+  </div>
+</div>
+
+<style>
+.sticky-cta {
+  position: fixed; left: 16px; right: 16px; bottom: 16px;
+  max-width: 720px; margin: 0 auto;
+  background: linear-gradient(135deg, #0a0a14 0%, #1a0814 100%);
+  border: 1.5px solid rgba(200,255,0,0.4);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 16px 48px -8px rgba(255,102,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);
+  cursor: pointer;
+  z-index: 950;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s, box-shadow 0.25s, border-color 0.25s;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.sticky-cta.visible { transform: translate3d(0, 0, 0); opacity: 1; }
+.sticky-cta.hidden { transform: translate3d(0, 120%, 0); opacity: 0; pointer-events: none; }
+.sticky-cta:hover { box-shadow: 0 24px 60px -8px rgba(255,102,0,0.55); border-color: rgba(200,255,0,0.7); transform: translate3d(0, -3px, 0); }
+.sticky-cta.pulse { animation: stickyPulse 0.9s cubic-bezier(0.4,0,0.6,1); }
+@keyframes stickyPulse {
+  0%, 100% { box-shadow: 0 16px 48px -8px rgba(255,102,0,0.35); border-color: rgba(200,255,0,0.4); }
+  50%      { box-shadow: 0 24px 60px -8px rgba(255,102,0,0.7), 0 0 0 6px rgba(200,255,0,0.15); border-color: #c8ff00; }
+}
+
+.sticky-cta-inner { display: flex; align-items: center; gap: 14px; }
+.sticky-cta-emoji { font-size: 1.7rem; line-height: 1; flex-shrink: 0; animation: stickyEmoji 3s ease-in-out infinite; }
+@keyframes stickyEmoji {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+.sticky-cta-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sticky-cta-text strong { font: 800 0.92rem/1.2 'Inter', sans-serif; color: #fff; letter-spacing: -0.2px; }
+.sticky-cta-meta { font: 600 0.68rem/1.2 'Inter', sans-serif; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; }
+.sticky-cta-meta #stickyRemaining { color: #c8ff00; font-weight: 800; }
+.sticky-cta-arrow {
+  font: 900 1.3rem/1 'Inter', sans-serif;
+  color: #c8ff00;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.sticky-cta:hover .sticky-cta-arrow { transform: translateX(4px); }
+
+/* Brief glow when CTA is clicked to draw eye to the form */
+.print-section-highlight {
+  animation: printHighlight 1.4s cubic-bezier(0.4,0,0.6,1);
+}
+@keyframes printHighlight {
+  0%, 100% { box-shadow: 0 30px 80px -20px rgba(200,255,0,0.15); }
+  40%      { box-shadow: 0 30px 80px -20px rgba(200,255,0,0.55), 0 0 0 4px rgba(200,255,0,0.25); }
+}
+
+/* Reserve space at bottom so sticky bar never covers footer content */
+body { padding-bottom: 96px; }
+
+@media (max-width: 520px) {
+  .sticky-cta { padding: 12px 14px; left: 12px; right: 12px; bottom: 12px; }
+  .sticky-cta-emoji { font-size: 1.4rem; }
+  .sticky-cta-text strong { font-size: 0.82rem; }
+  .sticky-cta-meta { font-size: 0.62rem; }
+}
+@media (max-width: 380px) {
+  .sticky-cta { padding: 10px 12px; border-radius: 12px; }
+  .sticky-cta-inner { gap: 10px; }
+  .sticky-cta-emoji { font-size: 1.2rem; }
+  .sticky-cta-text strong { font-size: 0.76rem; }
+  .sticky-cta-meta { font-size: 0.58rem; }
+  .sticky-cta-arrow { font-size: 1.1rem; }
 }
 </style>
 

@@ -13,6 +13,7 @@ COPY css/ /usr/share/nginx/html/css/
 COPY img/ /usr/share/nginx/html/img/
 COPY assets/ /usr/share/nginx/html/assets/
 COPY js/ /usr/share/nginx/html/js/
+COPY devquest/ /usr/share/nginx/html/devquest/
 
 # Set proper permissions
 RUN chmod -R 755 /usr/share/nginx/html

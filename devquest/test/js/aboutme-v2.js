@@ -738,11 +738,9 @@
         if (e.isIntersecting && !warmedUp) {
           warmedUp = true;
           screen.classList.add('warming-up');
-          // Auto-start channel 1 muted so the TV looks alive on first arrival
-          // (browser autoplay policy allows muted playback without user gesture)
-          volIdx = 0;
-          applyVolume();
-          display(currentCh);
+          // First time visible: just resume the already-loaded video.
+          // (display(0) was called at init; calling it here again would advance
+          // the clip pointer and reset src mid-playback — freezing the frame.)
         }
         // Pause video when TV is off screen, resume when back
         // Also coordinate with jukebox
@@ -1253,6 +1251,9 @@
     }
 
     function selectTrack(index) {
+      // Guard against rapid clicks racing audio.load() \u2014 see static audit
+      if (_trackLoading) return;
+      _trackLoading = true;
       currentTrack = index;
       updateDisplay(); renderTracks();
       var t = tracks[index];
@@ -1260,7 +1261,7 @@
         audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
         audio.load();
         isPlaying = true;
-        audio.play().catch(function() {});
+        audio.play().catch(function() {}).finally(function() { _trackLoading = false; });
         jukebox.classList.toggle('paused', false);
         playCompact.textContent = '\u23F8';
         playBtn.textContent = '\u23F8';
@@ -1303,8 +1304,8 @@
       playBtn.textContent = icon;
     }
 
-    function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
-    function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
+    function prevTrack() { if (_trackLoading) return; currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
+    function nextTrack() { if (_trackLoading) return; currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
 
     pill.addEventListener('click', function(e) {
       if (e.target === playCompact) { e.stopPropagation(); togglePlay(); return; }

@@ -857,6 +857,7 @@ function startGame() {
 }
 
 function endGame() {
+  if (gameOver) return;            // guard — prevents double submit when timer fires AND cheat/manual end races
   gameOver = true;
   clearInterval(timerInterval);
   clearInterval(sampleInterval);

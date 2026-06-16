@@ -676,6 +676,17 @@
     const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:8081' : '';
 
+    // HTML escape helper — protects against XSS in user-supplied fields from the API
+    function esc(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // Read from game flow first, fall back to leaderboard-specific keys
     let myId   = localStorage.getItem('dq-user-id') || localStorage.getItem('lb_uuid');
     let myRank = null;
@@ -787,13 +798,13 @@
         const medals = ['first','second','third'];
         const crowns = ['🥇','🥈','🥉'];
         podiumEl.innerHTML = top3.map((u, i) => `
-          <div class="podium-item ${medals[i]}" data-uid="${u.id}">
+          <div class="podium-item ${medals[i]}" data-uid="${esc(u.id)}">
             ${u.id === myId ? '<span class="podium-you">YOU</span>' : ''}
             <span class="podium-crown">${crowns[i]}</span>
-            <div class="podium-rank">#${u.rank}</div>
-            <div class="podium-name">${u.firstName} ${u.lastName}</div>
-            <div class="podium-role">${u.classRole || 'Unknown Class'}</div>
-            <div class="podium-stats" id="podium-stats-${u.id}">
+            <div class="podium-rank">#${esc(u.rank)}</div>
+            <div class="podium-name">${esc(u.firstName)} ${esc(u.lastName)}</div>
+            <div class="podium-role">${esc(u.classRole || 'Unknown Class')}</div>
+            <div class="podium-stats" id="podium-stats-${esc(u.id)}">
               <div class="podium-stat-bar" style="height:60%"></div>
               <div class="podium-stat-bar" style="height:80%"></div>
               <div class="podium-stat-bar" style="height:50%"></div>
@@ -821,16 +832,16 @@
         return `
           <div class="lb-row ${u.id === myId ? 'is-you' : ''}"
                style="animation-delay:${i * 40}ms">
-            <div class="lb-rank-num">${u.rank}</div>
+            <div class="lb-rank-num">${esc(u.rank)}</div>
             <div class="lb-info">
               <div class="lb-name">
-                ${u.firstName} ${u.lastName}
+                ${esc(u.firstName)} ${esc(u.lastName)}
                 ${u.id === myId ? '<span class="lb-name-you">You</span>' : ''}
                 ${isNew ? '<span class="lb-new-badge">New</span>' : ''}
               </div>
-              <div class="lb-role">${u.classRole || 'Unknown Class'}</div>
+              <div class="lb-role">${esc(u.classRole || 'Unknown Class')}</div>
             </div>
-            <div class="lb-since">${timeAgo(u.createdAt)}</div>
+            <div class="lb-since">${esc(timeAgo(u.createdAt))}</div>
           </div>`;
       }).join('');
     }

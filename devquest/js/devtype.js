@@ -52,6 +52,13 @@ async function fetchLeaderboard() {
   }
 }
 
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function renderLeaderboard(rows) {
   const container = document.getElementById('dt-lb-rows');
   if (!container) return;
@@ -68,9 +75,9 @@ function renderLeaderboard(rows) {
     const rankClass = row.rank === 1 ? 'gold' : row.rank === 2 ? 'silver' : row.rank === 3 ? 'bronze' : '';
 
     div.innerHTML =
-      '<span class="dt-lb-rank ' + rankClass + '">' + (row.rank <= 3 ? ['', '🥇', '🥈', '🥉'][row.rank] : '#' + row.rank) + '</span>' +
-      '<span class="dt-lb-name">' + row.name + (isMe ? ' <span class="dt-lb-you">YOU</span>' : '') + '</span>' +
-      '<span class="dt-lb-score">' + (typeof row.score === 'number' ? row.score.toLocaleString() : row.score) + '</span>';
+      '<span class="dt-lb-rank ' + rankClass + '">' + (row.rank <= 3 ? ['', '🥇', '🥈', '🥉'][row.rank] : '#' + escHtml(row.rank)) + '</span>' +
+      '<span class="dt-lb-name">' + escHtml(row.name) + (isMe ? ' <span class="dt-lb-you">YOU</span>' : '') + '</span>' +
+      '<span class="dt-lb-score">' + (typeof row.score === 'number' ? row.score.toLocaleString() : escHtml(row.score)) + '</span>';
     container.appendChild(div);
   });
 }

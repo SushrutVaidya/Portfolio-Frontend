@@ -70,6 +70,17 @@
     align-items: center;
     gap: 20px;
     cursor: pointer;
+    /* Skip rendering + animation when scrolled offscreen */
+    content-visibility: auto;
+    contain-intrinsic-size: 360px 620px;
+  }
+  /* Respect user reduced-motion preference — kill decorative loops */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
   .card-label {
     font: 700 0.75rem/1 'Inter', sans-serif;
@@ -117,9 +128,10 @@
       rgba(255,100,200,0.07) 0%, rgba(0,200,255,0.08) 25%,
       rgba(128,0,255,0.07) 50%, rgba(0,255,128,0.08) 75%,
       rgba(255,200,0,0.07) 100%);
-    background-size: 300% 300%;
-    animation: holoShift 5s ease-in-out infinite;
+    background-size: 150% 150%;
+    animation: holoShift 8s ease-in-out infinite;
     pointer-events: none; z-index: 1; border-radius: 22px;
+    will-change: background-position;
   }
   @keyframes holoShift {
     0% { background-position: 0% 50%; }
@@ -2309,6 +2321,10 @@ async function downloadCard() {
     linear-gradient(135deg, #0a0a14 0%, #15091f 50%, #1f0a14 100%);
   border: 1.5px solid rgba(200,255,0,0.25);
   border-radius: 28px;
+  /* Skip rendering + animation when offscreen — huge perf win since this
+     section is always in DOM but rarely in viewport. */
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1100px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 30px 80px -20px rgba(200,255,0,0.15), 0 0 0 1px rgba(255,255,255,0.03);

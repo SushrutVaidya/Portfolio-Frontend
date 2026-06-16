@@ -2028,14 +2028,19 @@ function initStickyCTA() {
   cta.addEventListener('click', goToPrint);
   cta.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToPrint(); } });
 
-  // Hide sticky bar when print section is in view (avoid duplication)
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) cta.classList.add('hidden');
-      else cta.classList.remove('hidden');
-    });
-  }, { threshold: 0.2 });
-  io.observe(ps);
+  // Hide sticky bar when print section is in view (avoid duplication).
+  // Wait until reveal animation finishes before observing — otherwise on tall
+  // viewports where printSection is already in view, the observer fires
+  // immediately and locks the bar hidden before it ever appears.
+  setTimeout(() => {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) cta.classList.add('hidden');
+        else cta.classList.remove('hidden');
+      });
+    }, { threshold: 0.2 });
+    io.observe(ps);
+  }, 1800);
 
   // Intent signal — pulse when hovering Save or Download
   ['btnSave', 'btnDownload'].forEach(id => {

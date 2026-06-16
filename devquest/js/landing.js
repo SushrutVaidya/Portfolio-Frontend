@@ -1,6 +1,8 @@
 // DevQuest Landing — name input + user registration + flow
 
-const API_BASE = 'http://localhost:8081';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8081'
+  : '';
 
 const enterBtn    = document.getElementById('enter-devquest');
 const backdrop    = document.getElementById('modal-backdrop');
@@ -76,6 +78,7 @@ async function startChallenge() {
   localStorage.setItem('dq-player-name', firstName);
   localStorage.setItem('dq-player-first', firstName);
   localStorage.setItem('dq-player-last', lastName);
+  localStorage.setItem('dq-game-path', 'true');
 
   // Register with backend (non-blocking — don't prevent game start if backend is down)
   try {
@@ -103,3 +106,17 @@ if (savedFirst) {
   if (savedLast) lastInput.value = savedLast;
   validate();
 }
+
+// Card teaser — live suspect count
+(async function initTeaser() {
+  const countEl = document.getElementById('teaser-count');
+  if (countEl) {
+    try {
+      const res  = await fetch(API_BASE + '/api/leaderboard');
+      const data = await res.json();
+      if (data.length > 0) {
+        countEl.textContent = `${data.length} suspect${data.length !== 1 ? 's' : ''} identified`;
+      }
+    } catch { /* keep placeholder */ }
+  }
+})();

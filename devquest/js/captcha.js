@@ -218,6 +218,7 @@ function startGame() {
   streak         = 0;
   shapePlaced    = false;
   shuffledShapes = shuffle(SHAPES);
+  window._captchaStart = Date.now();
   verifyBtn.classList.add('hidden');
   hidePrompt();
   updateLives();
@@ -321,6 +322,12 @@ function showSuccess() {
     stopMusic(0.8);
     DQSounds.allSorted();
   }
+
+  const timeMs = window._captchaStart ? Date.now() - window._captchaStart : 60000;
+  const speedBonus = Math.max(0, Math.min(30, Math.floor((90000 - timeMs) / 2000)));
+  const designStat = Math.min(100, 40 + (lives * 10) + speedBonus);
+  localStorage.setItem('dq-stat-design', designStat);
+  if (typeof showStatUnlocked === 'function') showStatUnlocked('DESIGN', designStat);
 }
 
 function updateLives() {
@@ -449,8 +456,16 @@ resetBtn.addEventListener('click', () => {
 });
 
 verifyBtn.addEventListener('click', () => {
-  window.location.href = 'devtype.html';
+  typeof window.pageTransition === 'function'
+    ? window.pageTransition('devtype.html')
+    : (window.location.href = 'devtype.html');
 });
+
+window.dqCheat = () => {
+  currentIndex = shuffledShapes.length;
+  lives = 3;
+  showSuccess();
+};
 
 window.addEventListener('load', () => {
   initSkipTroll();

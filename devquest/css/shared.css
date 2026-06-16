@@ -212,6 +212,17 @@ body::after { display: none; }
   letter-spacing: 0.5px;
 }
 
+.dq-nav-exit {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.dq-nav-exit:hover { color: rgba(255, 255, 255, 0.7); }
+
 /* ==========================================
    FOOTER
    ========================================== */
@@ -427,7 +438,8 @@ body::after { display: none; }
 @media (max-width: 600px) {
   .dq-nav       { padding: 0 16px; }
   .dq-nav-right { display: none; }
+  .dq-nav-exit  { display: none; }
   .dq-main      { padding: 16px; }
-  .dq-footer    { padding: 12px 16px; }
+  .dq-footer    { padding: 12px 16px; flex-direction: column; gap: 4px; text-align: center; }
   .dq-step-name { display: none; }
 }

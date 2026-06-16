@@ -6,12 +6,26 @@
   <meta name="description" content="About Sushrut — GTA style.">
   <meta name="theme-color" content="#f5f3ef">
   <title>About Me — DevQuest</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎴%3C/text%3E%3C/svg%3E">
   <!-- Pricedown font (GTA title font) -->
   <link rel="preconnect" href="https://fonts.cdnfonts.com">
   <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/aboutme-v2.css">
+  <script>
+    if(new URLSearchParams(location.search).get('skip_intro')){
+      document.documentElement.classList.add('skip-intro');
+      // Only apply dark fade-in if navigating forward (not back/reload)
+      const navType = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]?.type;
+      if(navType !== 'back_forward') {
+        document.documentElement.style.cssText='background:#000;opacity:0';
+      }
+    }
+  </script>
+  <script src="../js/mobile-banner.js"></script>
+  <script src="../js/transitions.js"></script>
+  <script src="../js/cursor.js"></script>
   <script src="js/theme.js" defer></script>
 </head>
 <body class="gta-page loading">
@@ -24,7 +38,7 @@
   <!-- ══ GTA LOADING SCREEN — Intro Sequence ══ -->
   <div class="gta-intro-overlay" id="intro-overlay">
     <div class="gta-intro-content">
-      <div class="gta-intro-logo">GRAND THEFT<br>PORTFOLIO</div>
+      <div class="gta-intro-logo">SUSHRUT<br>VAIDYA</div>
       <div class="gta-intro-bar">
         <div class="gta-intro-fill" id="intro-fill"></div>
       </div>
@@ -36,19 +50,16 @@
   <!-- ══ GTA HERO ══ -->
   <section class="gta-hero" id="hero">
     <div class="gta-hero-inner">
-      <!-- Left: Photo placeholder -->
+      <!-- Left: Photo -->
       <div class="gta-hero-art">
         <div class="gta-photo-frame gta-photo-hero">
-          <div class="gta-photo-placeholder">
-            <span class="gta-photo-icon">&#128247;</span>
-            <span class="gta-photo-label">YOUR PHOTO HERE</span>
-          </div>
+          <img src="photo.jpg" alt="Sushrut Vaidya" class="gta-hero-photo">
         </div>
       </div>
 
       <!-- Right: Character info -->
       <div class="gta-hero-info">
-        <span class="gta-hero-eyebrow">GRAND THEFT PORTFOLIO</span>
+        <span class="gta-hero-eyebrow">SUSHRUT VAIDYA</span>
         <h1 class="gta-hero-name">SUSHRUT<br>VAIDYA</h1>
         <div class="gta-hero-divider"></div>
         <p class="gta-hero-tagline">The one who cooks, games, and debugs — not always in that order.</p>
@@ -173,7 +184,7 @@
           </div>
           <div class="wanted-badge-divider"></div>
           <span class="wanted-badge-charge">CHARGED WITH</span>
-          <span class="wanted-badge-reason">Dangerously strong biryani opinions</span>
+          <span class="wanted-badge-reason">Dangerously strong Food opinions</span>
           <div class="wanted-badge-footer">
             <span class="wanted-badge-status">STATUS: AT LARGE</span>
           </div>
@@ -210,7 +221,7 @@
                 <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
               </div>
               <div class="wanted-mugshot">
-                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=500&fit=crop&crop=face" alt="The Cook" class="wanted-mugshot-img">
+                <img data-src="/kitchen/kungpao-paneer.jpg" alt="The Cook" class="wanted-mugshot-img">
                 <div class="wanted-silhouette-overlay"></div>
               </div>
               <div class="wanted-name">THE COOK</div>
@@ -227,20 +238,19 @@
             <button class="wanted-close" aria-label="Close">&times;</button>
             <div class="wanted-reveal-inner">
               <div class="wanted-reveal-photos">
-                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop" alt="Cooking" class="reveal-photo reveal-photo-main">
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=300&fit=crop" alt="Plated dish" class="reveal-photo reveal-photo-sm">
-                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=300&fit=crop" alt="Pizza" class="reveal-photo reveal-photo-sm">
+                <img data-src="/kitchen/biryani.jpg" alt="Hyderabadi Biryani" class="reveal-photo reveal-photo-main">
+                <img data-src="/kitchen/kungpao-paneer.jpg" alt="Kung Pao Paneer" class="reveal-photo reveal-photo-sm">
+                <img data-src="/kitchen/the-spread.jpg" alt="BBQ Spread" class="reveal-photo reveal-photo-sm">
               </div>
               <div class="wanted-reveal-info">
                 <span class="wanted-reveal-badge" style="--accent: var(--gta-amber)">THE COOK</span>
                 <h3 class="wanted-reveal-name">Kitchen Experiments</h3>
                 <p class="wanted-reveal-quote">"If it doesn't make you sweat, is it even food?"</p>
-                <p class="wanted-reveal-desc">Currently perfecting fresh pasta from scratch. The kitchen smells like Italy — or at least, Hyderabad's version of it. His cooking is either a 10/10 or a health hazard. There is no in-between.</p>
+                <p class="wanted-reveal-desc">Dum biryani, kung pao paneer, charcoal BBQ nights. The kitchen is either producing something incredible or on fire. No in-between. The neighbours have opinions.</p>
                 <div class="wanted-reveal-tags">
-                  <span class="wr-tag" style="--accent: var(--gta-amber)">Fresh Pasta</span>
                   <span class="wr-tag" style="--accent: var(--gta-amber)">Spice King</span>
-                  <span class="wr-tag" style="--accent: var(--gta-amber)">Reckless Confidence</span>
-                  <span class="wr-tag" style="--accent: var(--gta-amber)">Biryani Critic</span>
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Charcoal Certified</span>
+                  <span class="wr-tag" style="--accent: var(--gta-amber)">Indo-Chinese Arc</span>
                 </div>
               </div>
             </div>
@@ -259,7 +269,7 @@
                 <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
               </div>
               <div class="wanted-mugshot">
-                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=500&fit=crop&crop=center" alt="The Gamer" class="wanted-mugshot-img">
+                <img data-src="/gamer/pro-shot.jpg" alt="The Gamer" class="wanted-mugshot-img">
                 <div class="wanted-silhouette-overlay"></div>
               </div>
               <div class="wanted-name">THE GAMER</div>
@@ -267,7 +277,7 @@
                 <span>REWARD</span>
                 <span class="wanted-reward-amt">$25,000</span>
               </div>
-              <div class="wanted-charge">WANTED FOR: EXTREME BACKLOG HOARDING</div>
+              <div class="wanted-charge">WANTED FOR: IMPERSONATING A PRO PLAYER</div>
             </div>
           </div>
 
@@ -280,14 +290,14 @@
               </div>
               <div class="wanted-reveal-info">
                 <span class="wanted-reveal-badge" style="--accent: var(--gta-blue)">THE GAMER</span>
-                <h3 class="wanted-reveal-name">Controller In Hand</h3>
-                <p class="wanted-reveal-quote">"73 games in the backlog. 12% completion rate. No regrets."</p>
-                <p class="wanted-reveal-desc">Currently getting absolutely destroyed by Malenia in Elden Ring. Steam library is a graveyard of good intentions. Send help. Or a summon. Preferably both.</p>
+                <h3 class="wanted-reveal-name">1500 Hours. PS4 Controller.</h3>
+                <p class="wanted-reveal-quote">"Not a pro. Just plays like one. Sometimes."</p>
+                <p class="wanted-reveal-desc">1500 hours in CS2 on a PS4 controller. Yes, seriously. Actively hates Valorant. $40K inventory. Backlog is a graveyard of good intentions — Death Stranding and Detroit currently fighting for attention.</p>
                 <div class="wanted-reveal-tags">
-                  <span class="wr-tag" style="--accent: var(--gta-blue)">Steam</span>
-                  <span class="wr-tag" style="--accent: var(--gta-blue)">Soulslike Fan</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">CS2 Main</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">PS4 Controller</span>
+                  <span class="wr-tag" style="--accent: var(--gta-blue)">Valorant Hater</span>
                   <span class="wr-tag" style="--accent: var(--gta-blue)">Backlog Hoarder</span>
-                  <span class="wr-tag" style="--accent: var(--gta-blue)">Rage Quitter</span>
                 </div>
               </div>
             </div>
@@ -306,7 +316,7 @@
                 <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
               </div>
               <div class="wanted-mugshot">
-                <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44f5b8?w=400&h=500&fit=crop&crop=center" alt="The Social" class="wanted-mugshot-img">
+                <img data-src="/social/beer-mugshot.jpg" alt="The Social" class="wanted-mugshot-img">
                 <div class="wanted-silhouette-overlay"></div>
               </div>
               <div class="wanted-name">THE SOCIAL</div>
@@ -322,19 +332,19 @@
             <button class="wanted-close" aria-label="Close">&times;</button>
             <div class="wanted-reveal-inner">
               <div class="wanted-reveal-photos">
-                <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44f5b8?w=600&h=400&fit=crop" alt="Craft beer" class="reveal-photo reveal-photo-main">
-                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=300&fit=crop" alt="Fine dining" class="reveal-photo reveal-photo-sm">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt="Travel" class="reveal-photo reveal-photo-sm">
+                <img data-src="/social/group-shot.jpg" alt="Night out" class="reveal-photo reveal-photo-main">
+                <img data-src="/social/best-brewery.jpg" alt="B'est Brewery" class="reveal-photo reveal-photo-sm">
+                <img data-src="/social/forge-bar.jpg" alt="Forge Bar" class="reveal-photo reveal-photo-sm">
               </div>
               <div class="wanted-reveal-info">
                 <span class="wanted-reveal-badge" style="--accent: var(--gta-pink)">THE SOCIAL</span>
                 <h3 class="wanted-reveal-name">Craft Beers &amp; Good Food</h3>
                 <p class="wanted-reveal-quote">"Weekend plans are mandatory, not optional."</p>
-                <p class="wanted-reveal-desc">A sucker for craft beers and good food. Always at the regular go-to spot with good conversations. Gym arc in progress — it's called character development. Passport finally getting some exercise.</p>
+                <p class="wanted-reveal-desc">Brewery hopper. Group outing organiser. The one who picks the restaurant and is always right about it. Craft beer in hand, football on the screen, no further questions.</p>
                 <div class="wanted-reveal-tags">
                   <span class="wr-tag" style="--accent: var(--gta-pink)">Craft Beer</span>
+                  <span class="wr-tag" style="--accent: var(--gta-pink)">Brewery Regular</span>
                   <span class="wr-tag" style="--accent: var(--gta-pink)">Good Food</span>
-                  <span class="wr-tag" style="--accent: var(--gta-pink)">Travel</span>
                   <span class="wr-tag" style="--accent: var(--gta-pink)">Gym Arc</span>
                 </div>
               </div>
@@ -342,51 +352,7 @@
           </div>
         </div>
 
-        <!-- THE OTAKU -->
-        <div class="wanted-poster reveal" data-persona="otaku" data-accent="var(--gta-purple)">
-          <div class="wanted-front">
-            <div class="wanted-tape wanted-tape-l"></div>
-            <div class="wanted-tape wanted-tape-r"></div>
-            <div class="wanted-paper">
-              <div class="wanted-header">
-                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
-                <span class="wanted-title">WANTED</span>
-                <span class="wanted-stars">&#9733;&#9733;&#9733;</span>
-              </div>
-              <div class="wanted-mugshot">
-                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&h=500&fit=crop&crop=center" alt="The Otaku" class="wanted-mugshot-img">
-                <div class="wanted-silhouette-overlay"></div>
-              </div>
-              <div class="wanted-name">THE OTAKU</div>
-              <div class="wanted-reward">
-                <span>REWARD</span>
-                <span class="wanted-reward-amt">$50,000</span>
-              </div>
-              <div class="wanted-charge">WANTED FOR: 367 EPISODES OF GINTAMA (×5)</div>
-            </div>
-          </div>
-
-          <div class="wanted-reveal">
-            <button class="wanted-close" aria-label="Close">&times;</button>
-            <div class="wanted-reveal-inner">
-              <div class="wanted-reveal-photos">
-                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=400&fit=crop" alt="Anime collection" class="reveal-photo reveal-photo-main reveal-photo-wide">
-              </div>
-              <div class="wanted-reveal-info">
-                <span class="wanted-reveal-badge" style="--accent: var(--gta-purple)">THE OTAKU</span>
-                <h3 class="wanted-reveal-name">Gintama Enthusiast</h3>
-                <p class="wanted-reveal-quote">"Gintoki is the most relatable protagonist. This is not up for debate."</p>
-                <p class="wanted-reveal-desc">367 episodes. Rewatch #5 in progress. Can quote entire scenes from memory. Lo-fi for focus, Bollywood bangers for vibes. No in-between exists. Don't ask him about Gintama unless you have 3 hours to spare.</p>
-                <div class="wanted-reveal-tags">
-                  <span class="wr-tag" style="--accent: var(--gta-purple)">Gintama</span>
-                  <span class="wr-tag" style="--accent: var(--gta-purple)">Lo-fi & Bollywood</span>
-                  <span class="wr-tag" style="--accent: var(--gta-purple)">Anime Nerd</span>
-                  <span class="wr-tag" style="--accent: var(--gta-purple)">Rewatch King</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- THE OTAKU removed -->
 
       </div>
     </div>
@@ -480,12 +446,12 @@
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#127918;</span>
           <span class="gta-currently-label">PLAYING</span>
-          <span class="gta-currently-value">Detroit: Become Human + Death Stranding</span>
+          <span class="gta-currently-value" id="currently-playing">Detroit: Become Human + Death Stranding</span>
         </div>
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#128268;</span>
           <span class="gta-currently-label">LEARNING</span>
-          <span class="gta-currently-value">Arduino + Breadboard Circuits</span>
+          <span class="gta-currently-value" id="currently-learning">Arduino + Breadboard Circuits</span>
         </div>
         <div class="gta-currently-card">
           <span class="gta-currently-icon">&#127859;</span>
@@ -511,24 +477,9 @@
 
       <div class="lore-tv-wrap reveal">
         <div class="lore-tv" id="lore-tv">
-          <!-- Rabbit ear antenna -->
-          <div class="lore-tv-antenna">
-            <div class="lore-tv-antenna-ear lore-tv-antenna-l"></div>
-            <div class="lore-tv-antenna-ear lore-tv-antenna-r"></div>
-            <div class="lore-tv-antenna-base"></div>
-          </div>
-
           <div class="lore-tv-bezel">
-            <!-- Brand badge with red circle scribble -->
-            <div class="lore-tv-brand">
-              <span class="lore-tv-brand-name">SamSong</span>
-              <svg class="lore-tv-brand-circle" viewBox="0 0 140 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <ellipse cx="70" cy="22" rx="66" ry="18" stroke="#e33" stroke-width="2.5" stroke-dasharray="4 2" fill="none" transform="rotate(-2 70 22)" opacity="0.85"/>
-              </svg>
-            </div>
-            <!-- Power LED -->
-            <div class="lore-tv-power-led"></div>
 
+            <!-- Screen -->
             <div class="lore-tv-screen" id="tv-screen">
               <div class="lore-tv-static" id="tv-static"></div>
               <div class="lore-tv-vhs-line"></div>
@@ -536,38 +487,44 @@
               <video class="lore-tv-video" id="tv-video" muted loop playsinline></video>
               <div class="lore-tv-content" id="tv-content">
                 <div class="lore-tv-channel" id="tv-channel">CH 01</div>
+                <div class="lore-tv-emoji" id="tv-emoji"></div>
                 <div class="lore-tv-show" id="tv-show"></div>
-                <div class="lore-tv-quote" id="tv-quote"></div>
               </div>
               <div class="lore-tv-scanlines"></div>
             </div>
 
-            <!-- Controls bar: mute + knobs -->
-            <div class="lore-tv-controls">
-              <button class="lore-tv-mute-btn" id="tv-mute" aria-label="Toggle sound">🔇</button>
-              <div class="lore-tv-knob-group">
-                <span class="lore-tv-knob-label">CH</span>
-                <button class="lore-tv-knob" id="tv-prev" aria-label="Previous channel">
-                  <div class="lore-tv-knob-inner">
-                    <div class="lore-tv-knob-notch"></div>
-                  </div>
-                </button>
+            <!-- Bottom bar: brand + controls -->
+            <div class="lore-tv-bottom-bar">
+              <div class="lore-tv-brand-area">
+                <span class="lore-tv-brand-name">SamSong</span>
+                <div class="lore-tv-power-led"></div>
               </div>
-              <div class="lore-tv-knob-group">
-                <span class="lore-tv-knob-label">VOL</span>
-                <button class="lore-tv-knob" id="tv-vol" aria-label="Adjust volume">
-                  <div class="lore-tv-knob-inner">
-                    <div class="lore-tv-knob-notch"></div>
-                  </div>
-                </button>
+              <div class="lore-tv-controls">
+                <button class="lore-tv-mute-btn" id="tv-mute" aria-label="Toggle sound">🔇</button>
+                <div class="lore-tv-knob-group">
+                  <span class="lore-tv-knob-label">CH</span>
+                  <button class="lore-tv-knob" id="tv-prev" aria-label="Change channel">
+                    <div class="lore-tv-knob-inner"><div class="lore-tv-knob-notch"></div></div>
+                  </button>
+                </div>
+                <div class="lore-tv-knob-group">
+                  <span class="lore-tv-knob-label">VOL</span>
+                  <button class="lore-tv-knob" id="tv-vol" aria-label="Adjust volume">
+                    <div class="lore-tv-knob-inner"><div class="lore-tv-knob-notch"></div></div>
+                  </button>
+                </div>
               </div>
             </div>
+
           </div>
-          <div class="lore-tv-legs">
-            <div class="lore-tv-leg"></div>
-            <div class="lore-tv-leg"></div>
+
+          <!-- Pedestal stand -->
+          <div class="lore-tv-stand">
+            <div class="lore-tv-stand-neck"></div>
+            <div class="lore-tv-stand-base"></div>
           </div>
         </div>
+        <div class="lore-tv-caption" id="tv-quote"></div>
       </div>
     </div>
   </section>
@@ -581,6 +538,7 @@
 
       <div class="cardgen-layout reveal">
         <!-- Example card — Sushrut's card as teaser -->
+        <div class="player-card-wrap" id="card-wrap">
         <div class="player-card" id="example-card">
           <div class="pc-accent-stripe"></div>
           <div class="pc-inner">
@@ -642,6 +600,7 @@
             </div>
           </div>
         </div>
+        </div>
 
         <!-- CTA side -->
         <div class="cardgen-cta">
@@ -661,13 +620,17 @@
               <span class="cardgen-feat-text">Upload your mugshot</span>
             </div>
             <div class="cardgen-feat">
-              <span class="cardgen-feat-icon">&#128229;</span>
-              <span class="cardgen-feat-text">Download as image</span>
+              <span class="cardgen-feat-icon">&#127912;</span>
+              <span class="cardgen-feat-text">Pick from 9 styles</span>
             </div>
           </div>
           <a href="card-experiments.html" class="cardgen-btn">
             <span class="cardgen-btn-text">CREATE YOUR CARD</span>
           </a>
+          <div class="cardgen-leaderboard-nudge">
+            <span class="cardgen-suspect-count"><span id="cardgen-suspect-count">—</span> have left their mark.</span>
+            <a href="leaderboard.html" class="cardgen-lb-link">See the board <span class="cardgen-lb-arrow">→</span></a>
+          </div>
         </div>
       </div>
 
@@ -689,7 +652,7 @@
   <div class="am-jb-backdrop" id="jb-backdrop"></div>
   <div class="am-jukebox" id="jukebox">
     <button class="am-jb-pill" id="jb-pill">
-      <div class="am-jb-mini-eq"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="am-jb-vinyl" id="jb-vinyl"></div>
       <div class="am-jb-track-name" id="jb-track-name"><span class="am-jb-track-name-inner" id="jb-track-name-inner">Corridors of Time — Chrono Trigger</span></div>
       <span class="am-jb-play-btn" id="jb-play-compact" aria-label="Play/Pause">&#9654;</span>
     </button>
@@ -722,6 +685,15 @@
     </div>
   </div>
 
+  <!-- ═══ FIFA CARD UNBOXING OVERLAY ═══ -->
+  <div class="unbox-overlay" id="unboxOverlay">
+    <div class="unbox-rays" id="unboxRays"></div>
+    <div class="unbox-particles" id="unboxParticles"></div>
+    <div class="unbox-card-stage" id="unboxStage"></div>
+    <div class="unbox-dismiss">click anywhere to close</div>
+  </div>
+
   <script src="js/aboutme-v2.js" defer></script>
+
 </body>
 </html>

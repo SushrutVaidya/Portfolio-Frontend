@@ -2,7 +2,10 @@
 // API Configuration
 // ========================================
 
-const API_URL = '/api/stats';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8081'
+  : '';
+const API_URL = API_BASE + '/api/stats';
 
 // ========================================
 // DOM Elements
@@ -65,7 +68,7 @@ async function fetchStats() {
     startLiveClock();
 
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    console.warn('Stats fetch failed:', error);
 
     // Show default content even if API fails
     locationTextEl.textContent = 'hyderabad';
@@ -145,9 +148,7 @@ songNameEl.addEventListener('mouseenter', () => {
       songAudio = new Audio(API_URL.replace('/api/stats', '') + songPreviewUrl);
       songAudio.volume = 0.5;
     }
-    songAudio.play().catch(() => {
-      console.log('Click anywhere on the page first to enable audio');
-    });
+    songAudio.play().catch(() => {});
   }
 });
 
@@ -189,9 +190,7 @@ bookNameEl.addEventListener('mouseenter', () => {
     bookAudio.loop = true; // Loop the audio
   }
   bookAudio.currentTime = 0;
-  bookAudio.play().catch(() => {
-    console.log('Click anywhere on the page first to enable audio');
-  });
+  bookAudio.play().catch(() => {});
 });
 
 bookNameEl.addEventListener('mouseleave', () => {
@@ -476,7 +475,7 @@ function checkRickrolled() {
 function showRickrollMessage(count) {
   const message = document.createElement('div');
   message.className = 'rickroll-message';
-  message.innerHTML = `You're rickroll victim #${count}! Never gonna give you up 🎵`;
+  message.textContent = `You're rickroll victim #${count}! Never gonna give you up 🎵`;
   document.body.appendChild(message);
 
   setTimeout(() => {

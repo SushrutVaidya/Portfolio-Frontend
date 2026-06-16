@@ -1,6 +1,12 @@
 // About Me v2 — GTA V Light + Bold
 (() => {
-  const API_BASE = 'http://localhost:8081';
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8081'
+    : '';
+
+  if (!localStorage.getItem('dq-stat-social')) {
+    localStorage.setItem('dq-stat-social', '70');
+  }
 
   async function apiFetch(path) {
     const res = await fetch(API_BASE + path);
@@ -196,10 +202,7 @@
     const step = (Math.PI * 2) / n;
     const startAngle = -Math.PI / 2;
 
-    console.log('[Pentagon] Drawing — n:', n, 'cx:', cx, 'cy:', cy, 'r:', r);
-    console.log('[Pentagon] Values:', values);
-
-    // Draw static final frame immediately to test
+    // Draw static final frame
     ctx.clearRect(0, 0, w, h);
 
     // Grid rings
@@ -236,7 +239,6 @@
       const v = (values[idx] / 100) * r;
       const x = cx + Math.cos(a) * v;
       const y = cy + Math.sin(a) * v;
-      console.log('[Pentagon] Point', idx, ':', x.toFixed(1), y.toFixed(1), 'val:', values[idx], 'v:', v.toFixed(1));
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.closePath();
@@ -260,21 +262,21 @@
       ctx.stroke();
 
       // Label
-      const lr = r + 24;
+      const lr = r + 28;
+      const lx = cx + Math.cos(a) * lr;
+      const ly = cy + Math.sin(a) * lr;
       ctx.font = '700 11px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillText(labels[i], cx + Math.cos(a) * lr, cy + Math.sin(a) * lr);
+      ctx.fillText(labels[i], lx, ly);
 
-      // Value
-      const vr = r + 38;
+      // Value — stacked below label
       ctx.font = '800 10px -apple-system, sans-serif';
       ctx.fillStyle = colors[i];
-      ctx.fillText(values[i], cx + Math.cos(a) * vr, cy + Math.sin(a) * vr);
+      ctx.fillText(values[i], lx, ly + 14);
     }
 
-    console.log('[Pentagon] Draw complete');
     canvas.classList.add('glow');
     const wrap = canvas.closest('.stats-pentagon-wrap');
     if (wrap) wrap.classList.add('pulse');
@@ -551,7 +553,7 @@
       if (msg.label) div.innerHTML = '<span class="lore-msg-label">' + msg.label + '</span>' + msg.text;
       else div.textContent = msg.text;
       chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+      requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
     }
   }
 
@@ -562,11 +564,12 @@
   //  RETRO TV (The Channel)
   // ════════════════════════════════════
   const TV_CHANNELS = [
-    { show: 'FAMILY GUY', emoji: '📺', quote: "I've watched every episode. Multiple times. Peter Griffin is a lifestyle. Giggity.", clip: API_BASE + '/clips/familyguy.mp4' },
-    { show: 'GINTAMA', emoji: '🎌', quote: "The anime that made me realize a show about a lazy samurai could have the best fight scenes AND the best toilet humor.", clip: API_BASE + '/clips/gintama.mp4' },
-    { show: 'SOUTH PARK', emoji: '🏔️', quote: "Respect it. Don't worship it. But when Cartman has a plan, you listen. Or don't. Probably don't.", clip: API_BASE + '/clips/southpark.mp4' },
-    { show: 'DOOM ETERNAL', emoji: '💀', quote: "This isn't a game. It's a lifestyle. Rip and tear until you forget what day it is.", clip: API_BASE + '/clips/doom.mp4' },
-    { show: 'DETROIT: BECOME HUMAN', emoji: '🤖', quote: "28 STAB WOUNDS. I just wanted to see what happens. The game judged me. I judged it back.", clip: API_BASE + '/clips/detroit.mp4' },
+    { show: 'FAMILY GUY', emoji: '📺', quote: "I've watched every episode. Multiple times. Peter Griffin is a lifestyle. Giggity.", clips: [API_BASE + '/clips/familyguy1.mp4', API_BASE + '/clips/familyguy2.mp4'] },
+    { show: 'GINTAMA', emoji: '🎌', quote: "The anime that made me realize a show about a lazy samurai could have the best fight scenes AND the best toilet humor.", clips: [API_BASE + '/clips/gintama1.mp4', API_BASE + '/clips/gintama2.mp4'] },
+    { show: 'DOOM ETERNAL', emoji: '💀', quote: "This isn't a game. It's a lifestyle. Rip and tear until you forget what day it is.", clips: [API_BASE + '/clips/doom1.mp4', API_BASE + '/clips/doom2.mp4'] },
+    { show: 'GTA V', emoji: '🚗', quote: "The reason this whole portfolio exists. Los Santos never gets old.", clips: [API_BASE + '/clips/gtav1.mp4', API_BASE + '/clips/gtav2.mp4'] },
+    { show: 'COUNTER-STRIKE 2', emoji: '💣', quote: "1500 hours. PS4 controller. Zero regrets. Valorant players can look away.", clips: [API_BASE + '/clips/cs21.mp4', API_BASE + '/clips/cs22.mp4'] },
+    { show: 'SPACE MARINE 2', emoji: '⚔️', quote: "For the Emperor. No notes.", clips: [API_BASE + '/clips/sm21.mp4', API_BASE + '/clips/sm22.mp4'] },
   ];
 
   function initTV() {
@@ -575,6 +578,7 @@
     const staticEl = document.getElementById('tv-static');
     const channelEl = document.getElementById('tv-channel');
     const showEl = document.getElementById('tv-show');
+    const emojiEl = document.getElementById('tv-emoji');
     const quoteEl = document.getElementById('tv-quote');
     const videoEl = document.getElementById('tv-video');
     const muteBtn = document.getElementById('tv-mute');
@@ -593,17 +597,25 @@
     const VOL_ICONS = ['\u{1F507}', '\u{1F508}', '\u{1F509}', '\u{1F50A}'];
     let volIdx = 0; // start muted
 
-    const clipLoaded = {};
+    const clipLoaded = {};   // keyed by URL
+    const channelClipIdx = {}; // tracks which clip to play next per channel
 
-    function tryLoadClip(idx) {
-      if (clipLoaded[idx] !== undefined) return;
-      const ch = TV_CHANNELS[idx];
-      if (!ch.clip) { clipLoaded[idx] = false; return; }
+    function tryLoadClip(url) {
+      if (!url || clipLoaded[url] !== undefined) return;
       const tester = document.createElement('video');
-      tester.src = ch.clip;
-      tester.addEventListener('canplaythrough', () => { clipLoaded[idx] = true; }, { once: true });
-      tester.addEventListener('error', () => { clipLoaded[idx] = false; }, { once: true });
+      tester.src = url;
+      tester.addEventListener('canplaythrough', () => { clipLoaded[url] = true; }, { once: true });
+      tester.addEventListener('error', () => { clipLoaded[url] = false; }, { once: true });
       tester.load();
+    }
+
+    function getNextClip(chIdx) {
+      const clips = TV_CHANNELS[chIdx].clips || [];
+      if (!clips.length) return null;
+      if (channelClipIdx[chIdx] === undefined) channelClipIdx[chIdx] = 0;
+      const url = clips[channelClipIdx[chIdx]];
+      channelClipIdx[chIdx] = (channelClipIdx[chIdx] + 1) % clips.length;
+      return url;
     }
 
     function applyVolume() {
@@ -617,19 +629,33 @@
     function display(idx) {
       const ch = TV_CHANNELS[idx];
       channelEl.textContent = 'CH ' + String(idx + 1).padStart(2, '0');
-      showEl.innerHTML = '<span class="lore-tv-emoji">' + ch.emoji + '</span>' + ch.show;
-      quoteEl.textContent = ch.quote;
+      if (emojiEl) emojiEl.textContent = ch.emoji;
+      showEl.textContent = ch.show;
+      if (quoteEl) quoteEl.textContent = ch.quote;
 
-      if (clipLoaded[idx] === true && videoEl) {
-        videoEl.src = ch.clip;
+      const clipUrl = getNextClip(idx);
+      // Optimistically play unless we know the URL failed to load.
+      // Browsers allow muted autoplay; the play() promise rejects silently if blocked.
+      if (clipUrl && clipLoaded[clipUrl] !== false && videoEl) {
+        videoEl.src = clipUrl;
         applyVolume();
         videoEl.classList.add('active');
         videoEl.play().catch(() => {});
+        // Pause jukebox only if TV has audio on
+        if (volIdx > 0 && window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+          window._dqJukeboxAudio.pause();
+          window._tvPausedJukebox = true;
+        }
       } else {
         if (videoEl) {
           videoEl.classList.remove('active');
           videoEl.pause();
           videoEl.removeAttribute('src');
+          // Resume jukebox if TV paused it
+          if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+            window._dqJukeboxAudio.play().catch(() => {});
+            window._tvPausedJukebox = false;
+          }
         }
       }
     }
@@ -712,13 +738,53 @@
         if (e.isIntersecting && !warmedUp) {
           warmedUp = true;
           screen.classList.add('warming-up');
-          tvObs.disconnect();
+          // Auto-start channel 1 muted so the TV looks alive on first arrival
+          // (browser autoplay policy allows muted playback without user gesture)
+          volIdx = 0;
+          applyVolume();
+          display(currentCh);
+        }
+        // Pause video when TV is off screen, resume when back
+        // Also coordinate with jukebox
+        if (videoEl) {
+          if (e.isIntersecting) {
+            videoEl.play().catch(() => {});
+            // Pause jukebox when TV section is in view (only if TV has audio on)
+            if (volIdx > 0 && window._dqJukeboxAudio && !window._dqJukeboxAudio.paused) {
+              window._dqJukeboxAudio.pause();
+              window._tvPausedJukebox = true;
+            }
+          } else {
+            videoEl.pause();
+            // Resume jukebox when TV scrolls out of view
+            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+              window._dqJukeboxAudio.play().catch(() => {});
+              window._tvPausedJukebox = false;
+            }
+          }
         }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0, rootMargin: '0px' });
     tvObs.observe(screen);
 
-    TV_CHANNELS.forEach((_, i) => tryLoadClip(i));
+    // Also pause TV when card section comes into view
+    var cardgenEl = document.getElementById('cardgen');
+    if (cardgenEl) {
+      var cardObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting && videoEl) {
+            videoEl.pause();
+            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
+              window._dqJukeboxAudio.play().catch(function() {});
+              window._tvPausedJukebox = false;
+            }
+          }
+        });
+      }, { threshold: 0.1 });
+      cardObs.observe(cardgenEl);
+    }
+
+    TV_CHANNELS.forEach(ch => (ch.clips || []).forEach(url => tryLoadClip(url)));
     display(0);
   }
 
@@ -737,45 +803,95 @@
   const MOCK_DISHES = [
     {
       name: 'Hyderabadi Biryani',
-      photo: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f4?w=400&h=300&fit=crop',
-      spice: 4,
-      tag: 'SIGNATURE DISH',
-      story: 'The one dish that took 47 failed attempts to get right. Dum method, whole spices, zero shortcuts. The neighbours know when biryani day hits.'
-    },
-    {
-      name: 'Fresh Pasta Aglio e Olio',
-      photo: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop',
-      spice: 2,
-      tag: 'CURRENT OBSESSION',
-      story: 'Hand-rolled, no machine. Just flour, eggs, and main character energy. The key is toasting the garlic low and slow until it whispers back at you.'
-    },
-    {
-      name: 'Butter Chicken',
-      photo: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=300&fit=crop',
-      spice: 3,
-      tag: 'CROWD PLEASER',
-      story: 'The "play it safe" pick that never fails. Overnight marinade, cashew paste, stupid amounts of butter. Tastes like a warm hug from a desi auntie.'
-    },
-    {
-      name: 'Spicy Ramen',
-      photo: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop',
+      photo: API_BASE + '/kitchen/biryani.jpg',
       spice: 5,
-      tag: 'LATE NIGHT FUEL',
-      story: 'Tonkotsu base simmered for 8 hours. Chili oil homemade. Soft-boiled egg with the perfect jammy center. Anime-accurate slurping is mandatory.'
+      tag: 'SIGNATURE DISH',
+      story: 'Dum method. Foil seal, wet cloth, full patience. The cashews and mint on top mean it\'s done — not plated, done. Neighbours two floors down have opinions about when I make this.'
     },
     {
-      name: 'Chocolate Lava Cake',
-      photo: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop',
-      spice: 0,
-      tag: 'DESSERT BOSS',
-      story: 'The timing is everything — 12 minutes, not 11, not 13. Pull it out and flip it with unearned confidence. The molten center is either perfect or a crime scene.'
+      name: 'The White Bowl',
+      photo: API_BASE + '/kitchen/murgh-malai.jpg',
+      photoPosition: 'center 70%',
+      spice: 2,
+      tag: 'WEEKNIGHT FLEX',
+      story: 'Herby fried rice, cheese sauce with mushrooms and zucchini, pan-fried paneer on top. A cat showed up, rated it 4/5 without being asked, and received nothing in return.'
     },
     {
-      name: 'Chicken Tikka Tacos',
-      photo: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop',
+      name: 'Chilli Oil Noodles',
+      photo: API_BASE + '/kitchen/chilli-noodles.jpg',
+      spice: 4,
+      tag: 'MIDNIGHT SPECIAL',
+      story: 'Master Chow 2x spicy chilli oil + udon + 8 minutes. The bottle costs more than the noodles and that is the correct order of priorities. No notes.'
+    },
+    {
+      name: 'Paneer Fried Rice',
+      photo: API_BASE + '/kitchen/paneer-fried-rice.jpg',
       spice: 3,
-      tag: 'FUSION EXPERIMENT',
-      story: 'Desi meets Mexican in the most chaotic crossover episode. Tikka-marinated chicken, pickled onions, mint chutney, flour tortilla. Geneva Convention pending.'
+      tag: 'TUESDAY AT 12AM',
+      story: 'Indo-Chinese fried rice with paneer. Made this on a Tuesday midnight for no reason. The map placemat adds nothing. The rice adds everything. This is a vibe meal, not a recipe.'
+    },
+    {
+      name: 'Fusilli Arrabbiata',
+      photo: API_BASE + '/kitchen/penne.jpg',
+      spice: 3,
+      tag: 'NO JAR SAUCE',
+      story: 'Crushed tomatoes, garlic, red chilli, olive oil. That\'s it. That\'s the whole recipe and the whole personality. Anyone using jar sauce can leave.'
+    },
+    {
+      name: 'BBQ Night',
+      photo: API_BASE + '/kitchen/bbq-night.jpg',
+      spice: 4,
+      tag: 'CHARCOAL CERTIFIED',
+      story: 'Paneer tikka and tangdi on live charcoal. Old Monk was present in an advisory capacity. The grill was a ₹400 Amazon purchase. It cooked exactly as well as a tandoor. It did not.'
+    },
+    {
+      name: 'The Spread',
+      photo: API_BASE + '/kitchen/the-spread.jpg',
+      spice: 3,
+      tag: 'FULL SEND',
+      story: 'Paneer, pav, green chutney, fried stuff, charcoal grill going. No recipe. No plan. Just vibes and questionable decisions made at speed. Everyone ate well.'
+    },
+    {
+      name: 'Ramen',
+      photo: API_BASE + '/kitchen/ramen.jpg',
+      spice: 4,
+      tag: 'BUILT FROM SCRATCH',
+      story: 'Broth, tofu, mushrooms, noodles — all in. Not instant. Not a shortcut. The kind of bowl you make when you want to feel like you have your life together. Debatable.'
+    },
+    {
+      name: 'Black Bean Noodles',
+      photo: API_BASE + '/kitchen/black-bean-noodles.jpg',
+      spice: 3,
+      tag: 'CHAOS BUILD',
+      story: 'Black bean sauce, baby corn, mushrooms, and whatever else survived the fridge audit. Hakka style. No measurements. Turned out better than it had any right to.'
+    },
+    {
+      name: 'American Chopsuey',
+      photo: API_BASE + '/kitchen/american-chopsuey.jpg',
+      spice: 2,
+      tag: 'NOT AMERICAN. NOT CHINESE.',
+      story: 'Crispy noodles, sweet tangy sauce, caramelised onions. A dish that belongs to no country and every Indian household. Made it from memory. Memory was correct.'
+    },
+    {
+      name: 'Kung Pao Paneer',
+      photo: API_BASE + '/kitchen/kungpao-paneer.jpg',
+      spice: 4,
+      tag: 'INDO-CHINESE',
+      story: 'Paneer cubes, bell peppers, dried chillies, soy sauce. The wok was screaming. The kitchen smelled incredible. Went hard on the chilli. Zero regrets.'
+    },
+    {
+      name: 'Mango Cheesecake',
+      photo: API_BASE + '/kitchen/mango-cheesecake.jpg',
+      spice: 0,
+      tag: 'NO BAKE. ALL FLEX.',
+      story: 'Mango glaze on top, biscuit base, cream cheese filling. No oven. Just patience and a fridge. Took it out and held it like it was the World Cup. It was.'
+    },
+    {
+      name: 'Chilli Oil Dan Dan',
+      photo: API_BASE + '/kitchen/restaurant-noodles.jpg',
+      spice: 4,
+      tag: 'RESTAURANT RECON',
+      story: 'Ordered this at a restaurant just to reverse engineer it at home. White noodles, crispy chilli oil, vegetables, spring onion. Notes were taken. Mission ongoing.'
     },
   ];
 
@@ -798,7 +914,7 @@
         '<div class="kitchen-polaroid-inner" style="transform:rotate(' + angle + 'deg)">' +
           '<div class="kitchen-pol-front">' +
             '<div class="kitchen-tape"></div>' +
-            '<img class="kitchen-pol-photo" src="' + dish.photo + '" alt="' + dish.name + '" loading="lazy">' +
+            '<img class="kitchen-pol-photo" src="' + dish.photo + '" alt="' + dish.name + '" loading="lazy"' + (dish.photoPosition ? ' style="object-position:' + dish.photoPosition + '"' : '') + '>' +
             '<div class="kitchen-pol-bottom">' +
               '<div class="kitchen-pol-name">' + dish.name + '</div>' +
               '<div class="kitchen-pol-spice">' + spiceIcons + '</div>' +
@@ -1105,11 +1221,13 @@
     const volVal = document.getElementById('jb-vol-val');
     const backdrop = document.getElementById('jb-backdrop');
 
-    if (!jukebox || !pill || !tracks.length) return;
+    if (!jukebox || !pill || !tracks || !tracks.length) return;
 
     let currentTrack = 0;
     let isPlaying = false;
     var SEP = '  \u00b7  ';
+
+
 
     function updateDisplay() {
       var t = tracks[currentTrack];
@@ -1134,18 +1252,59 @@
       });
     }
 
-    function selectTrack(index) { currentTrack = index; updateDisplay(); renderTracks(); if (!isPlaying) togglePlay(); }
+    function selectTrack(index) {
+      currentTrack = index;
+      updateDisplay(); renderTracks();
+      var t = tracks[index];
+      if (t && t.audioURL) {
+        audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
+        audio.load();
+        isPlaying = true;
+        audio.play().catch(function() {});
+        jukebox.classList.toggle('paused', false);
+        playCompact.textContent = '\u23F8';
+        playBtn.textContent = '\u23F8';
+      }
+    }
+
+    // Audio playback
+    var audio = new Audio();
+    audio.volume = 0.3; // low volume for autoplay
+    var _trackLoading = false;
+    window._dqJukeboxAudio = audio; // expose for TV mute coordination
+
+    // No auto-play — user discovers jukebox naturally
+
+    function loadTrack(index) {
+      var t = tracks[index];
+      if (!t || !t.audioURL) return;
+      var wasPlaying = isPlaying;
+      _trackLoading = true;
+      audio.src = t.audioURL.startsWith('http') ? t.audioURL : API_BASE + t.audioURL;
+      audio.load();
+      _trackLoading = false;
+      if (wasPlaying) audio.play().catch(function() {});
+    }
+
+    audio.addEventListener('ended', function() {
+      if (_trackLoading) return;
+      currentTrack = (currentTrack + 1) % tracks.length;
+      updateDisplay(); renderTracks(); loadTrack(currentTrack);
+    });
 
     function togglePlay() {
+      if (!tracks || !tracks[currentTrack] || !tracks[currentTrack].audioURL) return;
+      if (!audio.src || audio.src === window.location.href) loadTrack(currentTrack);
       isPlaying = !isPlaying;
+      isPlaying ? audio.play().catch(function() {}) : audio.pause();
       jukebox.classList.toggle('paused', !isPlaying);
       var icon = isPlaying ? '\u23F8' : '\u25B6';
       playCompact.textContent = icon;
       playBtn.textContent = icon;
     }
 
-    function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); }
-    function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); }
+    function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
+    function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; updateDisplay(); renderTracks(); loadTrack(currentTrack); }
 
     pill.addEventListener('click', function(e) {
       if (e.target === playCompact) { e.stopPropagation(); togglePlay(); return; }
@@ -1160,7 +1319,7 @@
 
     var tlToggle = document.getElementById('jb-tl-toggle');
     if (tlToggle) { tlToggle.addEventListener('click', function() { jukebox.classList.toggle('expanded-full'); }); }
-    volSlider.addEventListener('input', function() { volVal.textContent = volSlider.value; });
+    volSlider.addEventListener('input', function(e) { e.stopPropagation(); audio.volume = volSlider.value / 100; volVal.textContent = volSlider.value; });
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && jukebox.classList.contains('expanded')) {
@@ -1199,15 +1358,23 @@
 
     jukebox.classList.add('paused');
     renderTracks();
+
+
   }
 
   // ════════════════════════════════════
-  //  PLAYER CARD 3D TILT
+  //  PLAYER CARD — FIFA UNBOXING + 3D TILT
   // ════════════════════════════════════
   function initCardTilt() {
+    const wrap = document.getElementById('card-wrap');
     const card = document.getElementById('example-card');
-    if (!card) return;
+    const overlay = document.getElementById('unboxOverlay');
+    const stage = document.getElementById('unboxStage');
+    const raysContainer = document.getElementById('unboxRays');
+    const particlesContainer = document.getElementById('unboxParticles');
+    if (!wrap || !card || !overlay) return;
 
+    // 3D tilt on the in-page card
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -1224,24 +1391,282 @@
       card.style.transform = '';
       card.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1)';
     });
+
+    // Build light rays once
+    function buildRays() {
+      raysContainer.innerHTML = '';
+      const count = 16;
+      for (let i = 0; i < count; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'unbox-ray';
+        const angle = (360 / count) * i;
+        const width = 2 + Math.random() * 3;
+        ray.style.transform = 'rotate(' + angle + 'deg)';
+        ray.style.width = width + 'px';
+        ray.style.opacity = 0.3 + Math.random() * 0.5;
+        raysContainer.appendChild(ray);
+      }
+    }
+
+    // Build floating particles
+    function buildParticles() {
+      particlesContainer.innerHTML = '';
+      const colors = ['#ff6600', '#ff9f0a', '#bf5af2', '#0a84ff', '#ffcc00', '#fff'];
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'unbox-particle';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = 2 + Math.random() * 5;
+        const x = 10 + Math.random() * 80;
+        const startY = 50 + Math.random() * 40;
+        const travel = -(100 + Math.random() * 300);
+        const dur = 2 + Math.random() * 2;
+        const delay = Math.random() * 1.2;
+        p.style.cssText =
+          'left:' + x + '%;' +
+          'top:' + startY + '%;' +
+          'width:' + size + 'px;' +
+          'height:' + size + 'px;' +
+          'background:' + color + ';' +
+          'box-shadow:0 0 ' + (size * 2) + 'px ' + color + ';' +
+          '--travel:' + travel + 'px;' +
+          '--dur:' + dur + 's;' +
+          '--delay:' + delay + 's;';
+        particlesContainer.appendChild(p);
+      }
+    }
+
+    // Open unboxing overlay
+    function openUnbox() {
+      buildRays();
+      buildParticles();
+
+      // Clone the card into the stage
+      stage.innerHTML = '';
+      const clone = card.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.style.transform = '';
+      clone.style.transition = '';
+      stage.appendChild(clone);
+
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // After rays appear, start pulsing
+      setTimeout(() => {
+        raysContainer.style.animation = 'raysPulse 3s ease-in-out infinite';
+      }, 1200);
+    }
+
+    // Close overlay
+    function closeUnbox() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      raysContainer.style.animation = '';
+    }
+
+    // Click card → open unboxing
+    wrap.addEventListener('click', openUnbox);
+
+    // Click overlay → close
+    overlay.addEventListener('click', closeUnbox);
+
+    // Escape to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('active')) {
+        closeUnbox();
+      }
+    });
   }
 
   // ── Init ──
+  async function fetchCurrently() {
+    try {
+      const data = await apiFetch('/api/stats');
+      const playing  = document.getElementById('currently-playing');
+      const learning = document.getElementById('currently-learning');
+      if (playing  && data.game)     playing.textContent  = data.game;
+      if (learning && data.bookName) learning.textContent = data.bookName;
+    } catch { /* keep hardcoded fallback values */ }
+  }
+
+  function fixMediaUrls() {
+    const prefixes = ['/kitchen/', '/social/', '/gamer/', '/clips/', '/otaku/', '/audio/'];
+
+    // Promote data-src → src for backend-served media (avoids 404s from browser
+    // fetching the path on the frontend host before JS runs).
+    document.querySelectorAll('img[data-src], video[data-src]').forEach(el => {
+      const path = el.getAttribute('data-src');
+      if (!path) return;
+      el.setAttribute('src', API_BASE ? API_BASE + path : path);
+      el.removeAttribute('data-src');
+    });
+
+    // Also fix any legacy src="/kitchen/..." absolute paths in dev (no-op in prod where API_BASE is '')
+    if (!API_BASE) return;
+    document.querySelectorAll('img[src], video[src]').forEach(el => {
+      const src = el.getAttribute('src');
+      if (src && prefixes.some(p => src.startsWith(p))) {
+        el.setAttribute('src', API_BASE + src);
+      }
+    });
+  }
+
   function init() {
-    runIntro();
-    try { initScrollProgress(); } catch(e) { console.error('initScrollProgress failed:', e); }
-    try { initTips(); } catch(e) { console.error('initTips failed:', e); }
-    try { initWheel(); } catch(e) { console.error('initWheel failed:', e); }
-    try { initStatPentagon(); } catch(e) { console.error('initStatPentagon failed:', e); }
-    try { initReveal(); } catch(e) { console.error('initReveal failed:', e); }
-    try { animateStatBars(); } catch(e) { console.error('animateStatBars failed:', e); }
-    try { animateWantedStars(); } catch(e) { console.error('animateWantedStars failed:', e); }
-    try { initLore(); } catch(e) { console.error('initLore failed:', e); }
-    try { initWantedPosters(); } catch(e) { console.error('initWantedPosters failed:', e); }
-    try { initCardTilt(); } catch(e) { console.error('initCardTilt failed:', e); }
-    try { initJukebox(); } catch(e) { console.error('initJukebox failed:', e); }
-    try { renderKitchen(); } catch(e) { console.error('renderKitchen failed:', e); }
-    try { renderGamingSections(); } catch(e) { console.error('renderGamingSections failed:', e); }
+    const skipIntro = new URLSearchParams(window.location.search).get('skip_intro');
+    if (skipIntro) {
+      const overlay = document.getElementById('intro-overlay');
+      if (overlay) overlay.style.display = 'none';
+      document.body.classList.remove('loading');
+      // Fade in smoothly from black, then clear inline styles so fixed positioning works normally
+      requestAnimationFrame(() => {
+        document.documentElement.style.transition = 'opacity 1s ease';
+        requestAnimationFrame(() => {
+          document.documentElement.style.opacity = '1';
+          setTimeout(() => {
+            document.documentElement.style.cssText = '';
+          }, 1100);
+        });
+      });
+    } else {
+      runIntro();
+    }
+    try { fixMediaUrls(); }         catch(e) { console.error('fixMediaUrls failed:', e); }
+    try { initScrollProgress(); } catch(e) {}
+    try { initTips(); } catch(e) {}
+    try { initWheel(); } catch(e) {}
+    try { initStatPentagon(); } catch(e) {}
+    try { initReveal(); } catch(e) {}
+    try { animateStatBars(); } catch(e) {}
+    try { animateWantedStars(); } catch(e) {}
+    try { initLore(); } catch(e) {}
+    try { initWantedPosters(); } catch(e) {}
+    try { initCardTilt(); } catch(e) {}
+    try { initJukebox(); } catch(e) {}
+    try { renderKitchen(); } catch(e) {}
+    try { renderGamingSections(); } catch(e) {}
+    try { fetchCurrently(); }       catch(e) { console.error('fetchCurrently failed:', e); }
+    try { initKonami(); }           catch(e) { console.error('initKonami failed:', e); }
+    try { initCardCTA(); }          catch(e) { console.error('initCardCTA failed:', e); }
+    try { fetchSuspectCount(); }    catch(e) { /* silent */ }
+  }
+
+  function showToast(html) {
+    const t = document.createElement('div');
+    t.setAttribute('style', [
+      'position:fixed',
+      'bottom:24px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'background:#0f0f0f',
+      'color:#fff',
+      'border:1.5px solid #c8ff00',
+      'padding:12px 20px',
+      'border-radius:4px',
+      'z-index:2147483647',
+      'font-size:clamp(0.6rem,2.5vw,0.72rem)',
+      'letter-spacing:0.1em',
+      'text-transform:uppercase',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.6)',
+      'white-space:normal',
+      'max-width:88vw',
+      'text-align:center',
+      'line-height:1.5',
+      'display:block',
+      'opacity:1',
+      'visibility:visible'
+    ].join(';'));
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.5s'; setTimeout(()=>t.remove(),500); }, 7000);
+  }
+
+  function initCardCTA() {
+    const cta = document.querySelector('.cardgen-cta');
+    if (!cta) return;
+
+    const isGamePath = localStorage.getItem('dq-game-path') === 'true';
+    const btn     = cta.querySelector('.cardgen-btn');
+    const btnText = cta.querySelector('.cardgen-btn-text');
+    const title   = cta.querySelector('.cardgen-cta-title');
+    const desc    = cta.querySelector('.cardgen-cta-desc');
+
+    if (isGamePath) {
+      const earned = {
+        DEV:    localStorage.getItem('dq-stat-dev')    || '—',
+        DESIGN: localStorage.getItem('dq-stat-design') || '—',
+        BRAIN:  localStorage.getItem('dq-stat-brain')  || '—',
+        GRIND:  localStorage.getItem('dq-stat-grind')  || '—',
+        SOCIAL: localStorage.getItem('dq-stat-social') || '70',
+      };
+
+      if (title) title.textContent = 'Your stats are ready.';
+      if (desc)  desc.textContent  = 'You earned these in the challenges. Choose a card style and claim yours.';
+
+      const pills = document.createElement('div');
+      pills.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;';
+      pills.innerHTML = Object.entries(earned).map(([k, v]) =>
+        `<span style="font:700 0.66rem/1 Inter,sans-serif;letter-spacing:.08em;padding:4px 10px;border-radius:6px;background:rgba(0,0,0,0.06);color:#1a1a1a;border:1px solid rgba(0,0,0,0.1);">${k} <span style="color:#ff6600;">${v}</span></span>`
+      ).join('');
+      if (btn) btn.before(pills);
+
+      if (btnText) btnText.textContent = 'BUILD YOUR CARD →';
+
+    } else {
+      const nudge = document.createElement('p');
+      nudge.style.cssText = 'font-size:0.65rem;color:rgba(0,0,0,0.38);margin-top:14px;line-height:1.5;';
+      nudge.innerHTML = 'Or <a href="../landing.html" style="color:#ff6600;text-decoration:none;font-weight:600;">play DevQuest →</a> to earn your real stats.';
+      if (btn) btn.after(nudge);
+    }
+  }
+
+  async function fetchSuspectCount() {
+    const el = document.getElementById('cardgen-suspect-count');
+    if (!el) return;
+    try {
+      const data = await apiFetch('/api/leaderboard');
+      el.textContent = data.length + (data.length !== 1 ? ' suspects' : ' suspect');
+    } catch { /* keep placeholder */ }
+  }
+
+  function initKonami() {
+    const CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let pos = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === CODE[pos]) {
+        pos++;
+        if (pos === CODE.length) {
+          pos = 0;
+          apiFetch('/api/rickroll').catch(() => {});
+          // Play a quick descending "game over" tone then rickroll in new tab
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523, 415, 330, 262];
+            notes.forEach((freq, i) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.connect(gain); gain.connect(ctx.destination);
+              osc.frequency.value = freq;
+              osc.type = 'square';
+              gain.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.1);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.09);
+              osc.start(ctx.currentTime + i * 0.1);
+              osc.stop(ctx.currentTime + i * 0.1 + 0.1);
+            });
+          } catch {}
+          setTimeout(async () => {
+            showToast('🎵 you got rickrolled');
+            try {
+              const data = await apiFetch('/api/rickroll/count');
+              if (data && data.count) showToast(`🎵 you got rickrolled — <b style="color:#c8ff00">${data.count}</b> people have fallen for this`);
+            } catch {}
+            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+          }, 500);
+        }
+      } else {
+        pos = e.key === CODE[0] ? 1 : 0;
+      }
+    });
   }
 
   if (document.readyState === 'loading') {

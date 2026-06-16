@@ -725,6 +725,10 @@ body {
   .semicircle-hole { width: 32px; height: 16px; }
   .triangle-hole   { border-left-width: 14px; border-right-width: 14px; border-bottom-width: 26px; }
 
+  /* Prevent box overflow on narrow screens */
+  #box-front { padding: 10px 4px; gap: 2px; }
+  .hole      { flex-shrink: 1; min-width: 0; }
+
   #active-shape         { width: 110px; height: 110px; }
   #active-shape.drop-in { left: calc(50% - 55px); }
 
@@ -747,4 +751,16 @@ body {
   /* Terminal skip — smaller on mobile */
   #skip-btn.terminal-active { min-width: unset; min-height: 90px; }
   #terminal-lines { font-size: 0.6rem; }
+}
+
+@media (max-width: 390px) {
+  #box-container { width: 98vw; }
+  #box-front { padding: 8px 2px; gap: 1px; }
+  .hole { width: 48px; height: 48px; }
+  .circle-hole     { width: 22px; height: 18px; }
+  .rectangle-hole  { width: 10px; height: 26px; }
+  .square-hole     { width: 22px; height: 22px; }
+  .semicircle-hole { width: 26px; height: 13px; }
+  .triangle-hole   { border-left-width: 11px; border-right-width: 11px; border-bottom-width: 20px; }
+  #active-shape    { width: 90px; height: 90px; }
 }

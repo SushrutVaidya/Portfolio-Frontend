@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,11 @@
   <meta name="theme-color" content="#000000">
   <title>Captcha — DevQuest</title>
   <link rel="stylesheet" href="css/captcha.css">
+  <link rel="preconnect" href="https://fonts.cdnfonts.com">
   <link rel="stylesheet" href="css/shared.css">
+  <script src="js/mobile-banner.js"></script>
+  <script src="js/transitions.js"></script>
+  <script src="js/cursor.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/sounds.js"></script>
 </head>
@@ -34,6 +38,7 @@
       </div>
     </div>
     <div class="dq-nav-right-group">
+      <a href="../index.html" class="dq-nav-exit">← Portfolio</a>
       <span class="dq-nav-right">challenge 1 of 3</span>
       <button class="dq-sound-toggle" id="dq-sound-toggle" title="Toggle sound">
         <span class="dq-sound-icon">♪</span>
@@ -130,7 +135,7 @@
         </button>
       </div>
       <span id="footer-brand">DevQuest</span>
-      <button id="verify-btn" class="hidden" onclick="window.location.href='devtype.html'">Next Challenge →</button>
+      <button id="verify-btn" class="hidden">Next Challenge →</button>
     </div>
 
     </div>
@@ -152,6 +157,8 @@
     </div>
   </footer>
 
+  <script src="js/cheatcode.js"></script>
+  <script src="js/stat-toast.js"></script>
   <script src="js/captcha.js" defer></script>
 
   <!-- Background music — <audio> is Safari-safe, no AudioContext needed -->

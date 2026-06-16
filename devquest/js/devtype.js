@@ -5,6 +5,76 @@
 // Hard:   SHA values + all quirks + SHA fade
 // ==========================================
 
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8081'
+  : '';
+
+// ==========================================
+// LEADERBOARD
+// ==========================================
+
+const MOCK_LEADERBOARD = [
+  { rank: 1, name: 'Sushrut',        score: 99999 },
+  { rank: 2, name: 'xX_ProGamer_Xx', score: 45200 },
+  { rank: 3, name: 'ShadowBlade99',  score: 38750 },
+  { rank: 4, name: 'NPC_Steve',      score: 22100 },
+  { rank: 5, name: 'Bot_McBotface',  score: 8400  },
+];
+
+async function submitScore(wpm, accuracy, difficulty) {
+  const userId = localStorage.getItem('dq-user-id');
+  if (!userId) return;
+  try {
+    const res = await fetch(API_BASE + '/api/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, game: 'devtype', wpm, accuracy, difficulty }),
+    });
+    if (!res.ok) throw new Error(res.status);
+  } catch { /* backend offline — silent fail */ }
+}
+
+async function fetchLeaderboard() {
+  try {
+    const res = await fetch(API_BASE + '/api/leaderboard');
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    // Transform backend response { rank, id, firstName, lastName, level, createdAt }
+    // into the shape renderLeaderboard expects: { rank, name, score }
+    return data.map(u => ({
+      rank:  u.rank,
+      id:    u.id,
+      name:  `${u.firstName} ${u.lastName}`,
+      score: u.level > 1 ? u.level * 1000 : '—'
+    }));
+  } catch {
+    return MOCK_LEADERBOARD;
+  }
+}
+
+function renderLeaderboard(rows) {
+  const container = document.getElementById('dt-lb-rows');
+  if (!container) return;
+  container.innerHTML = '';
+  const myId = localStorage.getItem('dq-user-id');
+  const playerName = (localStorage.getItem('dq-player-first') || '').trim().toLowerCase();
+
+  rows.forEach(row => {
+    const isMe = (myId && row.id === myId) ||
+                 (playerName && row.name.toLowerCase().startsWith(playerName));
+    const div = document.createElement('div');
+    div.className = 'dt-lb-row' + (isMe ? ' dt-lb-row-me' : '');
+
+    const rankClass = row.rank === 1 ? 'gold' : row.rank === 2 ? 'silver' : row.rank === 3 ? 'bronze' : '';
+
+    div.innerHTML =
+      '<span class="dt-lb-rank ' + rankClass + '">' + (row.rank <= 3 ? ['', '🥇', '🥈', '🥉'][row.rank] : '#' + row.rank) + '</span>' +
+      '<span class="dt-lb-name">' + row.name + (isMe ? ' <span class="dt-lb-you">YOU</span>' : '') + '</span>' +
+      '<span class="dt-lb-score">' + (typeof row.score === 'number' ? row.score.toLocaleString() : row.score) + '</span>';
+    container.appendChild(div);
+  });
+}
+
 // ==========================================
 // DIFFICULTY CONFIG
 // ==========================================
@@ -39,52 +109,129 @@ let currentDifficulty = 'easy';
 // WORD POOLS
 // ==========================================
 
-// Easy — Sushrut's bio (ordered, not shuffled)
-const EASY_TEXT = [
-  'Hi', 'I', 'am', 'Sushrut', 'a', 'backend', 'developer', 'from', 'Hyderabad',
-  'I', 'spend', 'my', 'days', 'writing', 'Java', 'and', 'my', 'nights', 'losing', 'in', 'CS2',
-  'I', 'built', 'DevQuest', 'to', 'gatekeep', 'my', 'portfolio', 'from', 'the', 'normies',
-  'My', 'stack', 'includes', 'Spring', 'Boot', 'Redis', 'Docker', 'and', 'questionable', 'decisions',
-  'I', 'enjoy', 'rickrolling', 'unsuspecting', 'visitors', 'and', 'shipping', 'hotfixes', 'at', '2am',
-  'If', 'you', 'made', 'it', 'this', 'far', 'you', 'are', 'probably', 'a', 'developer',
-  'or', 'very', 'very', 'lost', 'either', 'way', 'welcome', 'to', 'my', 'portfolio',
+// ── Easy variants (random on each load) ──
+const EASY_TEXTS = [
+  // V1 — Bio story
+  [
+    "Hi,", "I'm", "Sushrut", "—", "a", "backend", "developer", "from", "Hyderabad.",
+    "I", "spend", "my", "days", "writing", "Java", "and", "my", "nights", "losing", "in", "CS2.",
+    "I", "built", "DevQuest", "to", "gatekeep", "my", "portfolio", "from", "the", "normies.",
+    "My", "stack", "includes", "Spring", "Boot,", "Redis,", "Docker,", "and", "questionable", "decisions.",
+    "I", "enjoy", "rickrolling", "unsuspecting", "visitors", "and", "shipping", "hotfixes", "at", "2am.",
+    "If", "you", "made", "it", "this", "far,", "you're", "probably", "a", "developer", "—", "or", "very,", "very", "lost.",
+    "Either", "way,", "welcome", "to", "my", "portfolio.",
+  ],
+  // V2 — Work story
+  [
+    "I", "currently", "work", "at", "Apple", "AdPlatforms", "via", "Quest", "Global.",
+    "Every", "day", "I", "orchestrate", "thousands", "of", "DAGs", "across", "10+", "engineering", "teams.",
+    "I", "once", "reduced", "deployment", "failures", "by", "90%", "on", "a", "Tuesday", "afternoon.",
+    "My", "tools:", "Java,", "Airflow,", "Kubernetes,", "and", "excessive", "logging.",
+    "I'm", "AWS", "and", "OCI", "certified,", "which", "means", "two", "more", "things", "to", "brag", "about.",
+    "Ask", "me", "about", "my", "patent", "sometime.", "Yes,", "I", "have", "one.", "Yes,", "it's", "real.",
+  ],
+  // V3 — Personality story
+  [
+    "I", "cook", "noodles", "at", "midnight", "and", "call", "it", "meal", "prep.",
+    "I", "have", "1500", "hours", "in", "CS2", "and", "a", "win", "rate", "I'd", "rather", "not", "discuss.",
+    "My", "three", "life", "pillars:", "clean", "code,", "Gintama,", "and", "strong", "coffee.",
+    "I", "built", "a", "solar", "energy", "patent", "during", "college", "just", "to", "see", "if", "I", "could.",
+    "This", "entire", "portfolio", "is", "a", "game", "because", "I", "got", "bored", "of", "normal", "ones.",
+    "If", "you're", "typing", "this", "right", "now", "—", "you're", "exactly", "the", "kind", "of", "person", "I", "wanted", "here.",
+  ],
 ];
 
-// Medium — dev / cli word pool
-const MEDIUM_POOL = [
-  'git-push', 'git-blame', 'git-stash', 'git-rebase', 'git-cherry-pick',
-  'npm-install', 'npm-audit', 'npm-ci', 'yarn-add', 'pip-install',
-  'docker-ps', 'docker-build', 'kubectl-get', 'chmod-755', 'sudo!!',
-  'ls-la', 'grep-rn', 'rm-rf', 'cd..', 'cat-EOF',
-  'console.log', 'console.error', 'console.warn',
-  'process.env', 'process.exit', 'JSON.parse', 'JSON.stringify',
-  'Object.keys', 'Array.from', 'Promise.all', 'Promise.reject',
-  'localhost:3000', 'localhost:8080', '127.0.0.1', '/dev/null',
-  'undefined', 'null', 'NaN', 'Infinity', 'void_0',
-  'finalFinal', 'tmp2', 'PLEASE_WORK', 'doTheThing', 'x1',
-  'dontDelete', 'oldCode', 'temp_v2', 'copy_copy', 'test123',
-  'async', 'await', 'yield', 'const', 'typeof', 'instanceof',
-  'TypeError', 'SyntaxError', 'ReferenceError', 'RangeError',
-  'segfault', 'deadlock', 'overflow', 'OutOfMemory', 'SIGKILL',
-  'TODO', 'FIXME', 'HACK', 'NOTE', 'XXX',
-  'hotfix', 'refactor', 'deprecated', 'legacy', 'technical-debt',
-  'webpack', 'eslint', 'prettier', 'docker', 'nginx', 'redis',
-  'kubernetes', 'terraform', 'ansible', 'grafana', 'prometheus',
-  'singleton', 'middleware', 'callback-hell', 'race-condition',
-  'monkeypatch', 'boilerplate', 'microservice', 'deadcode',
+// ── Medium variants (random on each load) ──
+const MEDIUM_POOLS = [
+  // V1 — CLI classics
+  [
+    'git-push', 'git-blame', 'git-stash', 'git-rebase', 'git-cherry-pick',
+    'npm-install', 'npm-audit', 'npm-ci', 'yarn-add', 'pip-install',
+    'docker-ps', 'docker-build', 'kubectl-get', 'chmod-755', 'sudo!!',
+    'ls-la', 'grep-rn', 'rm-rf', 'cd..', 'cat-EOF',
+    'console.log', 'console.error', 'console.warn',
+    'process.env', 'process.exit', 'JSON.parse', 'JSON.stringify',
+    'Object.keys', 'Array.from', 'Promise.all', 'Promise.reject',
+    'localhost:3000', 'localhost:8080', '127.0.0.1', '/dev/null',
+    'undefined', 'null', 'NaN', 'Infinity', 'void_0',
+    'finalFinal', 'tmp2', 'PLEASE_WORK', 'doTheThing', 'x1',
+    'dontDelete', 'oldCode', 'temp_v2', 'copy_copy', 'test123',
+    'async', 'await', 'yield', 'const', 'typeof', 'instanceof',
+    'TypeError', 'SyntaxError', 'ReferenceError', 'RangeError',
+    'segfault', 'deadlock', 'overflow', 'OutOfMemory', 'SIGKILL',
+    'TODO', 'FIXME', 'HACK', 'NOTE', 'XXX',
+    'hotfix', 'refactor', 'deprecated', 'legacy', 'technical-debt',
+    'webpack', 'eslint', 'prettier', 'docker', 'nginx', 'redis',
+    'kubernetes', 'terraform', 'ansible', 'grafana', 'prometheus',
+    'singleton', 'middleware', 'callback-hell', 'race-condition',
+    'monkeypatch', 'boilerplate', 'microservice', 'deadcode',
+  ],
+  // V2 — A day in the terminal
+  [
+    'git-status', 'git-add', 'git-commit', 'git-push', 'CONFLICT',
+    'npm-install', '47-vulnerabilities', 'npm-audit', '51-vulnerabilities', 'package-lock',
+    'docker-ps', 'container_exited', 'docker-compose', 'port-in-use', 'bind-address',
+    'kubectl-pods', 'CrashLoopBackOff', 'kubectl-logs', 'NullPointer', 'OOMKilled',
+    'grep-TODO', '847-results', 'git-blame', 'it-was-me', 'senior-dev',
+    'hotfix-Friday', 'deploy-prod', 'rollback', 'on-call', 'incident',
+    'works-locally', 'prod-is-down', 'checking-logs', 'must-be-cache', 'restarting',
+    'standup-in-5', 'not-my-bug', 'ship-it', 'LGTM', 'approved',
+    'merge-conflict', 'force-push', 'git-reflog', 'detached-HEAD', 'stash-pop',
+  ],
+  // V3 — Interview mode
+  [
+    'Big-O', 'O(n²)', 'memoization', 'dynamic-programming', 'binary-search',
+    'REST', 'GraphQL', 'gRPC', 'WebSocket', 'long-polling',
+    'ACID', 'CAP-theorem', 'eventual-consistency', 'sharding', 'replication',
+    'Redis', 'Kafka', 'RabbitMQ', 'pub-sub', 'message-queue',
+    'load-balancer', 'circuit-breaker', 'rate-limiting', 'backpressure', 'retry',
+    'idempotent', 'stateless', 'horizontal-scaling', 'vertical-scaling', 'CDN',
+    'SQL-injection', 'XSS', 'CSRF', 'JWT', 'OAuth2',
+    'blue-green', 'canary-deploy', 'feature-flag', 'A/B-test', 'rollout',
+    'p99-latency', 'throughput', 'SLA', 'SLO', 'error-budget',
+  ],
 ];
 
-// Hard — git short SHAs (8-char hex)
-const SHA_POOL = [
-  'a3f2b1c8', 'd9e4f5a6', 'b7c8d9e0', 'f1a2b3c4', 'e5d6c7b8',
-  'a9b0c1d2', 'e3f4a5b6', 'c7d8e9f0', '1a2b3c4d', '5e6f7a8b',
-  '9c0d1e2f', '3a4b5c6d', '7e8f9a0b', '1c2d3e4f', '5a6b7c8d',
-  '9e0f1a2b', '3c4d5e6f', '7a8b9c0d', '1e2f3a4b', '5c6d7e8f',
-  '0a1b2c3d', '4e5f6a7b', '8c9d0e1f', '2a3b4c5d', '6e7f8a9b',
-  'fe3a91b2', 'c084d5e6', '7f2a3b4c', 'd1e2f3a4', 'b5c6d7e8',
-  '2f3a4b5c', '6d7e8f9a', '0b1c2d3e', '4f5a6b7c', '8e9f0a1b',
-  'dead1234', 'cafe5678', 'f00dface', 'b00b1e5c', '1337c0de',
+// ── Hard variants (random on each load) ──
+const SHA_POOLS = [
+  // V1 — git SHAs
+  [
+    'a3f2b1c8', 'd9e4f5a6', 'b7c8d9e0', 'f1a2b3c4', 'e5d6c7b8',
+    'a9b0c1d2', 'e3f4a5b6', 'c7d8e9f0', '1a2b3c4d', '5e6f7a8b',
+    '9c0d1e2f', '3a4b5c6d', '7e8f9a0b', '1c2d3e4f', '5a6b7c8d',
+    '9e0f1a2b', '3c4d5e6f', '7a8b9c0d', '1e2f3a4b', '5c6d7e8f',
+    '0a1b2c3d', '4e5f6a7b', '8c9d0e1f', '2a3b4c5d', '6e7f8a9b',
+    'fe3a91b2', 'c084d5e6', '7f2a3b4c', 'd1e2f3a4', 'b5c6d7e8',
+    '2f3a4b5c', '6d7e8f9a', '0b1c2d3e', '4f5a6b7c', '8e9f0a1b',
+    'dead1234', 'cafe5678', 'f00dface', 'b00b1e5c', '1337c0de',
+  ],
+  // V2 — HTTP errors + timestamps
+  [
+    'GET-/api/user-404', 'POST-/auth/login-401', 'PUT-/card/update-500',
+    '2026-06-11T14:22:31Z', 'ERR_CONNECTION_REFUSED', 'ECONNRESET',
+    '0xDEADBEEF', '0xFF00FF', '0x1337C0DE', 'NaN-undefined-null',
+    'ETIMEDOUT', 'ENOTFOUND', 'ECONNABORTED', 'EPIPE', 'EADDRINUSE',
+    '503-Service-Unavailable', '429-Too-Many-Requests', '422-Unprocessable',
+    'X-Request-Id-8f3a2', 'X-Trace-Id-d9c1b', 'X-RateLimit-Remaining-0',
+    '1749644551965', '1749644552001', '1749644552137', '1749644552299',
+  ],
+  // V3 — SHAs + stack traces
+  [
+    'a3f2b1c8', 'at-Object.<anonymous>', 'java.lang.NullPointerException',
+    'fe3a91b2', 'caused-by-line-247', 'segmentation-fault-core-dumped',
+    'dead1234', 'SIGKILL-9', 'OOMKilled', 'evicted', 'pending-forever',
+    'b7c8d9e0', 'at-sun.reflect.NativeMethodAccessorImpl', 'heap-space',
+    'c084d5e6', 'BUILD-FAILURE', 'Tests-run:-47-Failures:-3',
+    '1a2b3c4d', 'Process-finished-exit-code-137', 'killed-by-signal',
+    'cafe5678', 'at-com.sushrut.portfolio', 'Caused-by-IOException',
+  ],
 ];
+
+// Pick random variant index once per page load
+const _variantIdx = Math.floor(Math.random() * 3);
+const EASY_TEXT   = EASY_TEXTS[_variantIdx];
+const MEDIUM_POOL = MEDIUM_POOLS[_variantIdx];
+const SHA_POOL    = SHA_POOLS[_variantIdx];
 
 // ==========================================
 // QUIRK DATA
@@ -725,6 +872,15 @@ function endGame() {
   rAccEl.textContent  = Math.min(acc, 100) + '%';
   rBugsEl.textContent = errorCount;
 
+  const grindStat = Math.min(100, Math.max(10, Math.round((wpm / 120) * 100)));
+  const brainStat = Math.min(100, Math.max(0, (acc - 50) * 2));
+  localStorage.setItem('dq-stat-grind', grindStat);
+  localStorage.setItem('dq-stat-brain', brainStat);
+  if (typeof showStatUnlocked === 'function') {
+    showStatUnlocked('GRIND', grindStat);
+    setTimeout(() => showStatUnlocked('BRAIN', brainStat), 1800);
+  }
+
   passBadge.textContent = passed ? '✓  challenge passed' : `✗  need ${config.passAcc}% accuracy to pass`;
   passBadge.className   = passed ? 'pass' : 'fail';
 
@@ -746,6 +902,10 @@ function endGame() {
 
   resultsEl.classList.remove('dt-hidden');
   drawWpmGraph();
+
+  // Leaderboard: submit score + fetch & render
+  submitScore(wpm, acc, currentDifficulty);
+  fetchLeaderboard().then(renderLeaderboard);
 }
 
 function resetGame() {
@@ -1021,3 +1181,14 @@ window.addEventListener('load', () => {
   setDifficulty('easy');
   inputEl.focus();
 });
+
+window.dqCheat = () => {
+  correctChars = 480;
+  totalChars   = 490;
+  wordsCorrect = 96;
+  errorCount   = 1;
+  timeLeft     = 1;
+  if (!gameStarted) { gameStarted = true; }
+  clearInterval(timerInterval);
+  endGame();
+};

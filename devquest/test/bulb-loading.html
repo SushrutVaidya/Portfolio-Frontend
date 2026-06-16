@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Illuminate</title>
+  <script src="../js/mobile-banner.js"></script>
+  <script src="../js/transitions.js"></script>
+  <script src="../js/cursor.js"></script>
+  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      height: 100dvh;
+      width: 100vw;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+
+    /* ── Room photo ── */
+    #room-photo {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 95%;
+      filter: brightness(0.04);
+      z-index: 0;
+      pointer-events: none;
+      transition: filter 0.06s linear;
+    }
+
+    /* ── Wire ── */
+    #wire {
+      position: fixed;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 1.5px;
+      height: 28vh;
+      background: linear-gradient(180deg, transparent 0%, rgba(80,60,30,0.4) 60%, rgba(120,90,40,0.7) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── Bulb ── */
+    #bulb-wrap {
+      position: fixed;
+      top: 28vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    #bulb-svg {
+      width: 56px;
+      height: 74px;
+      overflow: visible;
+    }
+
+    /* ── Glow bloom ── */
+    #glow {
+      position: fixed;
+      top: 28vh;
+      left: 50%;
+      transform: translate(-50%, -20%);
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,220,100,0.8) 0%, rgba(255,160,20,0.2) 50%, transparent 72%);
+      opacity: 0;
+      z-index: 2;
+      pointer-events: none;
+      filter: blur(4px);
+    }
+
+    /* ── Tap hint ── */
+    #tap-hint {
+      position: fixed;
+      bottom: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      z-index: 10;
+      pointer-events: none;
+      animation: pulse 2.4s ease-in-out infinite;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.55; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── Progress line — bottom edge ── */
+    #progress-line {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,180,40,0.4), rgba(255,220,100,0.9));
+      z-index: 10;
+      pointer-events: none;
+      transition: width 0.12s ease;
+      box-shadow: 0 0 8px rgba(255,200,60,0.4);
+    }
+
+    /* ── Tap ripple ── */
+    .ripple {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,200,60,0.12);
+      transform: scale(0);
+      animation: ripple 0.6s ease-out forwards;
+      pointer-events: none;
+      z-index: 5;
+    }
+    @keyframes ripple {
+      to { transform: scale(6); opacity: 0; }
+    }
+
+    /* ── Flash ── */
+    #flash {
+      position: fixed; inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* ── Loading screen ── */
+    #loading-screen {
+      position: fixed; inset: 0;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 40;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    #loading-screen.active { opacity: 1; pointer-events: auto; }
+
+    #loading-name {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(2.8rem, 9vw, 6.5rem);
+      letter-spacing: 8px;
+      color: #fff;
+      text-align: center;
+      line-height: 1.05;
+    }
+
+    #loading-sub {
+      font-size: 0.68rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 14px;
+      opacity: 0;
+      transition: opacity 0.6s ease 0.4s;
+    }
+    #loading-screen.active #loading-sub { opacity: 1; }
+
+    #loading-bar-wrap {
+      width: 200px;
+      margin-top: 36px;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.6s;
+    }
+    #loading-screen.active #loading-bar-wrap { opacity: 1; }
+
+    #loading-bar {
+      height: 1.5px;
+      background: #1a1a1a;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    #loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #c8ff00;
+      transition: width 0.1s linear;
+    }
+    #loading-tip {
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      color: #333;
+      margin-top: 10px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    #skip-btn {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.15);
+      cursor: pointer;
+      background: none; border: none;
+      z-index: 20;
+      transition: color 0.2s;
+    }
+    #skip-btn:hover { color: rgba(255,255,255,0.4); }
+    @media (max-width: 480px) {
+      #wire { height: 22vh; }
+      #bulb-wrap { top: 22vh; }
+      #glow { top: 22vh; }
+      #bulb-svg { width: 44px; height: 58px; }
+      #tap-hint { font-size: 0.52rem; letter-spacing: 0.22em; bottom: 22%; }
+      #loading-name { font-size: clamp(2.2rem, 10vw, 3.5rem); letter-spacing: 4px; }
+      #loading-sub { font-size: 0.58rem; letter-spacing: 0.18em; }
+      #loading-bar-wrap { width: 160px; }
+    }
+    @media (max-width: 360px) {
+      #wire { height: 18vh; }
+      #bulb-wrap { top: 18vh; }
+      #glow { top: 18vh; }
+      #bulb-svg { width: 36px; height: 48px; }
+      #tap-hint { font-size: 0.46rem; letter-spacing: 0.18em; bottom: 18%; }
+      #loading-name { font-size: clamp(1.8rem, 9vw, 2.6rem); letter-spacing: 3px; line-height: 1.05; }
+      #loading-sub { font-size: 0.52rem; letter-spacing: 0.14em; }
+      #loading-bar-wrap { width: 140px; }
+      #skip-btn { bottom: 12px; right: 12px; font-size: 0.52rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <img id="room-photo" src="room.jpg" alt="">
+
+  <div id="wire"></div>
+
+  <div id="bulb-wrap">
+    <svg id="bulb-svg" viewBox="0 0 56 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="g" cx="42%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0" id="g0"/>
+          <stop offset="100%" stop-color="#ff9900" stop-opacity="0" id="g1"/>
+        </radialGradient>
+        <filter id="bloom" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Glass globe -->
+      <path d="M28 4 C12 4 4 16 4 26 C4 38 12 48 20 52 L20 60 L36 60 L36 52 C44 48 52 38 52 26 C52 16 44 4 28 4 Z"
+            fill="url(#g)" stroke="rgba(255,255,255,0.08)" stroke-width="0.5" id="glass"/>
+
+      <!-- Filament -->
+      <path d="M20 52 L23 40 L26 48 L28 36 L30 48 L33 40 L36 52"
+            stroke="rgba(80,60,20,0.4)" stroke-width="1.2"
+            stroke-linecap="round" stroke-linejoin="round"
+            fill="none" id="fil"/>
+      <path d="M20 52 L23 40 L26 48 L28 36 L30 48 L33 40 L36 52"
+            stroke="rgba(255,140,0,0)" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            fill="none" id="fil-glow" filter="url(#bloom)"/>
+
+      <!-- Neck -->
+      <path d="M20 59 Q28 63 36 59 L36 66 Q28 69 20 66 Z" fill="rgba(30,24,10,0.6)"/>
+      <!-- Base rings -->
+      <rect x="20" y="66" width="16" height="2" rx="0.5" fill="rgba(30,24,10,0.5)"/>
+      <rect x="20" y="69" width="16" height="2" rx="0.5" fill="rgba(30,24,10,0.4)"/>
+      <rect x="22" y="71" width="12" height="3" rx="1.5" fill="rgba(20,16,6,0.5)"/>
+
+      <!-- Shine -->
+      <ellipse cx="19" cy="18" rx="4" ry="7" fill="rgba(255,255,255,0.05)" transform="rotate(-18 19 18)"/>
+    </svg>
+  </div>
+
+  <div id="glow"></div>
+  <div id="progress-line"></div>
+  <div id="tap-hint">Tap anywhere to illuminate</div>
+
+  <div id="flash"></div>
+
+  <div id="loading-screen">
+    <div id="loading-name"></div>
+    <div id="loading-sub">Platform Engineer · Hyderabad</div>
+    <div id="loading-bar-wrap">
+      <div id="loading-bar"><div id="loading-bar-fill"></div></div>
+      <div id="loading-tip"></div>
+    </div>
+  </div>
+
+  <button id="skip-btn">Skip</button>
+
+  <script>
+    const TIPS = [
+      'Loading 1500hrs of CS2 data...',
+      'Brewing biryani algorithms...',
+      'Purging Valorant traces...',
+      'Calibrating PS4 controller...',
+      'Importing kitchen experiments...',
+      'Connecting to Upstash Redis...',
+      'Building Docker containers...',
+      'Deploying to AWS EC2...',
+    ];
+
+    let power = 0;
+    let done = false;
+    let decayTimer = null;
+
+    const photo     = document.getElementById('room-photo');
+    const glow      = document.getElementById('glow');
+    const glass     = document.getElementById('glass');
+    const fil       = document.getElementById('fil');
+    const filGlow   = document.getElementById('fil-glow');
+    const g0        = document.getElementById('g0');
+    const g1        = document.getElementById('g1');
+    const progress  = document.getElementById('progress-line');
+    const tapHint   = document.getElementById('tap-hint');
+    const flash     = document.getElementById('flash');
+    const loadScreen = document.getElementById('loading-screen');
+    const loadName  = document.getElementById('loading-name');
+    const loadBarFill = document.getElementById('loading-bar-fill');
+    const loadTip   = document.getElementById('loading-tip');
+    const skipBtn   = document.getElementById('skip-btn');
+
+    function updateVisuals() {
+      const p = power / 100;
+
+      // Room photo
+      photo.style.filter = `brightness(${0.04 + p * 0.72}) sepia(${p * 0.3}) contrast(${1 + p * 0.12})`;
+
+      // Glass fill
+      g0.setAttribute('stop-opacity', p * 0.85);
+      g1.setAttribute('stop-opacity', p * 0.4);
+      glass.setAttribute('stroke', `rgba(255,255,255,${0.06 + p * 0.1})`);
+
+      // Filament
+      const fR = 255, fG = Math.floor(p < 0.5 ? p*2*130 : 130+(p-0.5)*2*125);
+      fil.setAttribute('stroke', `rgba(${fR},${fG},0,${0.1 + p * 0.9})`);
+      fil.setAttribute('stroke-width', 1.2 + p * 1.2);
+      filGlow.setAttribute('stroke', `rgba(${fR},${fG},0,${p * 0.7})`);
+
+      // Glow bloom
+      const gs = 60 + p * 220;
+      glow.style.opacity = p * 0.95;
+      glow.style.width   = gs + 'px';
+      glow.style.height  = gs + 'px';
+      glow.style.background = `radial-gradient(circle,
+        rgba(255,${Math.floor(200+p*55)},${Math.floor(p*80)},${0.7*p}) 0%,
+        rgba(255,${Math.floor(140+p*60)},0,${0.15*p}) 50%,
+        transparent 75%)`;
+
+      // Progress line
+      progress.style.width = power + '%';
+
+      // Tap hint fades out as power grows
+      tapHint.style.opacity = Math.max(0, 1 - p * 3);
+    }
+
+    function spawnRipple(x, y) {
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      const s = 60;
+      r.style.cssText = `left:${x-s/2}px;top:${y-s/2}px;width:${s}px;height:${s}px`;
+      document.body.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    }
+
+    function pump(e) {
+      if (done) return;
+      const x = e?.clientX ?? e?.touches?.[0]?.clientX ?? window.innerWidth/2;
+      const y = e?.clientY ?? e?.touches?.[0]?.clientY ?? window.innerHeight/2;
+      spawnRipple(x, y);
+
+      power = Math.min(100, power + 5);
+      updateVisuals();
+
+      clearTimeout(decayTimer);
+      decayTimer = setTimeout(startDecay, 900);
+
+      if (power >= 100) trigger();
+    }
+
+    function startDecay() {
+      if (done || power <= 0) return;
+      power = Math.max(0, power - 1);
+      updateVisuals();
+      decayTimer = setTimeout(startDecay, 80);
+    }
+
+    function trigger() {
+      done = true;
+      clearTimeout(decayTimer);
+      // Small hold at full brightness, then loading screen fades in over the top
+      setTimeout(startLoadingScreen, 400);
+    }
+
+    function startLoadingScreen() {
+      loadScreen.classList.add('active');
+      const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&';
+      const target = 'SUSHRUT\nVAIDYA';
+      let iter = 0;
+      const iv = setInterval(() => {
+        loadName.innerHTML = target.split('').map((c, i) => {
+          if (c === '\n') return '<br>';
+          if (i < iter) return target[i];
+          return CHARS[Math.floor(Math.random() * CHARS.length)];
+        }).join('');
+        if (iter >= target.replace('\n','').length + 2) clearInterval(iv);
+        iter += 0.5;
+      }, 40);
+
+      let prog = 0, tipIdx = 0;
+      loadTip.textContent = TIPS[0];
+      const barIv = setInterval(() => {
+        prog += 0.8 + Math.random() * 1.2;
+        if (prog >= 100) {
+          prog = 100;
+          clearInterval(barIv);
+          loadTip.textContent = 'Ready.';
+          setTimeout(() => {
+            typeof window.pageTransition === 'function'
+              ? window.pageTransition('aboutme.html?skip_intro=1')
+              : (window.location.href = 'aboutme.html?skip_intro=1');
+          }, 600);
+        }
+        loadBarFill.style.width = prog + '%';
+        if (Math.floor(prog) % 14 === 0) loadTip.textContent = TIPS[tipIdx++ % TIPS.length];
+      }, 60);
+    }
+
+    // Tap anywhere
+    document.body.addEventListener('click', pump);
+    document.body.addEventListener('touchstart', (e) => { e.preventDefault(); pump(e); }, { passive: false });
+    document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); pump(e); } });
+    skipBtn.addEventListener('click', (e) => { e.stopPropagation(); power = 100; trigger(); });
+
+    updateVisuals();
+  </script>
+
+</body>
+</html>

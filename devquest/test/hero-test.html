@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hero Test — DevQuest</title>
+  <link rel="preconnect" href="https://fonts.cdnfonts.com">
+  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gta-lime:   #c8ff00;
+      --gta-orange: #ff6600;
+      --gta-dark:   #0f0f0f;
+      --gta-mid:    #1a1a1a;
+      --gta-text:   #f0ede8;
+      --gta-muted:  #888;
+    }
+
+    body {
+      background: #f5f3ef;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 56px;
+      background: var(--gta-dark);
+    }
+
+    .nav-logo {
+      font-family: 'Pricedown', sans-serif;
+      font-size: 1.2rem;
+      color: var(--gta-lime);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--gta-muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gta-text); }
+
+    .nav-cta {
+      background: var(--gta-lime);
+      color: var(--gta-dark);
+      border: none;
+      padding: 8px 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      width: 100%;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 56px;
+      position: relative;
+      overflow: hidden;
+      background: #f5f3ef;
+    }
+
+    /* subtle dot grid */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #ccc 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gta-orange);
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-family: 'Pricedown', sans-serif;
+      font-size: clamp(4.5rem, 12vw, 10rem);
+      line-height: 0.92;
+      text-align: center;
+      color: var(--gta-dark);
+      position: relative;
+      z-index: 1;
+      user-select: none;
+    }
+
+    .hero-title .line-accent {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--gta-dark);
+    }
+
+    .hero-title .line-highlight {
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-title .line-highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 0; right: 0;
+      height: 14px;
+      background: var(--gta-lime);
+      z-index: -1;
+      transform: skewX(-3deg);
+    }
+
+    /* ── ILLUSTRATION SLOT ── */
+    .hero-illustration {
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+      width: min(480px, 80vw);
+      height: 260px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .illus-platform {
+      position: absolute;
+      bottom: 0;
+      width: 340px;
+      height: 18px;
+      background: var(--gta-dark);
+      border-radius: 50%;
+      filter: blur(18px);
+      opacity: 0.18;
+    }
+
+    .illus-character {
+      width: 220px;
+      height: 240px;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* GTA-style star badge */
+    .illus-character::before {
+      content: '★★★★★';
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      color: var(--gta-orange);
+      letter-spacing: 4px;
+      white-space: nowrap;
+    }
+
+    /* wanted tag */
+    .illus-character::after {
+      content: 'WANTED';
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gta-orange);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      padding: 4px 14px;
+      white-space: nowrap;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    /* ── HERO FOOTER ROW ── */
+    .hero-meta {
+      position: relative;
+      z-index: 1;
+      margin-top: 56px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-val {
+      font-family: 'Pricedown', sans-serif;
+      font-size: 1.8rem;
+      color: var(--gta-dark);
+      line-height: 1;
+    }
+
+    .hero-stat-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gta-muted);
+      margin-top: 4px;
+    }
+
+    .hero-divider {
+      width: 1px;
+      height: 36px;
+      background: #ccc;
+    }
+
+    .hero-scroll-cue {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 1.2s forwards;
+    }
+
+    .hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, var(--gta-dark));
+      animation: scrollPulse 1.8s ease-in-out infinite;
+    }
+
+    .hero-scroll-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gta-muted);
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.15); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ── LIME TICKER STRIP ── */
+    .ticker {
+      width: 100%;
+      background: var(--gta-lime);
+      padding: 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      gap: 0;
+      animation: ticker 18s linear infinite;
+    }
+
+    .ticker-item {
+      font-family: 'Pricedown', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gta-dark);
+      letter-spacing: 0.08em;
+      padding: 0 32px;
+    }
+
+    .ticker-item::before {
+      content: '★ ';
+      color: var(--gta-orange);
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">SV</span>
+    <ul class="nav-links">
+      <li><a href="#">Stats</a></li>
+      <li><a href="#">Gaming</a></li>
+      <li><a href="#">Projects</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-cta">Hire Me</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <span class="hero-eyebrow">Platform Engineer &nbsp;·&nbsp; Hyderabad</span>
+
+    <h1 class="hero-title">
+      <span class="line-accent">Sushrut</span><br>
+      <span class="line-highlight">Vaidya</span>
+    </h1>
+
+    <!-- illustration slot — swap emoji for real asset -->
+    <div class="hero-illustration">
+      <div class="illus-platform"></div>
+      <div class="illus-character">👨‍💻</div>
+    </div>
+
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-val">4+</div>
+        <div class="hero-stat-label">Years Exp</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">90%</div>
+        <div class="hero-stat-label">Deploy Failures Cut</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">1</div>
+        <div class="hero-stat-label">Patent</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">1500</div>
+        <div class="hero-stat-label">CS2 Hours</div>
+      </div>
+    </div>
+
+    <div class="hero-scroll-cue">
+      <div class="hero-scroll-line"></div>
+      <span class="hero-scroll-label">Scroll</span>
+    </div>
+
+  </section>
+
+  <!-- LIME TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <!-- duplicated for seamless loop -->
+      <span class="ticker-item">Platform Engineer</span>
+      <span class="ticker-item">Spring Boot</span>
+      <span class="ticker-item">AWS EC2</span>
+      <span class="ticker-item">Docker</span>
+      <span class="ticker-item">Redis</span>
+      <span class="ticker-item">Kubernetes</span>
+      <span class="ticker-item">Apache Airflow</span>
+      <span class="ticker-item">CS2 Loyalist</span>
+      <span class="ticker-item">Patent Holder</span>
+      <span class="ticker-item">Platform Engineer</span>
+      <span class="ticker-item">Spring Boot</span>
+      <span class="ticker-item">AWS EC2</span>
+      <span class="ticker-item">Docker</span>
+      <span class="ticker-item">Redis</span>
+      <span class="ticker-item">Kubernetes</span>
+      <span class="ticker-item">Apache Airflow</span>
+      <span class="ticker-item">CS2 Loyalist</span>
+      <span class="ticker-item">Patent Holder</span>
+    </div>
+  </div>
+
+</body>
+</html>

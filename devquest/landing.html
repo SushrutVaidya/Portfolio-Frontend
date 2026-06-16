@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="css/landing.css">
   <link rel="stylesheet" href="css/shared.css">
   <link rel="stylesheet" href="css/sprites.css">
+  <script src="js/mobile-banner.js"></script>
+  <script src="js/transitions.js"></script>
+  <script src="js/cursor.js"></script>
   <script src="js/theme.js" defer></script>
 </head>
 <body class="landing-page">
@@ -47,6 +50,14 @@
         This portfolio has a <em>gatekeeping system</em> — if you're a dev, earn it.
       </p>
 
+      <!-- Card teaser — earn your card -->
+      <div class="hero-teaser-pill">
+        <span class="teaser-count-dot"></span>
+        <span id="teaser-count">— suspects identified</span>
+        <span class="teaser-pill-sep">·</span>
+        <span class="teaser-pill-copy">complete 3 challenges · earn your card</span>
+      </div>
+
       <div class="hero-actions">
         <button class="btn-primary" id="enter-devquest">
           <span>Enter DevQuest</span>
@@ -54,7 +65,7 @@
             <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <a href="aboutme.html" class="btn-secondary">Who am I? →</a>
+        <a href="test/bulb-loading.html" class="btn-secondary">Who am I? →</a>
         <a href="../index.html" class="btn-secondary">View Portfolio</a>
       </div>
 

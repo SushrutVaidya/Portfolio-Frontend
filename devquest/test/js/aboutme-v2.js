@@ -765,22 +765,12 @@
     }, { threshold: 0, rootMargin: '0px' });
     tvObs.observe(screen);
 
-    // Also pause TV when card section comes into view
-    var cardgenEl = document.getElementById('cardgen');
-    if (cardgenEl) {
-      var cardObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(e) {
-          if (e.isIntersecting && videoEl) {
-            videoEl.pause();
-            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
-              window._dqJukeboxAudio.play().catch(function() {});
-              window._tvPausedJukebox = false;
-            }
-          }
-        });
-      }, { threshold: 0.1 });
-      cardObs.observe(cardgenEl);
-    }
+    // (Previously: cardObs paused the TV when #cardgen became 10% visible.
+    //  On most viewports the next section is partially in view while the user
+    //  is still centered on the TV — so the TV would freeze right when they
+    //  arrived at it. tvObs above already handles pause-when-leaving via
+    //  threshold:0 / rootMargin:0, so the cardObs was both redundant and
+    //  actively buggy. Removed.)
 
     TV_CHANNELS.forEach(ch => (ch.clips || []).forEach(url => tryLoadClip(url)));
     display(0);

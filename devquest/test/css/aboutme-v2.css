@@ -68,29 +68,45 @@
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   padding: 0 32px; height: 52px;
   background: rgba(28,28,30,0.72);
-  backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-bottom: 0.5px solid rgba(255,255,255,0.1);
   position: sticky; top: 0; z-index: 100;
   transition: opacity 0.6s ease-out;
+  /* Own compositor layer — no per-scroll-frame repaint */
+  will-change: transform;
+  transform: translateZ(0);
 }
 .dq-nav-brand {
   font-family: -apple-system, 'SF Pro Display', sans-serif; font-size: 0.82rem;
   font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.5px; text-decoration: none;
+  display: inline-block;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+.dq-nav-brand:hover { transform: scale(1.06); }
+.dq-nav-brand:active { transform: scale(0.94); }
 .dq-brand-dot { color: #0a84ff; }
 .dq-nav-links { display: flex; align-items: center; gap: 24px; }
 .dq-nav-link {
   font-family: -apple-system, 'SF Pro Text', sans-serif; font-size: 0.72rem; font-weight: 500;
-  color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px; transition: color 0.2s;
+  color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px;
+  display: inline-block;
+  transition: color 200ms ease,
+              transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.dq-nav-link:hover { color: rgba(255,255,255,0.92); }
+.dq-nav-link:hover {
+  color: rgba(255,255,255,0.92);
+  transform: translateY(-2px);
+}
+.dq-nav-link:active {
+  transform: translateY(0) scale(0.96);
+}
 .dq-nav-link.active { color: rgba(255,255,255,0.92); font-weight: 600; }
 .dq-nav-right-group { display: flex; align-items: center; gap: 10px; }
 .dq-theme-toggle {
   display: flex; align-items: center; gap: 6px; padding: 5px 12px 5px 8px;
   border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08); backdrop-filter: blur(16px) saturate(1.6);
-  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  background: rgba(255,255,255,0.08); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   cursor: pointer; font-size: 0.65rem; font-family: -apple-system, 'SF Pro Text', sans-serif;
   color: rgba(255,255,255,0.65); letter-spacing: 0.3px;
   transition: background 0.2s, border-color 0.2s, color 0.2s; flex-shrink: 0; white-space: nowrap;

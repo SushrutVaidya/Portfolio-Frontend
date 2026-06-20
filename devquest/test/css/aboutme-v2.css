@@ -13,26 +13,29 @@
 @import url('https://fonts.cdnfonts.com/css/pricedown');
 
 :root {
-  --gta-green: #c8ff00;
-  --gta-orange: #ff6600;
-  --gta-pink: #ff375f;
-  --gta-blue: #0a84ff;
+  /* ── Brand spice (used SPARINGLY — accents only, not interactive elements) ── */
+  --gta-orange: #ff6600;   /* personality accent — section markers, hover hints */
+  --gta-pink:   #ff375f;
+  --gta-amber:  #ff9f0a;
+  --gta-mint:   #30d158;
   --gta-purple: #bf5af2;
-  --gta-amber: #ff9f0a;
-  --gta-mint: #30d158;
+  --gta-green:  #c8ff00;
 
-  /* Light theme base */
-  --gta-bg: #f5f3ef;
-  --gta-bg-warm: #faf8f4;
-  --gta-card: #ffffff;
-  --gta-card-border: rgba(0,0,0,0.08);
-  --gta-text: #1a1a1a;
-  --gta-text-secondary: #555555;
-  --gta-muted: rgba(0,0,0,0.4);
-  --gta-divider: rgba(0,0,0,0.06);
-  --gta-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --gta-shadow-md: 0 8px 32px rgba(0,0,0,0.08);
-  --gta-shadow-lg: 0 16px 48px rgba(0,0,0,0.1);
+  /* ── Interactive / system color (the primary CTA + link color) ── */
+  --gta-blue:   #0a84ff;   /* maps to portfolio --accent — buttons, links, focus */
+
+  /* ── Light theme base — tightened to feel calmer ── */
+  --gta-bg:        #fafafa;   /* was #f5f3ef — match system off-white */
+  --gta-bg-warm:   #f5f5f7;   /* was #faf8f4 — subtle alternation */
+  --gta-card:      #ffffff;
+  --gta-card-border: rgba(0,0,0,0.06);
+  --gta-text:      #1d1d1f;   /* was #1a1a1a — exact Apple gray */
+  --gta-text-secondary: #6e6e73; /* was #555 — official Apple secondary */
+  --gta-muted:     rgba(60,60,67,0.3);
+  --gta-divider:   #e5e5e7;
+  --gta-shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
+  --gta-shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --gta-shadow-lg: 0 16px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .gta-page {
@@ -193,7 +196,7 @@
 .gta-page:not(.loading) .gta-scroll-progress { opacity: 1; }
 .gta-scroll-fill {
   height: 100%; width: 0;
-  background: linear-gradient(90deg, var(--gta-orange), var(--gta-pink), var(--gta-purple));
+  background: var(--gta-blue);
   transition: width 0.1s linear;
 }
 
@@ -1583,6 +1586,66 @@
 }
 .cf-completed {
   color: var(--gta-purple);
+}
+
+/* ── Game detail panel (verdict + tags + last played) ── */
+.cf-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+.cf-last-played {
+  font: 500 0.65rem/1 'SF Mono', monospace;
+  color: var(--gta-muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  position: relative;
+  padding-left: 14px;
+}
+.cf-last-played::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gta-muted);
+  opacity: 0.5;
+}
+.cf-verdict {
+  font: 400 0.92rem/1.55 'Inter', -apple-system, sans-serif;
+  color: var(--gta-text);
+  margin: 14px 0 12px;
+  max-width: 520px;
+  letter-spacing: -0.005em;
+  /* Premium pull-quote feel: subtle left accent rule */
+  padding-left: 14px;
+  border-left: 2px solid var(--gta-blue);
+}
+.cf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.cf-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(10,132,255,0.08);
+  color: var(--gta-blue);
+  font: 600 0.62rem/1 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  border-radius: 100px;
+  text-transform: uppercase;
+  transition: background 200ms ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cf-tag:hover {
+  background: rgba(10,132,255,0.14);
+  transform: translateY(-1px);
 }
 
 /* ── Controls ── */

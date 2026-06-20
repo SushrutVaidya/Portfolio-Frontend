@@ -963,6 +963,37 @@
   };
   const DEFAULT_META = { emoji: '🎮', color: '#666' };
 
+  // Hardcoded "hot take" verdicts per game. Shown in the expanded panel.
+  // Keep these tight + opinionated — generic descriptions are boring.
+  const GAME_VERDICTS = {
+    730:     { verdict: 'My comfort food. 1500 hrs deep and counting. PS4 controller, full ranked. Valorant players, look away.', tags: ['Competitive', 'Daily Driver'] },
+    782330:  { verdict: 'The most metal game ever made. Doom Eternal is what happens when level designers also play in metal bands.', tags: ['Single-player', 'Stress Relief'] },
+    379720:  { verdict: 'The game that proved Doom could come back. Faster than memory allows.', tags: ['Replayed'] },
+    271590:  { verdict: 'Los Santos is the reason this whole portfolio exists. Played the campaign 4 times, never tire of it.', tags: ['Heart', 'Replayed'] },
+    1222140: { verdict: 'David Cage at his best. Branching narrative actually branches. Cried at least twice.', tags: ['Story-Driven', 'Emotional'] },
+    1190460: { verdict: 'Walking simulator that earned it. Kojima at peak Kojima — pretentious, weird, somehow profound.', tags: ['Slow Burn', 'Cinematic'] },
+    1240440: { verdict: 'Master Chief\'s grappling hook turned the whole franchise around. The open world finally fits.', tags: ['Replayed'] },
+    1088850: { verdict: 'Best Marvel game by a mile. Banter that actually lands. Star-Lord is a likable idiot.', tags: ['Underrated'] },
+    870780: { verdict: 'Remedy weird. Probably the best level design they\'ve ever shipped. Astral plane stuff = chef\'s kiss.', tags: ['Single-player'] },
+    2183900: { verdict: 'For the Emperor. No notes. Combat feels meatier than any other shooter this year.', tags: ['Fresh'] },
+    236870: { verdict: 'I\'m bald, I\'m built, I\'m problematic. Sandbox assassinations never get old.', tags: ['Sandbox'] },
+    447040: { verdict: 'San Francisco hackers in jorts. The vibe is everything. Combat ages, the world doesn\'t.', tags: ['Vibes'] },
+    202140: { verdict: 'B.J. Blazkowicz is the protagonist America needed in 2014 — still rips.', tags: ['Classic'] },
+    612880: { verdict: 'Tonally everywhere. Still a banger. Wheelchair mech segments live rent-free in my head.', tags: [] },
+    350080: { verdict: 'Castle Wolfenstein but with cosmic horror tentacles. Short, brutal, perfect.', tags: ['Short'] },
+  };
+  const DEFAULT_VERDICT = { verdict: 'Solid time spent here.', tags: [] };
+
+  // Approximate "last played" from data we already have. Real lastPlayed is
+  // available on Steam's playtime_2weeks field — TODO wire when STEAM_API_KEY
+  // is set in prod. For now derive from `played`.
+  function inferLastPlayed(g) {
+    if (g.played === 'Recently') return 'This week';
+    if (g.played === 'Completed') return 'Wrapped up';
+    if (g.played === 'A while ago') return 'A few months back';
+    return g.played || 'A while ago';
+  }
+
   function enrichGames(games) {
     return games.map(g => {
       const meta = GAME_META[g.appid] || DEFAULT_META;
@@ -1113,17 +1144,30 @@
     function updateInfo() {
       const g = games[activeIdx];
       const pct = Math.round((g.xp / maxXp) * 100);
+      const v = GAME_VERDICTS[g.appid] || DEFAULT_VERDICT;
+      const last = inferLastPlayed(g);
 
       // Crossfade: fade out, swap, fade in
       infoEl.classList.add('cf-info-out');
       setTimeout(() => {
+        const tagsHtml = (v.tags && v.tags.length)
+          ? '<div class="cf-tags">' +
+              v.tags.map(t => '<span class="cf-tag">' + t + '</span>').join('') +
+            '</div>'
+          : '';
+
         infoEl.innerHTML =
           '<h3 class="cf-title">' + g.emoji + ' ' + g.title + '</h3>' +
           '<div class="cf-bar-wrap">' +
             '<div class="cf-bar"><div class="cf-bar-fill" style="width:0%;background:' + g.color + '"></div></div>' +
             '<span class="cf-hrs">' + (g.xp > 0 ? g.xp.toLocaleString() + ' HRS' : 'COMPLETED') + '</span>' +
           '</div>' +
-          '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : g.played === 'Completed' ? 'cf-completed' : '') + '">' + g.played.toUpperCase() + '</span>';
+          '<div class="cf-meta-row">' +
+            '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : g.played === 'Completed' ? 'cf-completed' : '') + '">' + g.played.toUpperCase() + '</span>' +
+            '<span class="cf-last-played">' + last + '</span>' +
+          '</div>' +
+          '<p class="cf-verdict">' + v.verdict + '</p>' +
+          tagsHtml;
         infoEl.classList.remove('cf-info-out');
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {

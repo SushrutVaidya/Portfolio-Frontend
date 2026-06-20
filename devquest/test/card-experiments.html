@@ -98,9 +98,10 @@
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     /* Paint isolation — prevents one card's repaint from invalidating siblings */
     contain: layout style paint;
-    /* Force its own compositor layer, avoid blocking main thread */
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
+    /* NOTE: removed translate3d(0,0,0) + backface-visibility — they were
+       force-promoting all 9 cards to their own GPU layers simultaneously,
+       which on integrated Mac graphics fights for VRAM and ironically
+       INCREASES paint cost. will-change on hover is enough. */
   }
   /* Promote to GPU only while hovered, not always (perma will-change is memory-heavy) */
   .badge:hover { will-change: transform; }
@@ -2162,11 +2163,30 @@ async function submitPrintRequest(e) {
   }
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- html2canvas (200KB+) lazy-loaded inside downloadCard() — was eager
+     before, parsed on every page load even though only used on Download click. -->
 <script>
+// Lazy-load html2canvas only when the user clicks Download.
+// Saves ~200KB of script parsing on every page open.
+let _h2cPromise = null;
+function loadHtml2Canvas() {
+  if (window.html2canvas) return Promise.resolve(window.html2canvas);
+  if (_h2cPromise) return _h2cPromise;
+  _h2cPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload  = () => resolve(window.html2canvas);
+    s.onerror = () => reject(new Error('Failed to load html2canvas'));
+    document.head.appendChild(s);
+  });
+  return _h2cPromise;
+}
+
 async function downloadCard() {
   const btn = document.getElementById('btnDownload');
   btn.disabled = true;
+  btn.textContent = 'Loading…';
+  await loadHtml2Canvas();
   btn.textContent = 'Exporting...';
 
   try {

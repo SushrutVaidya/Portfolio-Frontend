@@ -254,44 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========================================
 
 function setupScrollColorTransition() {
-  const sections = [
-    { id: 'hero', color: '#1e90ff' }, // Dodger Blue (lighter, blends better with yellow)
-    { id: 'about', color: '#fc0' },
-    { id: 'interests', color: '#ff3838' },
-    { id: 'tracking', color: '#2ed573' },
-    { id: 'patent', color: '#9b59b6' },
-    { id: 'footer', color: '#1e90ff' } // Match hero
-  ];
-
-  // Set initial color
-  document.body.style.backgroundColor = sections[0].color;
-
-  // Intersection Observer to detect which section is visible
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.5 // Trigger when 50% of section is visible
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const sectionId = entry.target.id;
-        const section = sections.find(s => s.id === sectionId);
-        if (section) {
-          document.body.style.backgroundColor = section.color;
-        }
-      }
-    });
-  }, observerOptions);
-
-  // Observe all sections
-  sections.forEach(section => {
-    const element = document.getElementById(section.id);
-    if (element) {
-      observer.observe(element);
-    }
-  });
+  // REMOVED — the rainbow scroll-through-saturated-sections was a strong
+  // "creative project" signal. Replaced with a unified calm bg that lets
+  // content carry the page. Body keeps var(--bg) from CSS at all times.
+  // (Function kept as no-op so existing init() call doesn't error.)
 }
 
 // ========================================

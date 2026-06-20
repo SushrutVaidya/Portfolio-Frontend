@@ -18,23 +18,18 @@ body {
   transition: background-color 0.8s ease;
 }
 
-/* Beautiful animated gradient background for hero section */
+/* Calm hero — Apple/iOS palette. Subtle off-white wash, navy text. */
 #hero {
-  background: linear-gradient(-45deg, #1e90ff, #00bfff, #1e90ff, #4da6ff);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(10,132,255,0.10), transparent 60%),
+    linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+  color: var(--text-primary);
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+/* Body adopts the off-white system bg by default */
+body {
+  background: var(--bg);
+  color: var(--text-primary);
 }
 
 /* ========================================
@@ -50,9 +45,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: 96px 32px;
   position: relative;
+  color: var(--text-primary);
+  /* Subtle alternation via tinted bg — far calmer than rainbow */
   background: transparent;
+}
+.section:nth-of-type(even) {
+  background: var(--bg-subtle);  /* #f5f5f7 — barely-there contrast */
+}
+.section + .section {
+  border-top: 1px solid var(--border);
 }
 
 .section.short {
@@ -64,53 +67,59 @@ body {
   width: 100%;
 }
 
-/* Section Colors - removed since background is on body now */
-.section.light {
-  color: #fff;
-}
-
-.section.dark {
-  color: #000;
-}
+/* Legacy modifier classes from rainbow era — kept as no-ops for any
+   stragglers in the HTML, but the real palette now flows from --text-primary. */
+.section.light,
+.section.dark { color: var(--text-primary); }
 
 /* ========================================
    TYPOGRAPHY
    ======================================== */
 
 h1 {
-  font-size: 10rem;
-  font-weight: 900;
-  margin: 0 0 1rem 0;
-  line-height: 0.9;
+  font-size: clamp(3rem, 8vw, 5.5rem);   /* 48-88px responsive — Apple HIG scale */
+  font-weight: 700;
+  margin: 0 0 var(--space-5) 0;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
   position: relative;
   display: inline-block;
 }
 
 h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin: 0 0 2rem 0;
-  line-height: 1.5;
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  margin: 0 0 var(--space-5) 0;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
 }
 
 p {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  margin: 0 0 1.5rem 0;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  margin: 0 0 var(--space-5) 0;
+  color: var(--text-primary);
+  max-width: 64ch;
 }
 
 a {
-  color: inherit;
-  text-decoration: underline;
-  transition: opacity 0.2s ease;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: color 200ms ease, border-color 200ms ease;
 }
 
 a:hover {
-  opacity: 0.7;
+  color: var(--accent-hover);
+  border-color: transparent;
+  opacity: 1;
 }
 
 strong {
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* ========================================
@@ -587,10 +596,11 @@ strong {
 .loader,
 .welcome {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 13rem;
-  font-weight: 900;
-  line-height: 1.2;
-  color: white; /* Back to white for blue background */
+  font-size: clamp(4rem, 12vw, 9rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
   margin: 0;
   padding: 10px 0;
   position: absolute;
@@ -611,6 +621,7 @@ strong {
 
 .loader .dropping-dot {
   display: inline-block;
+  color: var(--accent);
   animation: dotDrop 12s ease-in-out infinite;
 }
 
@@ -773,7 +784,7 @@ strong {
   .game-hover,
   .book-hover {
     font-weight: 700;
-    color: rgba(255, 255, 255, 1);
+    color: var(--accent);
     animation: subtlePulse 3s ease-in-out infinite;
   }
 }
@@ -782,11 +793,11 @@ strong {
 @keyframes subtlePulse {
   0%, 100% {
     opacity: 1;
-    color: rgba(255, 255, 255, 1);
+    color: var(--accent);
   }
   50% {
-    opacity: 0.85;
-    color: rgba(200, 230, 255, 1);
+    opacity: 0.7;
+    color: var(--accent-hover);
   }
 }
 
@@ -814,7 +825,7 @@ strong {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%) translateY(100px);
-  background: #0b24fb;
+  background: var(--accent);
   color: white;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -843,8 +854,8 @@ strong {
   align-items: center;
   gap: 8px;
   padding: 14px 28px;
-  background: #fff;
-  color: #0b24fb;
+  background: var(--accent);
+  color: var(--text-on-accent);
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
@@ -854,21 +865,23 @@ strong {
   position: relative;
   overflow: hidden;
   transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(255,255,255,0.12);
+              box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 250ms ease;
+  box-shadow: 0 6px 20px rgba(10,132,255,0.28);
   will-change: transform;
 }
 .hero-cta-primary::after {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(circle at center, rgba(11,36,251,0.10), transparent 70%);
+  background: radial-gradient(circle at center, rgba(255,255,255,0.18), transparent 70%);
   opacity: 0;
   transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .hero-cta-primary:hover {
   transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 16px 40px rgba(255,255,255,0.25),
-              0 4px 12px rgba(11,36,251,0.18);
+  background: var(--accent-hover);
+  box-shadow: 0 18px 44px rgba(10,132,255,0.40),
+              0 4px 14px rgba(10,132,255,0.20);
 }
 .hero-cta-primary:hover::after { opacity: 1; }
 .hero-cta-primary:active { transform: translateY(-1px) scale(0.98); }
@@ -878,14 +891,14 @@ strong {
   align-items: center;
   gap: 8px;
   padding: 14px 28px;
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.75);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-decoration: none;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  border: 1.5px solid var(--border-strong);
   border-radius: 100px;
   position: relative;
   overflow: hidden;
@@ -897,19 +910,13 @@ strong {
   will-change: transform;
 }
 .hero-cta-secondary:hover {
-  color: #fff;
-  border-color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.08);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
   transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 14px 32px rgba(255,255,255,0.12);
+  box-shadow: 0 14px 32px rgba(10,132,255,0.14);
 }
 .hero-cta-secondary:active { transform: translateY(-1px) scale(0.98); }
-
-/* Arrow slide on the "Who am I? ↓" CTA — taps user expectation */
-.hero-cta-primary,
-.hero-cta-secondary {
-  transition-property: transform, box-shadow, color, border-color, background;
-}
 
 @media (max-width: 600px) {
   .hero-cta-row { flex-direction: column; align-items: flex-start; }

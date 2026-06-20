@@ -104,6 +104,22 @@
   }
   /* Promote to GPU only while hovered, not always (perma will-change is memory-heavy) */
   .badge:hover { will-change: transform; }
+
+  /* Skeleton state for staggered card hydration — keeps layout stable
+     so the page doesn't visually pop as cards fill in. */
+  .badge-skeleton {
+    background: linear-gradient(90deg,
+      rgba(0,0,0,0.04) 0%,
+      rgba(0,0,0,0.08) 50%,
+      rgba(0,0,0,0.04) 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes skeletonShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   .photo-img {
     width: 100%;
     height: 100%;
@@ -1614,13 +1630,31 @@ const CARD_STYLES = [
 // ── Build grid ──
 const grid = document.getElementById('cardGrid');
 function renderGrid() {
+  // First paint: cheap shells only — gets pixels on screen in <16ms.
+  // Avoids the "page lags as soon as we open it" feel from rendering
+  // 9 styled cards (badges, gradients, photos) synchronously.
   grid.innerHTML = '';
+  const cols = [];
   CARD_STYLES.forEach((style, i) => {
     const col = document.createElement('div');
     col.className = 'card-col' + (style.wrapper ? ' ' + style.wrapper : '');
-    col.innerHTML = `<span class="card-label">${i + 1}. ${style.name}</span>${style.build(false)}`;
+    col.innerHTML = `<span class="card-label">${i + 1}. ${style.name}</span><div class="badge badge-skeleton"></div>`;
     col.addEventListener('click', () => openZoom(style, i));
     grid.appendChild(col);
+    cols.push({ col, style });
+  });
+
+  // Hydrate the visible card synchronously, defer the rest one-per-frame.
+  // (Most users only see the first 1-2 cards above the fold initially.)
+  requestAnimationFrame(() => {
+    cols.forEach(({ col, style }, i) => {
+      if (i === 0) {
+        col.lastElementChild.outerHTML = style.build(false);
+      } else {
+        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 16 * i));
+        idle(() => { col.lastElementChild.outerHTML = style.build(false); }, { timeout: 200 });
+      }
+    });
   });
 }
 

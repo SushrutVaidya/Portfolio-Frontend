@@ -69,9 +69,11 @@ export function Cursor() {
       ref={dotRef}
       aria-hidden="true"
       className={[
-        'pointer-events-none fixed top-0 left-0 z-150 border-2 border-black mix-blend-difference',
-        'transition-[width,height,background-color] duration-[var(--dur-fast)]',
-        hot ? 'size-12 bg-[var(--section-accent)]' : 'size-4 bg-transparent',
+        // Circle, not a bordered square: at 16px with mix-blend-difference a
+        // square read as a stray UI artifact floating over the text.
+        'pointer-events-none fixed top-0 left-0 z-150 rounded-full mix-blend-difference',
+        'transition-[width,height,opacity] duration-[var(--dur-fast)] ease-[var(--ease-expo-out)]',
+        hot ? 'size-10 bg-white opacity-90' : 'size-3 bg-white opacity-70',
       ].join(' ')}
     />
   )

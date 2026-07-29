@@ -1,6 +1,8 @@
 import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Reveal } from './Reveal'
+import { contrastInk } from '@/lib/color'
+import { SplitText } from './SplitText'
 
 interface SectionProps {
   id: string
@@ -58,7 +60,11 @@ export function Section({
       aria-labelledby={`${id}-heading`}
       className={`${STOCK_CLASS[stock]} border-t-4 border-black px-6 py-20 md:px-12 md:py-28`}
       onViewportEnter={() => {
-        document.documentElement.style.setProperty('--section-accent', accent)
+        const root = document.documentElement
+        root.style.setProperty('--section-accent', accent)
+        // Companion ink, so anything sitting ON the accent stays readable.
+        // CSS can't compute contrast, so it's derived here and published too.
+        root.style.setProperty('--section-accent-ink', contrastInk(accent))
       }}
       viewport={{ amount: 0.35 }}
     >
@@ -72,7 +78,7 @@ export function Section({
               {index}
             </span>
             <h2 id={`${id}-heading`} className="text-3xl leading-[0.95] md:text-5xl">
-              {title}
+              <SplitText>{title}</SplitText>
               {subtitle && (
                 <span className="font-sans mt-3 block text-base font-normal normal-case tracking-normal text-muted-foreground md:text-xl">
                   {subtitle}

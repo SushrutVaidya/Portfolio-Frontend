@@ -1,4 +1,5 @@
 import { Reveal } from '@/components/Reveal'
+import { CountUp } from '@/components/CountUp'
 import { Section } from '@/components/Section'
 import { certifications, experience, metrics } from '@/content/site'
 
@@ -35,7 +36,9 @@ export function About() {
             >
               <dt className="sr-only">{m.label}</dt>
               <dd>
-                <span className="font-head block text-3xl tabular-nums md:text-5xl">{m.value}</span>
+                <span className="font-head block text-3xl tabular-nums md:text-5xl">
+                  <CountUp value={m.value} />
+                </span>
                 <span className="mt-2 block text-sm leading-snug">{m.label}</span>
                 <span className="font-mono mt-1 block text-xs text-muted-foreground">
                   {m.detail}

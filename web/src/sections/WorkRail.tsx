@@ -31,12 +31,15 @@ export function WorkRail() {
           {projects.map((project) => (
             <article
               key={project.slug}
-              className="w-[min(84vw,26rem)] shrink-0 snap-start border-2 border-black bg-card shadow-lg"
+              // flex + h-auto with a stretched track gives equal heights; the
+              // previous h-[calc(100%-9.5rem)] assumed every masthead was the
+              // same height and clipped the CTA when a title wrapped to 3 lines.
+              className="flex w-[min(84vw,26rem)] shrink-0 snap-start flex-col border-2 border-black bg-card shadow-lg"
             >
               {/* Masthead carries the project's own accent, previewing the
                   palette the case-study route commits to fully. */}
               <div
-                className="border-b-2 border-black p-6"
+                className="flex min-h-[11rem] flex-col justify-end border-b-2 border-black p-6"
                 style={{ background: project.theme.stock, color: project.theme.ink }}
               >
                 <p
@@ -51,8 +54,8 @@ export function WorkRail() {
                 <p className="font-mono mt-2 text-xs opacity-80">{project.tagline}</p>
               </div>
 
-              <div className="flex h-[calc(100%-9.5rem)] flex-col p-6">
-                <p className="line-clamp-5 text-sm leading-relaxed">{project.summary}</p>
+              <div className="flex flex-1 flex-col p-6">
+                <p className="line-clamp-4 text-sm leading-relaxed">{project.summary}</p>
 
                 <ul className="mt-5 flex flex-wrap gap-1.5" aria-label={`${project.name} stack`}>
                   {project.stack.slice(0, 5).map((tech) => (
@@ -72,7 +75,7 @@ export function WorkRail() {
 
                 <Link
                   to={`/work/${project.slug}`}
-                  className="retro-press font-head mt-auto inline-block self-start border-2 border-black bg-[var(--section-accent)] px-4 py-2 text-sm text-white shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                  className="retro-press font-head mt-auto inline-block self-start border-2 border-black bg-[var(--section-accent)] px-4 py-2 text-sm text-[var(--section-accent-ink)] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
                   Read the case study →
                 </Link>

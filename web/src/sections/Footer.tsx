@@ -1,5 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { Reveal } from '@/components/Reveal'
+import { SplitText } from '@/components/SplitText'
+import { Magnetic } from '@/components/Magnetic'
 import { useRickroll } from '@/hooks/useRickroll'
 import { links, profile } from '@/content/site'
 import { DUR, EASE_EXPO_OUT } from '@/lib/motion'
@@ -29,7 +31,7 @@ export function Footer() {
       <div className="mx-auto max-w-5xl">
         <Reveal>
           <h2 className="text-4xl leading-[0.9] md:text-6xl">
-            Let&apos;s build something
+            <SplitText>Let&apos;s build something</SplitText>
             <span className="font-sans mt-4 block text-base font-normal normal-case tracking-normal text-muted-foreground md:text-xl">
               or just argue about whether Kubernetes was necessary
             </span>
@@ -37,12 +39,14 @@ export function Footer() {
         </Reveal>
 
         <Reveal delay={0.08}>
+          <Magnetic strength={14}>
           <a
             href={`mailto:${profile.email}`}
-            className="font-head mt-10 inline-block border-2 border-black bg-[var(--section-accent)] px-6 py-4 text-lg text-white shadow-lg transition-[transform,box-shadow] duration-[var(--dur-fast)] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-xl active:translate-x-0 active:translate-y-0 active:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black md:text-2xl"
+            className="font-head mt-10 inline-block border-2 border-black bg-[var(--section-accent)] px-6 py-4 text-lg text-[var(--section-accent-ink)] shadow-lg transition-[transform,box-shadow] duration-[var(--dur-fast)] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-xl active:translate-x-0 active:translate-y-0 active:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black md:text-2xl"
           >
             {profile.email}
           </a>
+          </Magnetic>
         </Reveal>
 
         <Reveal delay={0.12}>

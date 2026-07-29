@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react'
 import {
@@ -9,16 +9,18 @@ import {
 } from '@/components/ui/accordion'
 import { Reveal } from '@/components/Reveal'
 import { Pinned } from '@/components/Pinned'
+import { SplitText } from '@/components/SplitText'
+import { CountUp } from '@/components/CountUp'
 import { projects } from '@/content/projects'
-import { DUR, EASE_EXPO_OUT } from '@/lib/motion'
+import { contrastInk } from '@/lib/color'
 
 /**
  * Case study route — /work/:slug.
  *
- * The project owns the entire page. Its palette is written to the document
- * custom properties on mount, so headings, rules, buttons and the cursor all
- * recolour — the approach david-hckh.com takes with its .project-* classes.
- * Cleaned up on unmount so navigating away restores the site palette.
+ * The project owns the entire page: its palette is applied to a wrapper element
+ * so headings, rules and buttons all recolour — the approach david-hckh.com
+ * takes with its .project-* classes. Scoped rather than global, so it cannot
+ * leak into the shared footer.
  *
  * Structure is deliberately long-form: masthead, then narrative blocks, then
  * the engineering decisions. A recruiter reads the masthead and outcome; an
@@ -32,27 +34,6 @@ export function CaseStudy() {
   // Scroll progress bar — cheap orientation cue on a long page.
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 })
-
-  useEffect(() => {
-    if (!project) return
-    const root = document.documentElement
-    const previous = {
-      accent: root.style.getPropertyValue('--section-accent'),
-      ink: root.style.getPropertyValue('--foreground'),
-      stock: root.style.getPropertyValue('--background'),
-    }
-    root.style.setProperty('--section-accent', project.theme.accent)
-    root.style.setProperty('--foreground', project.theme.ink)
-    root.style.setProperty('--background', project.theme.stock)
-    return () => {
-      // Restore rather than clear: clearing would drop the site defaults too.
-      root.style.setProperty('--section-accent', previous.accent || '#0b24fb')
-      if (previous.ink) root.style.setProperty('--foreground', previous.ink)
-      else root.style.removeProperty('--foreground')
-      if (previous.stock) root.style.setProperty('--background', previous.stock)
-      else root.style.removeProperty('--background')
-    }
-  }, [project])
 
   useEffect(() => {
     if (project) document.title = `${project.name} — Sushrut Vaidya`
@@ -70,7 +51,7 @@ export function CaseStudy() {
         </p>
         <Link
           to="/"
-          className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2 text-white shadow-md"
+          className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2 text-[var(--section-accent-ink)] shadow-md"
         >
           ← Back
         </Link>
@@ -78,8 +59,24 @@ export function CaseStudy() {
     )
   }
 
+  /**
+   * Theme is scoped to this wrapper, NOT documentElement.
+   *
+   * Writing --foreground/--background to :root leaked the project palette into
+   * the Footer, which renders outside this route but in the same tree — cream
+   * ink landed on tan paper and the whole footer became unreadable. Custom
+   * properties inherit, so scoping them here themes the case study completely
+   * while leaving everything outside it alone.
+   */
+  const themeVars = {
+    '--section-accent': project.theme.accent,
+    '--section-accent-ink': contrastInk(project.theme.accent),
+    '--foreground': project.theme.ink,
+    '--background': project.theme.stock,
+  } as CSSProperties
+
   return (
-    <>
+    <div style={themeVars} className="bg-background text-foreground">
       {!reduceMotion && (
         <motion.div
           className="fixed top-0 left-0 z-100 h-1 w-full origin-left bg-[var(--section-accent)]"
@@ -99,14 +96,11 @@ export function CaseStudy() {
               ← All work
             </Link>
 
-            <motion.h1
-              className="mt-8 text-[clamp(2.5rem,9vw,7rem)] leading-[0.85]"
-              initial={reduceMotion ? undefined : { opacity: 0, y: 28 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: DUR.hero, ease: EASE_EXPO_OUT }}
-            >
-              {project.name}
-            </motion.h1>
+            <h1 className="mt-8 text-[clamp(2.5rem,9vw,7rem)] leading-[0.85]">
+              <SplitText immediate delay={0.15}>
+                {project.name}
+              </SplitText>
+            </h1>
 
             <p className="mt-6 max-w-2xl text-lg md:text-2xl">{project.tagline}</p>
 
@@ -131,7 +125,7 @@ export function CaseStudy() {
                   href={project.href}
                   target={project.href.startsWith('http') ? '_blank' : undefined}
                   rel={project.href.startsWith('http') ? 'noreferrer noopener' : undefined}
-                  className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2.5 text-sm text-black shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2.5 text-sm text-[var(--section-accent-ink)] shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
                 >
                   {project.status === 'live' ? 'Open it' : 'Read the filing'} →
                 </a>
@@ -159,7 +153,7 @@ export function CaseStudy() {
                   <dt className="sr-only">{m.label}</dt>
                   <dd>
                     <span className="font-head block text-4xl tabular-nums md:text-6xl">
-                      {m.value}
+                      <CountUp value={m.value} />
                     </span>
                     <span className="font-mono mt-1 block text-xs opacity-70">{m.label}</span>
                   </dd>
@@ -278,6 +272,6 @@ export function CaseStudy() {
           </div>
         </section>
       </main>
-    </>
+    </div>
   )
 }

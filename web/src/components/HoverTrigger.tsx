@@ -36,7 +36,7 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
         'font-head cursor-pointer border-b-4 px-0.5 transition-colors duration-[var(--dur-fast)]',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
         isActive
-          ? 'border-black bg-[var(--section-accent)] text-black'
+          ? 'border-black bg-[var(--section-accent)] text-[var(--section-accent-ink)]'
           : 'border-[var(--section-accent)] hover:bg-[var(--section-accent)]',
       ].join(' ')}
     >

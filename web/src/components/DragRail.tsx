@@ -78,7 +78,7 @@ export function DragRail({ children, hint, ariaLabel }: DragRailProps) {
       >
         <motion.div
           ref={trackRef}
-          className="flex w-max gap-6 md:gap-8"
+          className="flex w-max items-stretch gap-6 md:gap-8"
           drag={canDrag && dragLimit > 0 ? 'x' : false}
           dragConstraints={{ left: -dragLimit, right: 0 }}
           // Elastic beyond the ends, then settle — the "weight" of the rail.

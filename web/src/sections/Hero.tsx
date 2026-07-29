@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { HoverTrigger } from '@/components/HoverTrigger'
+import { SplitText } from '@/components/SplitText'
+import { Magnetic } from '@/components/Magnetic'
 import { useLiveClock } from '@/hooks/useLiveClock'
 import { useStats } from '@/hooks/useStats'
 import { profile } from '@/content/site'
@@ -48,14 +50,14 @@ export function Hero() {
           ))}
         </div>
 
-        <motion.h1
-          className="text-[clamp(2.75rem,11vw,9rem)] leading-[0.82]"
-          initial={reduceMotion ? undefined : { opacity: 0, y: 32 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: DUR.hero, delay: 0.45, ease: EASE_EXPO_OUT }}
-        >
-          {profile.name}
-        </motion.h1>
+        {/* Character-level reveal — the name is short enough that per-char
+            reads as deliberate rather than gimmicky, and long enough that the
+            stagger has somewhere to go. */}
+        <h1 className="text-[clamp(2.75rem,11vw,9rem)] leading-[0.82]">
+          <SplitText by="char" immediate delay={0.5}>
+            {profile.name}
+          </SplitText>
+        </h1>
 
         <motion.p
           className="font-pixel mt-6 text-[0.7rem] tracking-[0.2em] uppercase md:text-xs"
@@ -135,12 +137,15 @@ export function Hero() {
         </p>
 
         <nav aria-label="Primary" className="mt-12 flex flex-wrap gap-4">
+          <Magnetic>
           <a
             href="#work"
-            className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-6 py-3 text-base text-white shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-6 py-3 text-base text-[var(--section-accent-ink)] shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
           >
             See the work ↓
           </a>
+          </Magnetic>
+          <Magnetic>
           <a
             href={profile.resume}
             download
@@ -148,6 +153,7 @@ export function Hero() {
           >
             Résumé (PDF)
           </a>
+          </Magnetic>
         </nav>
       </div>
     </header>

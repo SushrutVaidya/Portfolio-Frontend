@@ -15,15 +15,12 @@
   --font-pixel: var(--font-pixel);
   --radius: var(--radius);
 
-  /* Motion system (from pacomepertant.com). Every reveal, hover and scroll
-     animation draws from these — CSS transitions and Motion's JS animations
-     share the same curves so the whole page feels like one system. This is
-     the "motion tokens" work deferred in PERFORMANCE_NOTES.md. */
-  --ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-quad-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --dur-fast: 150ms;
-  --dur-base: 400ms;
-  --dur-slow: 800ms;
+  /* NOTE: motion tokens are deliberately NOT declared here.
+     Tailwind tree-shakes @theme tokens that no generated utility references,
+     and `--dur-*` / `--ease-*` are only ever consumed through arbitrary values
+     like duration-[var(--dur-fast)] — which Tailwind does not trace back to the
+     theme. Declared in @theme they vanish from the output and every transition
+     using them silently collapses. They live in :root below instead. */
 
   --shadow-xs: 1px 1px 0 0 var(--border);
   --shadow-sm: 2px 2px 0 0 var(--border);
@@ -71,6 +68,18 @@
 }
 
 :root {
+  /* Motion system (from pacomepertant.com). Plain custom properties so they're
+     always emitted and reachable from both CSS (duration-[var(--dur-fast)],
+     ease-[var(--ease-expo-out)]) and Motion's JS options — one set of curves
+     for the whole page. This is the "motion tokens" work PERFORMANCE_NOTES.md
+     deferred as "200+ rules to touch". */
+  --dur-fast: 150ms;
+  --dur-base: 350ms;
+  --dur-reveal: 600ms;
+  --dur-slow: 800ms;
+  --ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-quad-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
   --font-head: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
@@ -171,11 +180,13 @@
 }
 
 /* The signature neobrutalist interaction: lift toward the light on hover,
-   then slam flat into the shadow on press. */
+   then slam flat into the shadow on press. Draws timing from the motion tokens
+   rather than hardcoding, so a change to --dur-fast moves every press together.
+   Shadow offsets match --shadow-lg / --shadow-xs. */
 @utility retro-press {
   transition-property: transform, box-shadow;
-  transition-duration: 150ms;
-  transition-timing-function: ease-out;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-expo-out);
   &:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 0 var(--border);

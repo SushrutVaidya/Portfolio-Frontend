@@ -5,6 +5,8 @@ import { HoverMediaProvider } from '@/components/HoverMediaProvider'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { Preloader } from '@/components/Preloader'
 import { Cursor } from '@/components/Cursor'
+import { RouteCurtain } from '@/components/RouteCurtain'
+import { SectionIndex } from '@/components/SectionIndex'
 import { Footer } from '@/sections/Footer'
 import { Home } from '@/pages/Home'
 import { CaseStudy } from '@/pages/CaseStudy'
@@ -31,6 +33,8 @@ export default function App() {
     <SmoothScroll>
       <Preloader onDone={onDone} />
       <Cursor />
+      <RouteCurtain />
+      {location.pathname === '/' && <SectionIndex />}
 
       <a
         href="#work"
@@ -46,10 +50,11 @@ export default function App() {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
+            // No crossfade: RouteCurtain covers the swap, and fading
+            // underneath an opaque panel just delays the incoming paint.
             initial={reduceMotion ? undefined : { opacity: 0 }}
             animate={reduceMotion ? undefined : { opacity: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0 }}
-            transition={{ duration: DUR.base, ease: EASE_EXPO_OUT }}
+            transition={{ duration: DUR.fast, ease: EASE_EXPO_OUT }}
             style={{ visibility: ready ? 'visible' : 'hidden' }}
           >
             <Routes location={location}>

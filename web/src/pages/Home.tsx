@@ -1,6 +1,6 @@
 import { Hero } from '@/sections/Hero'
 import { About } from '@/sections/About'
-import { WorkRail } from '@/sections/WorkRail'
+import { ShowcaseScroll } from '@/sections/ShowcaseScroll'
 import { Stack } from '@/sections/Stack'
 import { Patent } from '@/sections/Patent'
 import { Marquee } from '@/components/Marquee'
@@ -23,7 +23,7 @@ export function Home() {
           which is what stops the page reading as a stack of centred columns. */}
       <Marquee items={MARQUEE} />
       <About />
-      <WorkRail />
+      <ShowcaseScroll />
       <Marquee items={['Open to platform roles', 'Hyderabad · Remote']} duration={22} reverse />
       <Stack />
       <Patent />

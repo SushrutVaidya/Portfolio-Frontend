@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/*
+ * RetroUI neobrutalist theme (Tailwind v4).
+ * Square corners + hard offset shadows keyed to --border are what make this
+ * read as neobrutalist rather than "shadcn with a yellow accent".
+ *
+ * Fonts load via <link> in index.html (Vite has no next/font), and the stacks
+ * are bound to --font-head / --font-sans in :root below.
+ */
+@theme inline {
+  --font-head: var(--font-head);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-pixel: var(--font-pixel);
+  --radius: var(--radius);
+
+  /* Motion system (from pacomepertant.com). Every reveal, hover and scroll
+     animation draws from these — CSS transitions and Motion's JS animations
+     share the same curves so the whole page feels like one system. This is
+     the "motion tokens" work deferred in PERFORMANCE_NOTES.md. */
+  --ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-quad-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --dur-fast: 150ms;
+  --dur-base: 400ms;
+  --dur-slow: 800ms;
+
+  --shadow-xs: 1px 1px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--border);
+  --shadow: 3px 3px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 10px 10px 0 1px var(--border);
+  --shadow-2xl: 16px 16px 0 1px var(--border);
+
+  /* RetroUI's components hardcode `border-black` rather than `border-border`,
+     so overriding --foreground alone wouldn't reach them. Redefining Tailwind's
+     `black` is the single point that makes every component pick up the warm
+     off-black from david-hckh.com. */
+  --color-black: #2d2a24;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Paper stock scale (niccolomiranda.com + david-hckh.com) for banding
+     sections against each other without leaving the paper world. */
+  --color-paper-100: var(--paper-100);
+  --color-paper-200: var(--paper-200);
+  --color-paper-300: var(--paper-300);
+  --color-paper-400: var(--paper-400);
+
+  /* The single per-section accent. One accent per band, never competing —
+     the one-pop-accent discipline borrowed from pacomepertant.com. */
+  --color-section-accent: var(--section-accent);
+}
+
+:root {
+  --font-head: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+  /* Pixel bitmap face for section numerals and micro-labels — the nod to
+     david-hckh.com's ProFontWindows, and to the existing Gintama sprites. */
+  --font-pixel: "Silkscreen", "Space Mono", ui-monospace, monospace;
+
+  --radius: 0;
+
+  /* Paper stock — warm, not white. */
+  --paper-100: #fff7e8;
+  --paper-200: #f5efe6;
+  --paper-300: #e9ded0;
+  --paper-400: #dfd1bc;
+
+  --background: var(--paper-100);
+  /* Warm off-black rather than #000 (david-hckh.com). Pure black is harsh
+     across the large flat areas and thick borders this design leans on. */
+  --foreground: #2d2a24;
+  --card: #fff;
+  --card-foreground: #2d2a24;
+  --primary: #ffdc58;
+  --primary-hover: #ffd12e;
+  --primary-foreground: #2d2a24;
+  --secondary: #2d2a24;
+  --secondary-foreground: #fff7e8;
+  --muted: #efe7d6;
+  --muted-foreground: #6b6355;
+  --accent: #ffe7a3;
+  --accent-foreground: #2d2a24;
+  --destructive: #e63946;
+  --destructive-foreground: #fff;
+  --border: #2d2a24;
+  --input: #fff;
+  --ring: #2d2a24;
+
+  /* Overridden per section; defaults to the hero blue. */
+  --section-accent: #0b24fb;
+}
+
+.dark {
+  --paper-100: #1a1815;
+  --paper-200: #201d19;
+  --paper-300: #262320;
+  --paper-400: #2e2a24;
+
+  --background: var(--paper-100);
+  --foreground: #f5f0e6;
+  --card: #262320;
+  --card-foreground: #f5f0e6;
+  --primary: #ffdc58;
+  --primary-hover: #ffd12e;
+  --primary-foreground: #2d2a24;
+  --secondary: #3a352f;
+  --secondary-foreground: #f5f0e6;
+  --muted: #2e2a24;
+  --muted-foreground: #b3ac9e;
+  --accent: #38342b;
+  --accent-foreground: #f5f0e6;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #1a1815;
+  --border: #0a0a0a;
+  --input: #262320;
+  --ring: #ffdc58;
+
+  /* Electric mint reads far better than blue on warm dark
+     (pacomepertant.com's --color-pop-green). */
+  --section-accent: #21ffc0;
+}
+
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-head uppercase tracking-tight;
+  }
+
+  /* Respect users who ask for less motion. Motion's own hooks read this too,
+     but CSS-driven marquee/scroll bits need it declared here as well. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* The signature neobrutalist interaction: lift toward the light on hover,
+   then slam flat into the shadow on press. */
+@utility retro-press {
+  transition-property: transform, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--border);
+  }
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0 0 var(--border);
+  }
+}

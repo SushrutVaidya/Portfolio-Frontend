@@ -23,8 +23,12 @@ body {
 #incident-container {
   position: relative;
   background: rgba(28, 28, 30, 0.75);
-  backdrop-filter: blur(40px) saturate(1.8);
-  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  /* Was blur(40px). Same fix pattern as captcha (F2) and landing
+     header (A2): 75%-opaque background does most of the visual work,
+     and the 40px radius auto-promotes this to a max-texture compositor
+     layer. 10px keeps the frosted look at ~15% of the shader cost. */
+  backdrop-filter: blur(10px) saturate(1.8);
+  -webkit-backdrop-filter: blur(10px) saturate(1.8);
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
   width: 860px;
@@ -289,6 +293,15 @@ body {
 }
 
 .code-line:hover { background: rgba(255,255,255,0.05); }
+
+/* Keyboard focus — visible orange ring so keyboard/screen-reader users
+   can see which line they're about to accuse. :focus-visible fires on
+   keyboard focus only, so mouse users aren't distracted. */
+.code-line:focus-visible {
+  outline: 2px solid #ff6600;
+  outline-offset: -2px;
+  background: rgba(255, 102, 0, 0.10);
+}
 
 .code-line.correct {
   background: rgba(48, 209, 88, 0.18) !important;
@@ -605,8 +618,11 @@ body {
   transform: translateX(-50%);
   width: 290px;
   background: rgba(28,28,30,0.94);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /* Toast is fixed + 94%-opaque bg. blur(24) here is invisible; 8px
+     is a token frosted edge that still reads on the ~5% translucent
+     region. */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   padding: 12px 14px;

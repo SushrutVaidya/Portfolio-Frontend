@@ -37,12 +37,20 @@ html, body {
 .orb {
   position: fixed;
   border-radius: 50%;
-  filter: blur(70px);
+  /* No `filter: blur(...)` — Chrome allocates a max-texture-size
+     compositor layer (16k×16k) per filter-having element. On landing,
+     3 orbs × that layer = ~1 GB reserved GPU memory. Trace
+     20260706T220421 showed 5 GPU tasks × ~380ms in a 550ms window
+     during navigation (Start Challenge click), because Chrome had to
+     compose landing's final frame AND raster captcha's first frame
+     while unwinding all those layers.
+     The radial-gradient stops at 70 % transparent, which is already
+     inherently soft — the blur was gilding the lily. The floatA/
+     floatB keyframes still animate `transform`, so Chrome
+     auto-composites the element for the animation duration, but
+     WITHOUT the max-texture layer bounds. */
   pointer-events: none;
   z-index: 0;
-  will-change: transform;
-  transform: translateZ(0);         /* promote to GPU layer */
-  backface-visibility: hidden;      /* prevent flicker */
 }
 
 /* 3 orbs instead of 4 — reduced GPU load */
@@ -125,8 +133,11 @@ html, body {
   padding: 0 40px;
   height: 56px;
   background: rgba(10, 10, 10, 0.72);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  /* Reduced from blur(24px) → blur(8px). Background is 72% opaque
+     so most blur is invisible anyway. Cuts one always-composited
+     max-texture layer that survived every prior perf pass. */
+  backdrop-filter: blur(8px) saturate(1.8);
+  -webkit-backdrop-filter: blur(8px) saturate(1.8);
   border-bottom: 0.5px solid var(--border);
 }
 
@@ -162,9 +173,14 @@ html, body {
   animation: heroEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Entrance animation for the hero on landing. Was animating `filter: blur(6px)`
+   which pushed paint bounds to Chrome's infinity marker (trace 07: 543
+   infinity paints on #hero across landing visits). Removed the blur —
+   the translate+opacity fade alone reads as a soft entrance without
+   creating a filter compositor layer. */
 @keyframes heroEntrance {
-  from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 .hero-eyebrow {
@@ -202,15 +218,15 @@ html, body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: hueShift 8s linear infinite;
-  will-change: filter;
+  /* Removed `animation: hueShift 8s linear infinite; will-change: filter`.
+     hue-rotate() on the hero title kept a filter-layer alive and burned a
+     shader pass every frame — enough to show up in the trace as constant
+     GPU work on an otherwise idle page. The gradient itself already has
+     a rich color range, so the animated hue rotation added little visual
+     value for the cost. */
 }
 
-/* hue-rotate is GPU-accelerated, unlike background-position shift */
-@keyframes hueShift {
-  0%   { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
+/* hueShift keyframes removed — see comment above. */
 
 .name-period { -webkit-text-fill-color: #5e3bff; color: #5e3bff; }
 
@@ -465,10 +481,15 @@ html, body {
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
-  filter: blur(2px) brightness(0.65);
-  transition: filter 0.4s ease, box-shadow 0.4s ease;
+  /* Was: `filter: blur(2px) brightness(0.65)`. Filter creates a raster
+     layer + shader pass per card. Same visual dim via opacity — no
+     filter shader, no bounds inflation. Slight visual difference (no
+     softening) but the cards are 84px tall so blur was barely visible
+     anyway. Hover reveals full opacity. */
+  opacity: 0.6;
+  transition: opacity 0.4s ease, box-shadow 0.4s ease;
 }
-.hero-teaser:hover .teaser-card { filter: blur(0) brightness(1); }
+.hero-teaser:hover .teaser-card { opacity: 1; }
 
 .teaser-card.theme-gta  { background: #1a1208; border: 1.5px solid #ff6600; box-shadow: 0 0 14px rgba(255,102,0,0.28); }
 .teaser-card.theme-holo { background: #f0eeff; border: 1.5px solid rgba(120,0,255,0.35); box-shadow: 0 0 14px rgba(120,0,255,0.15); }

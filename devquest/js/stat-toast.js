@@ -84,17 +84,39 @@
     const old = document.getElementById('dq-stat-toast');
     if (old) { old.remove(); }
 
+    // Build toast via createElement + textContent so the caller-supplied
+    // statName/value/subtext render as text even if they contain HTML.
+    // All callers today pass literal strings, but a defensive shape here
+    // means a future caller can't accidentally introduce XSS.
     const toast = document.createElement('div');
     toast.id = 'dq-stat-toast';
-    toast.innerHTML = `
-      <div class="toast-header">Stat Unlocked</div>
-      <div class="toast-row">
-        <div class="toast-badge">${statName}</div>
-        <div class="toast-value">${value}</div>
-      </div>
-      <div class="toast-bar-track"><div class="toast-bar-fill" id="dq-toast-bar"></div></div>
-      <div class="toast-sub">${subtext || 'earned in the challenge'}</div>
-    `;
+
+    const header = document.createElement('div');
+    header.className = 'toast-header';
+    header.textContent = 'Stat Unlocked';
+
+    const row = document.createElement('div');
+    row.className = 'toast-row';
+    const badge = document.createElement('div');
+    badge.className = 'toast-badge';
+    badge.textContent = statName;
+    const val = document.createElement('div');
+    val.className = 'toast-value';
+    val.textContent = value;
+    row.append(badge, val);
+
+    const barTrack = document.createElement('div');
+    barTrack.className = 'toast-bar-track';
+    const barFill = document.createElement('div');
+    barFill.className = 'toast-bar-fill';
+    barFill.id = 'dq-toast-bar';
+    barTrack.appendChild(barFill);
+
+    const sub = document.createElement('div');
+    sub.className = 'toast-sub';
+    sub.textContent = subtext || 'earned in the challenge';
+
+    toast.append(header, row, barTrack, sub);
     document.body.appendChild(toast);
 
     requestAnimationFrame(() => {

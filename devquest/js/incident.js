@@ -550,6 +550,12 @@ function renderRound() {
     const div     = document.createElement('div');
     div.className = 'code-line';
     div.dataset.line = i;
+    // Keyboard/a11y: each line is a focusable button. Tab through them,
+    // press Enter/Space to accuse. Matches the click flow so mouse and
+    // keyboard players hit the same code path.
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('aria-label', `Line ${i + 1}. Press Enter to mark as the bug.`);
 
     const numSpan = document.createElement('span');
     numSpan.className   = 'line-num';
@@ -564,9 +570,22 @@ function renderRound() {
     div.appendChild(numSpan);
     div.appendChild(codeSpan);
     div.addEventListener('click', () => handleLineClick(i));
+    div.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleLineClick(i);
+      }
+    });
     incCode.appendChild(div);
     currentLineEls.push(div); // fix 2: cache
   });
+
+  // Focus first line so keyboard users can immediately Arrow/Enter.
+  // requestAnimationFrame delays until after DOM paint so focus lands
+  // reliably even if the round transition animation is running.
+  if (currentLineEls[0]) {
+    requestAnimationFrame(() => currentLineEls[0].focus({ preventScroll: true }));
+  }
 }
 
 // ==========================================
@@ -639,6 +658,11 @@ function startRound() {
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       clearQuirks();
+      // Set gameOver BEFORE the reveal setTimeout — otherwise a click
+      // in the 1400ms reveal window still runs handleLineClick, pushes
+      // a second roundResults entry, and calls nextRound again, which
+      // skips a round. gameOver is reset in startRound() for next round.
+      gameOver = true;
       roundResults.push(false);
       incStatus.textContent = '⏱ Time\'s up — showing the bug...';
       incStatus.className   = 'wrong';

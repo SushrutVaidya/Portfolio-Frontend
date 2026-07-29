@@ -1,7 +1,7 @@
 // DevQuest — Theme Toggle + Sound Toggle
 (function () {
   const html  = document.documentElement;
-  const saved = localStorage.getItem('dq-theme') || 'light';
+  const saved = localStorage.getItem('dq-theme') || 'dark';
   html.setAttribute('data-theme', saved);
 })();
 
@@ -46,15 +46,23 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── Sound toggle ──
+  // Button controls both background music (only on captcha) AND UI SFX
+  // (all pages). aria-label was previously "Mute music" which was
+  // misleading on pages without <audio id="dq-music">. Now says "sound"
+  // generically and reflects state via aria-pressed for screen readers.
   if (soundBtn) {
     const iconEl = soundBtn.querySelector('.dq-sound-icon');
+    const hasMusic = !!document.getElementById('dq-music');
+    const noun = hasMusic ? 'music and sound effects' : 'sound effects';
 
     function updateSoundBtn() {
       if (typeof DQSounds === 'undefined') return;
       const muted = DQSounds.isMuted();
       soundBtn.classList.toggle('muted', muted);
       if (iconEl) iconEl.textContent = muted ? '♪' : '♫';
-      soundBtn.setAttribute('aria-label', muted ? 'Unmute music' : 'Mute music');
+      soundBtn.setAttribute('aria-label', (muted ? 'Unmute ' : 'Mute ') + noun);
+      soundBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      soundBtn.title = (muted ? 'Unmute ' : 'Mute ') + noun;
     }
 
     updateSoundBtn();

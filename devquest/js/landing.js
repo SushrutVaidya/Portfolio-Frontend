@@ -1,8 +1,15 @@
 // DevQuest Landing — name input + user registration + flow
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8081'
-  : '';
+// API base:
+//   - Prod (any non-loopback host): '' (same-origin, nginx routes /api).
+//   - Local via nginx-proxy on port 8888: '' (same-origin, proxy routes /api).
+//   - Local direct (python http.server / frontend container on 8080): backend on :8081.
+const API_BASE = (() => {
+  const h = window.location.hostname, p = window.location.port;
+  if (h !== 'localhost' && h !== '127.0.0.1') return '';
+  if (p === '8888') return '';
+  return 'http://localhost:8081';
+})();
 
 const enterBtn    = document.getElementById('enter-devquest');
 const backdrop    = document.getElementById('modal-backdrop');
@@ -70,9 +77,16 @@ startBtn.addEventListener('click', startChallenge);
 startBtn.disabled = true;
 
 async function startChallenge() {
+  // Idempotency guard — prevents double-registration on rapid double-click
+  // or Enter-mash. Without this, two POSTs race and can create dup rows
+  // (backend has a unique constraint now, but still wastes a request).
+  if (startBtn.disabled || startBtn.dataset.submitting === '1') return;
   const firstName = firstInput.value.trim();
   const lastName = lastInput.value.trim();
   if (!firstName || firstName.length < 2 || !lastName || lastName.length < 2) return;
+
+  startBtn.dataset.submitting = '1';
+  startBtn.disabled = true;
 
   // Save to localStorage (display name + full name for API)
   localStorage.setItem('dq-player-name', firstName);
@@ -89,7 +103,11 @@ async function startChallenge() {
     });
     if (res.ok) {
       const data = await res.json();
-      localStorage.setItem('dq-user-id', data.id);
+      if (data && data.id) {
+        localStorage.setItem('dq-user-id', data.id);
+        // HMAC token — sent as X-DQ-Token on mutating requests
+        if (data.token) localStorage.setItem('dq-user-token', data.token);
+      }
     }
   } catch {
     // Backend unreachable — continue anyway, scores saved locally

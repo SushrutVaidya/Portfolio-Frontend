@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/captcha.css">
   <link rel="preconnect" href="https://fonts.cdnfonts.com">
   <link rel="stylesheet" href="css/shared.css">
+  <script src="js/game-gate.js"></script>
   <script src="js/mobile-banner.js"></script>
   <script src="js/transitions.js"></script>
   <script src="js/cursor.js"></script>
@@ -68,18 +69,18 @@
 
       <!-- Top row: lives + progress -->
       <div id="top-row">
-        <div id="lives-area">
-          <span class="life" id="life-1">❤️</span>
-          <span class="life" id="life-2">❤️</span>
-          <span class="life" id="life-3">❤️</span>
+        <div id="lives-area" role="status" aria-live="polite" aria-label="Lives remaining">
+          <span class="life" id="life-1" role="img" aria-label="Life 1">❤️</span>
+          <span class="life" id="life-2" role="img" aria-label="Life 2">❤️</span>
+          <span class="life" id="life-3" role="img" aria-label="Life 3">❤️</span>
         </div>
         <div id="progress-area">
-          <span id="progress-text">Shape 1 of 6</span>
+          <span id="progress-text" aria-live="polite">Shape 1 of 6</span>
         </div>
       </div>
 
       <!-- Prompt text -->
-      <div id="prompt-text" class="prompt hidden"></div>
+      <div id="prompt-text" class="prompt hidden" aria-live="polite"></div>
 
       <!-- Shape zone (visual background only) -->
       <div id="shape-zone"></div>
@@ -89,24 +90,27 @@
       <!-- Active shape (positioned relative to game-area) -->
       <img id="active-shape" class="hidden" src="" alt="" draggable="false">
 
-      <!-- 3D Box with holes -->
+      <!-- 3D Box with holes. Each hole is keyboard-focusable so users
+           without a pointer can Tab through and press Enter/Space to
+           attempt placing the current shape (see keyboard handler in
+           captcha.js). aria-labels describe the shape each hole fits. -->
       <div id="box-container">
         <div id="box-3d">
           <div id="box-top"></div>
           <div id="box-front">
-            <div class="hole" id="hole-circle">
+            <div class="hole" id="hole-circle" role="button" tabindex="0" aria-label="Circle hole. Press Enter to place shape here.">
               <div class="hole-silhouette circle-hole"></div>
             </div>
-            <div class="hole" id="hole-rectangle">
+            <div class="hole" id="hole-rectangle" role="button" tabindex="0" aria-label="Rectangle hole. Press Enter to place shape here.">
               <div class="hole-silhouette rectangle-hole"></div>
             </div>
-            <div class="hole" id="hole-triangle">
+            <div class="hole" id="hole-triangle" role="button" tabindex="0" aria-label="Triangle hole. Press Enter to place shape here.">
               <div class="hole-silhouette triangle-hole"></div>
             </div>
-            <div class="hole" id="hole-square">
+            <div class="hole" id="hole-square" role="button" tabindex="0" aria-label="Square hole. Press Enter to place shape here.">
               <div class="hole-silhouette square-hole"></div>
             </div>
-            <div class="hole" id="hole-semicircle">
+            <div class="hole" id="hole-semicircle" role="button" tabindex="0" aria-label="Semicircle hole. Press Enter to place shape here.">
               <div class="hole-silhouette semicircle-hole"></div>
             </div>
           </div>
@@ -139,8 +143,264 @@
       <button id="verify-btn" class="hidden">Next Challenge →</button>
     </div>
 
+
+    <style>
+      /* ── Meme reference card ─────────────────────────────────
+         Full-width flanking section that lives BELOW the game panel.
+         Video-preview thumb on the left, contextual copy on the right,
+         everything inside a bordered card so it reads as an intentional
+         section — not a floating orphan. Click anywhere on the card
+         opens the modal with full controls + sound. */
+      .meme-hint-section {
+        margin: 32px auto 40px;
+        max-width: 640px;
+        padding: 0 20px;
+      }
+      #meme-hint-btn {
+        display: flex;
+        align-items: stretch;
+        gap: 18px;
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg,
+          rgba(255, 102, 0, 0.08) 0%,
+          rgba(20, 20, 24, 0.85)  60%);
+        border: 1px solid rgba(255, 102, 0, 0.35);
+        border-radius: 14px;
+        cursor: pointer;
+        text-align: left;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        animation: memeHintPulse 2.6s ease-in-out 4;   /* pulses 4× then stops */
+      }
+      #meme-hint-btn:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 136, 51, 0.85);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+      @keyframes memeHintPulse {
+        0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 0 0 rgba(255,102,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04); }
+        50%      { box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 0 6px rgba(255,102,0,0), inset 0 1px 0 rgba(255,255,255,0.04); }
+      }
+
+      /* Video thumb — portrait 9:16, keeps compact width so copy has room. */
+      .meme-hint-thumb {
+        position: relative;
+        flex: 0 0 96px;
+        aspect-ratio: 9 / 16;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #000;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+      }
+      #meme-hint-preview {
+        position: absolute;
+        inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+      }
+      .meme-hint-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg,
+          rgba(0,0,0,0.05) 0%,
+          rgba(0,0,0,0.35) 100%);
+        pointer-events: none;
+      }
+      .meme-hint-play {
+        width: 32px; height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 102, 0, 0.98);
+        color: #fff;
+        font-size: 0.85rem;
+        line-height: 1;
+        padding-left: 2px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      }
+
+      /* Copy column — eyebrow, title, subtitle. Right side of the card. */
+      .meme-hint-copy {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        min-width: 0;
+      }
+      .meme-hint-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #ff8833;
+        font: 700 0.62rem/1 -apple-system, 'SF Pro Text', sans-serif;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+      }
+      .meme-hint-eyebrow::before {
+        content: '';
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #ff6600;
+        box-shadow: 0 0 8px rgba(255, 102, 0, 0.8);
+        animation: memeHintDot 1.6s ease-in-out infinite;
+      }
+      @keyframes memeHintDot {
+        0%, 100% { opacity: 1;   transform: scale(1); }
+        50%      { opacity: 0.35; transform: scale(0.7); }
+      }
+      .meme-hint-title {
+        color: #fff;
+        font: 700 1.05rem/1.2 -apple-system, 'SF Pro Display', sans-serif;
+        letter-spacing: -0.2px;
+      }
+      .meme-hint-sub {
+        color: rgba(255, 255, 255, 0.55);
+        font: 400 0.78rem/1.35 -apple-system, 'SF Pro Text', sans-serif;
+      }
+      .meme-hint-cta {
+        margin-top: 2px;
+        color: #ff8833;
+        font: 600 0.72rem/1 -apple-system, 'SF Pro Text', sans-serif;
+        letter-spacing: 0.3px;
+      }
+
+      /* Mobile — same layout, tighter dimensions. */
+      @media (max-width: 600px) {
+        .meme-hint-section { margin: 24px auto 28px; padding: 0 14px; }
+        #meme-hint-btn { gap: 12px; padding: 10px; }
+        .meme-hint-thumb { flex-basis: 74px; }
+        .meme-hint-play { width: 26px; height: 26px; font-size: 0.72rem; }
+        .meme-hint-title { font-size: 0.92rem; }
+        .meme-hint-sub { font-size: 0.72rem; }
+      }
+
+      /* ── Modal (unchanged shell, portrait card for 9:16 source) ── */
+      #meme-hint-modal.hidden { display: none; }
+      #meme-hint-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: memeHintFade 0.18s ease-out;
+      }
+      @keyframes memeHintFade {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+      #meme-hint-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      #meme-hint-card {
+        position: relative;
+        z-index: 1;
+        width: min(380px, 92vw);
+        max-height: 90vh;
+        background: #1c1c1e;
+        border: 0.5px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 16px 16px 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: memeHintPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes memeHintPop {
+        from { transform: translateY(12px) scale(0.98); opacity: 0; }
+        to   { transform: translateY(0)    scale(1);    opacity: 1; }
+      }
+      #meme-hint-title {
+        margin: 0;
+        padding-right: 24px;
+        font: 700 0.85rem/1.2 -apple-system, 'SF Pro Text', sans-serif;
+        color: rgba(255, 255, 255, 0.88);
+        letter-spacing: 0.2px;
+      }
+      #meme-hint-video {
+        width: 100%;
+        aspect-ratio: 9 / 16;
+        display: block;
+        border-radius: 8px;
+        background: #000;
+        max-height: calc(90vh - 80px);
+        object-fit: contain;
+      }
+      #meme-hint-close {
+        position: absolute;
+        top: 6px; right: 10px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.55);
+        font: 400 1.5rem/1 -apple-system, sans-serif;
+        cursor: pointer;
+        padding: 4px 8px;
+        transition: color 0.15s ease;
+      }
+      #meme-hint-close:hover { color: #fff; }
+
+      @media (prefers-reduced-motion: reduce) {
+        #meme-hint-btn { animation: none !important; transition: none !important; }
+        #meme-hint-preview { display: none !important; }   /* no autoplay motion */
+        .meme-hint-eyebrow::before { animation: none !important; }
+        #meme-hint-modal, #meme-hint-card { animation: none !important; }
+      }
+    </style>
+
     </div>
 
+    </div>
+
+    <!-- ▶ Meme reference card — lives BELOW #captcha-container so it
+         renders as its own section, not inside the dark game panel.
+         Full flanking layout with video thumb + copy = intentional,
+         not a floating orphan. -->
+    <section class="meme-hint-section">
+      <button id="meme-hint-btn" type="button" aria-label="Watch the reference clip">
+        <span class="meme-hint-thumb">
+          <video id="meme-hint-preview"
+                 src="/clips/captcha-meme.mp4"
+                 autoplay muted loop playsinline preload="metadata"></video>
+          <span class="meme-hint-overlay">
+            <span class="meme-hint-play" aria-hidden="true">▶</span>
+          </span>
+        </span>
+        <span class="meme-hint-copy">
+          <span class="meme-hint-eyebrow">Reference clip · 0:59</span>
+          <span class="meme-hint-title">The captcha, but real.</span>
+          <span class="meme-hint-sub">A short meme on what shape-sorting <em>actually</em> looks like when the shapes don't cooperate.</span>
+          <span class="meme-hint-cta">Tap to watch →</span>
+        </span>
+      </button>
+    </section>
+
+    <!-- Modal — hidden by default. Full video with sound + controls.
+         Portrait-oriented card matches the 9:16 source video. Click
+         backdrop or × or Esc to close; video pauses on close. -->
+    <div id="meme-hint-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="meme-hint-title">
+      <div id="meme-hint-backdrop"></div>
+      <div id="meme-hint-card">
+        <button id="meme-hint-close" type="button" aria-label="Close">&times;</button>
+        <h3 id="meme-hint-title">The captcha, but real.</h3>
+        <video id="meme-hint-video" controls preload="metadata" playsinline>
+          <source src="/clips/captcha-meme.mp4" type="video/mp4">
+          Your browser doesn't support inline video.
+        </video>
+      </div>
     </div>
 
   </main>
@@ -164,5 +424,77 @@
 
   <!-- Background music — <audio> is Safari-safe, no AudioContext needed -->
   <audio id="dq-music" src="assets/keyboardcat.mp3" loop preload="auto"></audio>
+
+  <script>
+    // Meme-hint modal — vanilla, no framework. Guards missing DOM refs
+    // so if this block ever gets pruned the rest of the page keeps
+    // working. Video pauses on close so audio doesn't linger.
+    //
+    // A11y: implements a proper focus trap so Tab stays inside the
+    // modal while it's open (matches WCAG SC 2.4.3), and restores focus
+    // to the trigger button on close so keyboard users don't lose
+    // their place in the page.
+    (function () {
+      const btn    = document.getElementById('meme-hint-btn');
+      const modal  = document.getElementById('meme-hint-modal');
+      const back   = document.getElementById('meme-hint-backdrop');
+      const close  = document.getElementById('meme-hint-close');
+      const video  = document.getElementById('meme-hint-video');
+      if (!btn || !modal || !video) return;
+
+      // Tabbable elements inside the modal — the close button and the
+      // video (which itself has controls). Order matters: Tab from last
+      // wraps to first, Shift+Tab from first wraps to last.
+      function focusable() {
+        return [close, video].filter(el => el && !el.disabled);
+      }
+
+      function onTrapKeydown(e) {
+        if (e.key !== 'Tab') return;
+        const els = focusable();
+        if (!els.length) return;
+        const first = els[0];
+        const last  = els[els.length - 1];
+        // If focus somehow escaped the modal (e.g. dev tool click),
+        // pull it back to the first element.
+        if (!modal.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+          return;
+        }
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+
+      function show() {
+        modal.classList.remove('hidden');
+        // Focus the close button by default — safest landing target,
+        // and a screen reader announces "Close, button" immediately so
+        // the user knows how to leave.
+        setTimeout(() => close.focus(), 0);
+        document.addEventListener('keydown', onTrapKeydown);
+      }
+      function hide() {
+        modal.classList.add('hidden');
+        try { video.pause(); video.currentTime = 0; } catch {}
+        document.removeEventListener('keydown', onTrapKeydown);
+        // Return focus to the trigger — otherwise a keyboard user is
+        // dropped to <body> and has to Tab from the top of the page.
+        try { btn.focus(); } catch {}
+      }
+
+      btn.addEventListener('click', show);
+      back.addEventListener('click', hide);
+      close.addEventListener('click', hide);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) hide();
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -24,8 +24,11 @@ body {
 
 #captcha-container {
   background: rgba(28, 28, 30, 0.75);
-  backdrop-filter: blur(40px) saturate(1.8);
-  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  /* 40px backdrop-filter sits behind the animating holes; each frame of
+     holeAccept re-blurred this surface. 12px keeps the frosted feel with
+     a fraction of the per-pixel shader cost. */
+  backdrop-filter: blur(12px) saturate(1.8);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
   width: 620px;
@@ -232,6 +235,7 @@ body {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.06),
     0 4px 20px rgba(0,0,0,0.3);
@@ -276,15 +280,22 @@ body {
     rgba(0, 0, 0, 0.22) 100%);
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.5);
+  /* Was `filter: drop-shadow(0 3px 6px ...)` alongside these box-shadows.
+     drop-shadow blows paint bounds to Chrome's infinity marker (16M×16M).
+     When the holeAccept keyframe animated it below, the GPU re-rasterized
+     that infinite region every frame — trace showed 7× 360-397ms GPU
+     stalls with 48 dropped frames each. box-shadow gives the same visual
+     with defined bounds. Every hole shares this rule, so this fix
+     applies to all tiles uniformly. */
   box-shadow:
     inset 0 5px 16px rgba(0, 0, 0, 0.55),
     inset 0 2px 5px rgba(0, 0, 0, 0.35),
     inset -1px -1px 3px rgba(255, 255, 255, 0.06),
     0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 0 1.5px rgba(0, 0, 0, 0.3);
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+    0 0 0 1.5px rgba(0, 0, 0, 0.3),
+    0 3px 6px rgba(0, 0, 0, 0.35);
   transition: background 0.15s ease, transform 0.15s ease,
-              filter 0.15s ease, box-shadow 0.15s ease;
+              box-shadow 0.15s ease;
   position: relative;
 }
 
@@ -295,18 +306,38 @@ body {
     rgba(10, 80, 180, 0.35) 100%);
   border-color: rgba(74, 144, 217, 0.7);
   transform: scale(1.1);
-  filter: drop-shadow(0 0 14px rgba(74, 144, 217, 0.7));
+  /* drop-shadow → box-shadow (same reason as .hole above). */
   box-shadow:
     inset 0 4px 14px rgba(0, 0, 0, 0.4),
     inset 0 0 8px rgba(74, 144, 217, 0.3),
-    0 0 0 2px rgba(74, 144, 217, 0.4);
+    0 0 0 2px rgba(74, 144, 217, 0.4),
+    0 0 14px rgba(74, 144, 217, 0.7);
+}
+
+/* Keyboard focus — visible orange ring so keyboard/screen-reader users
+   can see which hole they're about to drop into. :focus-visible only
+   fires on keyboard focus (not click), so mouse users don't see it. */
+.hole:focus-visible {
+  outline: 3px solid #ff6600;
+  outline-offset: 4px;
+  box-shadow:
+    inset 0 4px 14px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 102, 0, 0.45),
+    0 0 14px rgba(255, 102, 0, 0.55);
 }
 
 /* Wrong hole - red flash + shake */
 .hole.wrong {
   background: linear-gradient(155deg, rgba(180,30,30,0.6) 0%, rgba(140,20,20,0.4) 100%);
   border-color: rgba(220, 60, 60, 0.7);
-  filter: drop-shadow(0 0 10px rgba(220, 60, 60, 0.5));
+  /* drop-shadow → box-shadow. Kept the existing base .hole box-shadow
+     list intact by writing the full stack; a partial override would
+     lose the inset shadows. */
+  box-shadow:
+    inset 0 5px 16px rgba(0, 0, 0, 0.55),
+    inset 0 2px 5px rgba(0, 0, 0, 0.35),
+    0 0 0 1.5px rgba(0, 0, 0, 0.3),
+    0 0 10px rgba(220, 60, 60, 0.5);
   animation: shakeHole 0.38s ease;
 }
 
@@ -315,11 +346,33 @@ body {
   animation: holeAccept 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* Keyframe now animates transform + box-shadow only. Filter has been
+   removed entirely — the trace showed this animation causing 362-397ms
+   GPU tasks (48 consecutive DroppedFrame events per animation). With
+   box-shadow the paint bounds stay bounded, so the compositor doesn't
+   re-raster a virtual infinity every frame. Same 4-keyframe spring
+   feel, no visual regression. */
 @keyframes holeAccept {
-  0%   { transform: scale(1);    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
-  40%  { transform: scale(1.2);  filter: drop-shadow(0 0 20px rgba(74,144,217,0.85)); }
-  70%  { transform: scale(0.95); filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4)); }
-  100% { transform: scale(1);    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
+  0%   { transform: scale(1);
+         box-shadow: inset 0 5px 16px rgba(0,0,0,0.55),
+                     inset 0 2px 5px rgba(0,0,0,0.35),
+                     0 0 0 1.5px rgba(0,0,0,0.3),
+                     0 3px 6px rgba(0,0,0,0.35); }
+  40%  { transform: scale(1.2);
+         box-shadow: inset 0 5px 16px rgba(0,0,0,0.55),
+                     inset 0 0 8px rgba(74,144,217,0.4),
+                     0 0 0 2px rgba(74,144,217,0.5),
+                     0 0 20px rgba(74,144,217,0.85); }
+  70%  { transform: scale(0.95);
+         box-shadow: inset 0 5px 16px rgba(0,0,0,0.55),
+                     inset 0 2px 5px rgba(0,0,0,0.35),
+                     0 0 0 1.5px rgba(0,0,0,0.3),
+                     0 3px 8px rgba(0,0,0,0.4); }
+  100% { transform: scale(1);
+         box-shadow: inset 0 5px 16px rgba(0,0,0,0.55),
+                     inset 0 2px 5px rgba(0,0,0,0.35),
+                     0 0 0 1.5px rgba(0,0,0,0.3),
+                     0 3px 6px rgba(0,0,0,0.35); }
 }
 
 @keyframes shakeHole {

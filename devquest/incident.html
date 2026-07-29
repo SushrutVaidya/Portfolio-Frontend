@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/incident.css">
   <link rel="preconnect" href="https://fonts.cdnfonts.com">
   <link rel="stylesheet" href="css/shared.css">
+  <script src="js/game-gate.js"></script>
   <script src="js/mobile-banner.js"></script>
   <script src="js/transitions.js"></script>
   <script src="js/cursor.js"></script>
@@ -97,17 +98,17 @@
 
           <!-- Top bar -->
           <div id="inc-topbar">
-            <div id="inc-lives">
-              <span class="inc-life" id="inc-life-1">❤️</span>
-              <span class="inc-life" id="inc-life-2">❤️</span>
-              <span class="inc-life" id="inc-life-3">❤️</span>
+            <div id="inc-lives" role="status" aria-live="polite" aria-label="Lives remaining">
+              <span class="inc-life" id="inc-life-1" role="img" aria-label="Life 1">❤️</span>
+              <span class="inc-life" id="inc-life-2" role="img" aria-label="Life 2">❤️</span>
+              <span class="inc-life" id="inc-life-3" role="img" aria-label="Life 3">❤️</span>
             </div>
             <div id="inc-round-info">
-              <span id="inc-round-label">Round 1 of 5</span>
+              <span id="inc-round-label" aria-live="polite">Round 1 of 5</span>
               <span id="inc-title"></span>
             </div>
-            <div id="inc-timer-wrap">
-              <svg id="inc-timer-ring" viewBox="0 0 36 36">
+            <div id="inc-timer-wrap" role="timer" aria-label="Time remaining in seconds">
+              <svg id="inc-timer-ring" viewBox="0 0 36 36" aria-hidden="true">
                 <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
                 <circle class="ring-fill" id="ring-fill" cx="18" cy="18" r="15.9"/>
               </svg>

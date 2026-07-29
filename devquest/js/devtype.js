@@ -5,9 +5,12 @@
 // Hard:   SHA values + all quirks + SHA fade
 // ==========================================
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8081'
-  : '';
+const API_BASE = (() => {
+  const h = window.location.hostname, p = window.location.port;
+  if (h !== 'localhost' && h !== '127.0.0.1') return '';
+  if (p === '8888') return '';   // local e2e via nginx-proxy
+  return 'http://localhost:8081';
+})();
 
 // ==========================================
 // LEADERBOARD
@@ -21,15 +24,59 @@ const MOCK_LEADERBOARD = [
   { rank: 5, name: 'Bot_McBotface',  score: 8400  },
 ];
 
+// Shared in-flight token refresh — if the user finishes several games
+// back-to-back and each 401s at the same time, we only fire ONE re-register
+// POST and every waiting call reuses its result. Prevents backend row
+// duplication and localStorage clobber under concurrency.
+let _dqRefreshInFlight = null;
+function _dqRefreshToken() {
+  if (_dqRefreshInFlight) return _dqRefreshInFlight;
+  const firstName = localStorage.getItem('dq-player-first');
+  const lastName  = localStorage.getItem('dq-player-last');
+  if (!firstName || !lastName) return Promise.resolve(null);
+  _dqRefreshInFlight = (async () => {
+    const reg = await fetch(API_BASE + '/api/user', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ firstName, lastName })
+    });
+    if (!reg.ok) return null;
+    const data = await reg.json();
+    if (!data || !data.token) return null;
+    localStorage.setItem('dq-user-token', data.token);
+    if (data.id) localStorage.setItem('dq-user-id', data.id);
+    return data.token;
+  })().finally(() => { _dqRefreshInFlight = null; });
+  return _dqRefreshInFlight;
+}
+
 async function submitScore(wpm, accuracy, difficulty) {
   const userId = localStorage.getItem('dq-user-id');
   if (!userId) return;
+  const body = JSON.stringify({ userId, game: 'devtype', wpm, accuracy, difficulty });
   try {
-    const res = await fetch(API_BASE + '/api/score', {
+    let res = await fetch(API_BASE + '/api/score', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, game: 'devtype', wpm, accuracy, difficulty }),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-DQ-Token':  localStorage.getItem('dq-user-token') || ''
+      },
+      body,
     });
+    // Token likely stale (server secret rotated, or user pre-dates auth).
+    // Refresh (deduped across concurrent callers) then retry once.
+    if (res.status === 401) {
+      const fresh = await _dqRefreshToken();
+      if (!fresh) return;
+      res = await fetch(API_BASE + '/api/score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-DQ-Token':  fresh
+        },
+        body,
+      });
+    }
     if (!res.ok) throw new Error(res.status);
   } catch { /* backend offline — silent fail */ }
 }
@@ -336,6 +383,22 @@ const VERDICTS = {
 // ==========================================
 // STATE
 // ==========================================
+
+// Container rect cache — getBoundingClientRect() forces a synchronous
+// layout when called after any style write. In the hot handlers below
+// (mid-word autocomplete, floating review) we used to call this twice
+// per keystroke on the container element. Cache it and invalidate only
+// on scroll/resize so layout only recomputes when the container actually
+// moves. Autocomplete/review both use this via getContRect().
+let _contRectCache = null;
+function getContRect() {
+  if (_contRectCache) return _contRectCache;
+  _contRectCache = containerEl.getBoundingClientRect();
+  return _contRectCache;
+}
+function _invalidateContRect() { _contRectCache = null; }
+window.addEventListener('scroll',  _invalidateContRect, { passive: true });
+window.addEventListener('resize',  _invalidateContRect);
 
 let words        = [];
 let wordEls      = [];
@@ -871,9 +934,12 @@ function endGame() {
   const config   = DIFF_CONFIG[currentDifficulty];
   const minutes  = config.timer / 60;
   const wpm      = Math.round((correctChars / 5) / minutes);
-  const acc      = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+  const acc      = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 0;
   const locPerHr = Math.round(wpm * 8);
-  const passed   = acc >= config.passAcc;
+  // Gate pass on BOTH accuracy threshold AND actually having typed something.
+  // Without the wordsCorrect check, a user who types nothing scores 100% acc
+  // by the identity above and cheeses their way to the next challenge.
+  const passed   = acc >= config.passAcc && wordsCorrect > 0;
 
   rLocEl.textContent  = locPerHr;
   rTimeEl.textContent = wordsCorrect;
@@ -992,7 +1058,7 @@ function showAutocomplete(typed, rest) {
   const wordEl = wordEls[currentWordIdx];
   if (!wordEl) return;
   const wordRect = wordEl.getBoundingClientRect();
-  const contRect = containerEl.getBoundingClientRect();
+  const contRect = getContRect();
   acTypedEl.textContent = typed;
   acRestEl.textContent  = rest;
   acEl.style.left = Math.max(4, wordRect.left - contRect.left) + 'px';
@@ -1039,7 +1105,7 @@ function triggerCodeReview() {
 
 function showFloatingReview(wordEl, comment) {
   const wordRect = wordEl.getBoundingClientRect();
-  const contRect = containerEl.getBoundingClientRect();
+  const contRect = getContRect();
   reviewEl.textContent = comment;
   reviewEl.style.left  = (wordRect.right - contRect.left + 8) + 'px';
   reviewEl.style.top   = (wordRect.top   - contRect.top  + 2) + 'px';

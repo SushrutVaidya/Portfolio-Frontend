@@ -6,25 +6,26 @@
   <title>Known Suspects — DevQuest</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🎴%3C/text%3E%3C/svg%3E">
   <script src="../js/mobile-banner.js"></script>
-  <script src="../js/transitions.js"></script>
-  <script src="../js/cursor.js"></script>
-  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+  <script src="../js/transitions.js"></script>  <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/tokens.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #f5f3ef;
+      --bg:       #fafafa;
       --surface:  #ffffff;
-      --border:   rgba(0,0,0,0.08);
-      --text:     #1a1a1a;
-      --muted:    rgba(0,0,0,0.4);
+      --border:   #e5e5e7;
+      --text:     #1d1d1f;
+      --muted:    #6e6e73;
       --lime:     #c8ff00;
-      --orange:   #ff6600;
-      --gold:     #f5a623;
+      --orange:   #ff6600;     /* personality accent — eyebrow/podium only */
+      --accent:   #0a84ff;     /* interactive — buttons, focus, links */
+      --accent-hover: #0066cc;
+      --gold:     #d4af37;
       --silver:   #8e8e93;
       --bronze:   #c77b30;
-      --red:      #ff375f;
+      --red:      #ff3b30;
     }
 
     body {
@@ -197,29 +198,36 @@
 
     .register-input::placeholder { color: rgba(0,0,0,0.25); }
     .register-input:focus {
-      border-color: #ff6600;
+      border-color: var(--accent);
       background: #fff;
+      box-shadow: 0 0 0 3px rgba(10,132,255,0.12);
     }
 
     .register-btn {
       width: 100%;
-      padding: 13px;
-      background: #1a1a1a;
+      padding: 14px;
+      background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 10px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
+      transition: background 200ms ease,
+                  transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 12px rgba(10,132,255,0.22);
     }
 
-    .register-btn:hover { opacity: 0.82; }
-    .register-btn:active { transform: scale(0.98); }
-    .register-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .register-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 24px rgba(10,132,255,0.30);
+    }
+    .register-btn:active { transform: translateY(0) scale(0.98); }
+    .register-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .register-note {
       font-size: 0.6rem;
@@ -734,10 +742,20 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ firstName: first, lastName: last })
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || err.message || `Server returned ${res.status}`);
+        }
         const data = await res.json();
+        if (!data.id) {
+          throw new Error('Malformed server response — missing id');
+        }
         myId = data.id;
         // Write to both key sets so game flow and leaderboard stay in sync
         localStorage.setItem('dq-user-id',     myId);
+        // HMAC token — used by card/photo/score endpoints. Existing users
+        // registering the same name get the same token back (deterministic).
+        if (data.token) localStorage.setItem('dq-user-token', data.token);
         localStorage.setItem('dq-player-first', first);
         localStorage.setItem('dq-player-last',  last);
         localStorage.setItem('dq-player-name',  first);
@@ -747,8 +765,8 @@
         const rank = localStorage.getItem('lb_rank') || '?';
         showYouCard(`${first} ${last}`, rank);
         showToast(`🎯 Suspect #${String(rank).padStart(3,'0')} logged`);
-      } catch {
-        showToast('Failed to register — try again');
+      } catch (e) {
+        showToast(e.message ? `Register failed: ${e.message}` : 'Failed to register — try again');
         btn.disabled = false;
         btn.textContent = 'Identify Yourself';
       }
@@ -758,7 +776,9 @@
     async function loadLeaderboard() {
       try {
         const res  = await fetch(`${API}/api/leaderboard`);
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('Malformed leaderboard response');
         renderLeaderboard(data);
         document.getElementById('total-count').textContent =
           `${data.length} suspect${data.length !== 1 ? 's' : ''} identified`;

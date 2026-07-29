@@ -3,9 +3,12 @@
   // ════════════════════════════════════
   //  API CONFIG — Backend Integration
   // ════════════════════════════════════
-  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8081'
-    : '';
+  const API_BASE = (() => {
+    const h = window.location.hostname, p = window.location.port;
+    if (h !== 'localhost' && h !== '127.0.0.1') return '';
+    if (p === '8888') return '';   // local e2e via nginx-proxy
+    return 'http://localhost:8081';
+  })();
 
   async function apiFetch(path) {
     const res = await fetch(API_BASE + path);
@@ -396,22 +399,45 @@
   }
 
   // ── Game of the Month Spotlight ──
+  // Uses createElement + textContent instead of innerHTML so that even
+  // if the backend ever returns a title/desc with markup (or, worst
+  // case, an attacker-controlled string via a compromised API), it
+  // renders as plain text. Zero markup interpolation = zero XSS.
   function renderSpotlight(data) {
     const card = document.getElementById('spotlight-card');
     if (!card || card.children.length > 0) return;
 
-    const chips = data.genre
-      .map(g => '<span class="am-chip am-chip-blue">' + g + '</span>')
-      .join('');
+    const cover = document.createElement('div');
+    cover.className = 'am-spot-cover';
+    cover.style.background = data.color;
+    cover.textContent = data.emoji;
 
-    card.innerHTML =
-      '<div class="am-spot-cover" style="background:' + data.color + '">' + data.emoji + '</div>' +
-      '<div class="am-spot-info">' +
-        '<span class="am-spot-badge">NOW PLAYING</span>' +
-        '<h3 class="am-spot-title">' + data.title + '</h3>' +
-        '<div class="am-spot-chips">' + chips + '</div>' +
-        '<p class="am-spot-desc">' + data.desc + '</p>' +
-      '</div>';
+    const info = document.createElement('div');
+    info.className = 'am-spot-info';
+
+    const badge = document.createElement('span');
+    badge.className = 'am-spot-badge';
+    badge.textContent = 'NOW PLAYING';
+
+    const title = document.createElement('h3');
+    title.className = 'am-spot-title';
+    title.textContent = data.title;
+
+    const chips = document.createElement('div');
+    chips.className = 'am-spot-chips';
+    data.genre.forEach(g => {
+      const chip = document.createElement('span');
+      chip.className = 'am-chip am-chip-blue';
+      chip.textContent = g;
+      chips.appendChild(chip);
+    });
+
+    const desc = document.createElement('p');
+    desc.className = 'am-spot-desc';
+    desc.textContent = data.desc;
+
+    info.append(badge, title, chips, desc);
+    card.append(cover, info);
   }
 
   // ── Game Library ──
@@ -422,11 +448,25 @@
     games.forEach(g => {
       const card = document.createElement('div');
       card.className = 'am-game-card reveal';
-      card.innerHTML =
-        '<div class="am-game-cover" style="background:' + g.color + '">' + g.emoji + '</div>' +
-        '<p class="am-game-title">' + g.title + '</p>' +
-        '<p class="am-game-xp">XP: ' + g.xp + ' hrs</p>' +
-        '<p class="am-game-played">' + g.played + '</p>';
+
+      const cover = document.createElement('div');
+      cover.className = 'am-game-cover';
+      cover.style.background = g.color;
+      cover.textContent = g.emoji;
+
+      const title = document.createElement('p');
+      title.className = 'am-game-title';
+      title.textContent = g.title;
+
+      const xp = document.createElement('p');
+      xp.className = 'am-game-xp';
+      xp.textContent = 'XP: ' + g.xp + ' hrs';
+
+      const played = document.createElement('p');
+      played.className = 'am-game-played';
+      played.textContent = g.played;
+
+      card.append(cover, title, xp, played);
       grid.appendChild(card);
     });
   }
@@ -439,11 +479,26 @@
     stats.forEach(stat => {
       const card = document.createElement('div');
       card.className = 'am-gstat-card reveal';
-      card.innerHTML =
-        '<div class="am-gstat-num" data-target="' + stat.value + '" style="color:' + stat.color + '">' +
-          '0' + (stat.suffix ? '<span class="am-gstat-suffix">' + stat.suffix + '</span>' : '') +
-        '</div>' +
-        '<div class="am-gstat-label">' + stat.label + '</div>';
+
+      const num = document.createElement('div');
+      num.className = 'am-gstat-num';
+      num.dataset.target = stat.value;
+      num.style.color = stat.color;
+      // Start at "0" — countUp() rewrites this via textContent during
+      // the animation, and appends a suffix child if provided.
+      num.textContent = '0';
+      if (stat.suffix) {
+        const suf = document.createElement('span');
+        suf.className = 'am-gstat-suffix';
+        suf.textContent = stat.suffix;
+        num.appendChild(suf);
+      }
+
+      const label = document.createElement('div');
+      label.className = 'am-gstat-label';
+      label.textContent = stat.label;
+
+      card.append(num, label);
       grid.appendChild(card);
     });
 
@@ -476,7 +531,15 @@
       const current = Math.round(ease * target);
 
       if (suffixText) {
-        el.innerHTML = current.toLocaleString() + '<span class="am-gstat-suffix">' + suffixText + '</span>';
+        // Rebuild via createElement instead of innerHTML — suffixText
+        // was read from a DOM element that WE created upstream, so it
+        // *should* be safe today, but hardening the write path removes
+        // one more place XSS could enter if the pipeline ever changes.
+        el.textContent = current.toLocaleString();
+        const suf = document.createElement('span');
+        suf.className = 'am-gstat-suffix';
+        suf.textContent = suffixText;
+        el.appendChild(suf);
       } else {
         el.textContent = current.toLocaleString();
       }
@@ -497,10 +560,23 @@
     rows.forEach(row => {
       const div = document.createElement('div');
       div.className = 'am-lb-row reveal' + (row.rank === 1 ? ' am-lb-row-top' : '');
-      div.innerHTML =
-        '<span class="am-lb-rank">#' + row.rank + '</span>' +
-        '<span class="am-lb-name">' + row.name + '</span>' +
-        '<span class="am-lb-score">' + row.score + '</span>';
+
+      const rank = document.createElement('span');
+      rank.className = 'am-lb-rank';
+      rank.textContent = '#' + row.rank;
+
+      const name = document.createElement('span');
+      name.className = 'am-lb-name';
+      // Player names come from user submissions on landing.html — this
+      // is the highest-risk field on the page. textContent guarantees
+      // any <script> tag in a name renders as literal characters.
+      name.textContent = row.name;
+
+      const score = document.createElement('span');
+      score.className = 'am-lb-score';
+      score.textContent = row.score;
+
+      div.append(rank, name, score);
       table.appendChild(div);
     });
   }
@@ -544,15 +620,25 @@
     updateDisplay();
 
     function renderTracks() {
+      // innerHTML = '' is a safe way to clear — no user data flows in.
       trackList.innerHTML = '';
       tracks.forEach((track, i) => {
         const div = document.createElement('div');
         div.className = 'am-jb-track' + (i === currentTrack ? ' active' : '');
-        div.innerHTML =
-          '<div class="am-jb-track-info">' +
-            '<span class="am-jb-track-title">' + track.title + '</span>' +
-            '<span class="am-jb-track-game">' + track.game + '</span>' +
-          '</div>';
+
+        const info = document.createElement('div');
+        info.className = 'am-jb-track-info';
+
+        const title = document.createElement('span');
+        title.className = 'am-jb-track-title';
+        title.textContent = track.title;
+
+        const game = document.createElement('span');
+        game.className = 'am-jb-track-game';
+        game.textContent = track.game;
+
+        info.append(title, game);
+        div.appendChild(info);
         div.addEventListener('click', function(e) {
           e.stopPropagation();
           selectTrack(i);

@@ -23,8 +23,14 @@ const DQSounds = window.DQSounds = (() => {
   }
 
   function resumeOnGesture() {
+    // {once: true} is important: without it, every mousedown/touch/key
+    // input across the page re-invokes unlockAudio(), which creates a
+    // fresh 1-sample AudioBuffer + BufferSource each time. Cheap
+    // individually but wasteful at scale (esp. on the typing challenge
+    // where every keystroke would fire this). Auto-removed after the
+    // first gesture, which is all the browser needs to unlock audio.
     ['mousedown', 'touchstart', 'pointerdown', 'keydown'].forEach(e =>
-      document.addEventListener(e, unlockAudio, { passive: true })
+      document.addEventListener(e, unlockAudio, { passive: true, once: true })
     );
   }
 

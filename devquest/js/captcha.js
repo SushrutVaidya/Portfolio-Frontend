@@ -296,6 +296,10 @@ function handleWrongDrop(hole) {
   if (lives > 0 && typeof DQSounds !== 'undefined') DQSounds.lifeLost();
 
   if (lives === 0) {
+    // Full wipe — show a clearer message than the ambiguous "Not that
+    // one..." so the user knows they ran out and the challenge is
+    // restarting (previously silently reset with the shape flying off).
+    setPrompt('All lives lost — restarting…', 'prompt-wrong');
     activeShape.style.transition = 'transform 0.45s ease, opacity 0.45s ease';
     activeShape.style.transform  = 'scale(0.3) rotate(540deg) translateY(-150px)';
     activeShape.style.opacity    = '0';
@@ -303,6 +307,11 @@ function handleWrongDrop(hole) {
       lives        = 3;
       streak       = 0;
       currentIndex = 0;
+      // Reset the start clock too — otherwise speedBonus in showSuccess
+      // will be silently penalized for the failed run's elapsed time,
+      // and a fast retry still shows as slow. The player earned a fresh
+      // scoring window by restarting.
+      window._captchaStart = Date.now();
       activeShape.style.transform = '';
       activeShape.style.opacity   = '1';
       updateLives();
@@ -353,12 +362,32 @@ function returnToCenter() {
 function enableDrag() {
   activeShape.addEventListener('mousedown',  startDrag);
   activeShape.addEventListener('touchstart', startDrag, { passive: false });
+  keyboardArmed = true;
 }
 
 function disableDrag() {
   activeShape.removeEventListener('mousedown',  startDrag);
   activeShape.removeEventListener('touchstart', startDrag);
+  keyboardArmed = false;
 }
+
+// Keyboard path — pointer users drag; keyboard/screen-reader users Tab
+// through the .hole buttons and press Enter/Space on the hole they think
+// fits. Reuses handleCorrectDrop / handleWrongDrop so scoring, sfx,
+// particles, and progression are identical to the drag path.
+// `keyboardArmed` gates the handler to the same window as pointer drag
+// (i.e. after the shape has finished its drop-in animation, before it
+// snaps or the game ends).
+let keyboardArmed = false;
+holes.forEach(hole => {
+  hole.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (!keyboardArmed || shapePlaced || isDragging) return;
+    e.preventDefault();
+    if (hole.id === CORRECT_HOLE) handleCorrectDrop(hole);
+    else                          handleWrongDrop(hole);
+  });
+});
 
 function startDrag(e) {
   e.preventDefault();

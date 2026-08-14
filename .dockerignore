@@ -1,0 +1,31 @@
+# Keep the build context small. Without this, `docker build` uploads
+# web/node_modules (hundreds of MB, lucide-react alone is 40 MB) before the
+# Dockerfile's first instruction even runs.
+.git
+.github
+.DS_Store
+**/.DS_Store
+
+# Node — reinstalled inside the builder from the lockfile.
+web/node_modules
+web/dist
+tests/node_modules
+tests/playwright-report
+tests/test-results
+
+# Local-only and secret-bearing files.
+.env
+.env.*
+docker-compose.override.yml
+*.tar.gz
+*.tar
+
+# Docs don't affect the served output.
+*.md
+!README.md
+
+# Legacy front end, replaced by the web/ build. Left in the repo for reference
+# until the cutover is verified, but no reason to ship it.
+index.html
+css/
+js/

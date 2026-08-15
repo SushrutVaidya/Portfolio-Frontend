@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { DUR, EASE_EXPO_OUT } from '@/lib/motion'
+import { DUR, EASE } from '@/lib/motion'
 import type { ReactNode } from 'react'
 
 interface RevealProps {
@@ -32,7 +32,7 @@ export function Reveal({ children, delay = 0, distance = 24, className }: Reveal
       initial={{ opacity: 0, y: distance }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: DUR.reveal, ease: EASE_EXPO_OUT, delay }}
+      transition={{ duration: DUR.smooth, ease: EASE, delay }}
     >
       {children}
     </motion.div>

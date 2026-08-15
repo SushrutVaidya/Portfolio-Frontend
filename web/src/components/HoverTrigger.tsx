@@ -33,11 +33,11 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
       onBlur={() => close(spec.id)}
       onClick={hasHover ? undefined : () => toggle(spec.id)}
       className={[
-        'font-head cursor-pointer border-b-4 px-0.5 transition-colors duration-[var(--dur-fast)]',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
+        'font-display cursor-pointer border-b px-0.5 transition-colors duration-[var(--dur-fast)]',
+        '',
         isActive
-          ? 'border-black bg-[var(--section-accent)] text-[var(--section-accent-ink)]'
-          : 'border-[var(--section-accent)] hover:bg-[var(--section-accent)]',
+          ? 'border-line bg-accent text-accent-ink'
+          : 'border-[var(--accent)] hover:bg-accent',
       ].join(' ')}
     >
       {children}

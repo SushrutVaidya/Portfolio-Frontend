@@ -26,8 +26,6 @@ export function Stack() {
       index="03"
       title="I automate everything"
       subtitle="if I have to do it twice by hand, that's a bug"
-      accent="#2ed573"
-      stock="paper-300"
     >
       <Pinned
         aside={
@@ -36,7 +34,7 @@ export function Stack() {
               Backend and platform is where I&apos;m strongest. I hold my own on the frontend
               — this site is React, Tailwind and Motion with no template underneath it.
             </p>
-            <p className="font-pixel mt-6 text-[0.6rem] tracking-[0.25em] uppercase text-[var(--section-accent)]">
+            <p className="font-mono mt-6 text-[0.6rem] tracking-[0.25em] uppercase text-accent">
               No proficiency bars
             </p>
             <p className="font-mono mt-2 max-w-xs text-xs text-muted-foreground">
@@ -45,11 +43,11 @@ export function Stack() {
           </div>
         }
       >
-        <div className="grid gap-px border-2 border-black bg-black shadow-lg sm:grid-cols-2">
+        <div className="grid gap-px border border-line bg-black shadow-lg sm:grid-cols-2">
           {GROUPS.map((group, i) => (
             <Reveal key={group.key} delay={i * 0.04} className="bg-card">
               <div className="h-full p-5 md:p-6">
-                <h3 className="font-pixel text-[0.65rem] tracking-widest text-[var(--section-accent)] uppercase">
+                <h3 className="font-mono text-[0.65rem] tracking-widest text-accent uppercase">
                   {group.label}
                 </h3>
                 <ul className="mt-4 space-y-1.5">

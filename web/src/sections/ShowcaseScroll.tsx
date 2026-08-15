@@ -46,7 +46,7 @@ export function ShowcaseScroll() {
       <section
         id="work"
         aria-labelledby="work-heading"
-        className="bg-paper-100 border-t-4 border-black px-6 py-20"
+        className="bg-paper border-t border-line px-6 py-20"
       >
         <h2 id="work-heading" className="text-3xl leading-[0.95]">
           <SplitText>I ship systems, not demos</SplitText>
@@ -67,11 +67,11 @@ export function ShowcaseScroll() {
       aria-labelledby="work-heading"
       // Height drives the scroll distance: one viewport per panel.
       style={{ height: `${projects.length * 100}vh` }}
-      className="relative border-t-4 border-black"
+      className="relative border-t border-line"
     >
       <div className="sticky top-0 flex h-dvh flex-col overflow-hidden">
-        <header className="bg-paper-100 flex items-baseline gap-4 border-b-4 border-black px-6 py-5 md:px-12">
-          <span aria-hidden="true" className="font-pixel text-sm text-[var(--section-accent)]">
+        <header className="bg-paper flex items-baseline gap-4 border-b border-line px-6 py-5 md:px-12">
+          <span aria-hidden="true" className="font-mono text-sm text-accent">
             02
           </span>
           <h2 id="work-heading" className="text-xl md:text-3xl">
@@ -92,7 +92,7 @@ export function ShowcaseScroll() {
             hides how far through you are. */}
         <div
           aria-hidden="true"
-          className="bg-paper-100 flex items-center gap-2 border-t-4 border-black px-6 py-3 md:px-12"
+          className="bg-paper flex items-center gap-2 border-t border-line px-6 py-3 md:px-12"
         >
           {projects.map((p, i) => (
             <ProgressTick key={p.slug} progress={scrollYProgress} index={i} />
@@ -115,8 +115,8 @@ function ProgressTick({
   const end = (index + 1) / total
   const scaleX = useTransform(progress, [start, end], [0, 1], { clamp: true })
   return (
-    <div className="h-1.5 flex-1 border-2 border-black">
-      <motion.div className="h-full origin-left bg-[var(--section-accent)]" style={{ scaleX }} />
+    <div className="h-1.5 flex-1 border border-line">
+      <motion.div className="h-full origin-left bg-accent" style={{ scaleX }} />
     </div>
   )
 }
@@ -135,13 +135,13 @@ function ProjectPanel({ index, stacked = false }: { index: number; stacked?: boo
     <article
       style={{ background: project.theme.stock, color: ink }}
       className={[
-        'flex flex-col justify-center border-black px-6 md:px-16',
-        stacked ? 'border-2 py-14 shadow-lg' : 'h-full w-screen flex-none border-r-4 py-10',
+        'flex flex-col justify-center border-line px-6 md:px-16',
+        stacked ? 'border py-14 shadow-lg' : 'h-full w-screen flex-none border-r-4 py-10',
       ].join(' ')}
     >
       <div className="mx-auto w-full max-w-5xl">
         <p
-          className="font-pixel text-[0.65rem] tracking-[0.3em] uppercase"
+          className="font-mono text-[0.65rem] tracking-[0.3em] uppercase"
           style={{ color: project.theme.accent }}
         >
           {String(index + 1).padStart(2, '0')} — {project.year} · {project.status}
@@ -158,7 +158,7 @@ function ProjectPanel({ index, stacked = false }: { index: number; stacked?: boo
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
           {project.metrics?.slice(0, 3).map((m) => (
             <div key={m.label}>
-              <span className="font-head block text-2xl tabular-nums md:text-4xl">{m.value}</span>
+              <span className="font-display block text-2xl tabular-nums md:text-4xl">{m.value}</span>
               <span className="font-mono text-[0.7rem] opacity-70">{m.label}</span>
             </div>
           ))}
@@ -179,7 +179,7 @@ function ProjectPanel({ index, stacked = false }: { index: number; stacked?: boo
         <Magnetic>
           <Link
             to={`/work/${project.slug}`}
-            className="font-head mt-10 inline-block border-2 px-6 py-3 text-base shadow-md transition-transform duration-[var(--dur-fast)]"
+            className="font-display mt-10 inline-block border px-6 py-3 text-base shadow-md transition-transform duration-[var(--dur-fast)]"
             style={{
               background: project.theme.accent,
               color: accentInk,

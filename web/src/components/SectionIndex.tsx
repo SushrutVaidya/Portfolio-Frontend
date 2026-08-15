@@ -63,7 +63,7 @@ export function SectionIndex() {
         <div className="absolute top-0 left-0 h-full w-0.5 bg-black/15">
           {!reduceMotion && (
             <motion.div
-              className="w-full origin-top bg-[var(--section-accent)]"
+              className="w-full origin-top bg-accent"
               style={{ height }}
             />
           )}
@@ -78,9 +78,9 @@ export function SectionIndex() {
           >
             <span
               className={[
-                'font-pixel text-[0.6rem] tracking-widest transition-all duration-[var(--dur-fast)]',
+                'font-mono text-[0.6rem] tracking-widest transition-all duration-[var(--dur-fast)]',
                 active === section.id
-                  ? 'text-[var(--section-accent)] opacity-100'
+                  ? 'text-accent opacity-100'
                   : 'opacity-35 group-hover:opacity-70',
               ].join(' ')}
             >

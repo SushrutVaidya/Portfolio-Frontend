@@ -10,7 +10,7 @@ import { SectionIndex } from '@/components/SectionIndex'
 import { Footer } from '@/sections/Footer'
 import { Home } from '@/pages/Home'
 import { CaseStudy } from '@/pages/CaseStudy'
-import { DUR, EASE_EXPO_OUT } from '@/lib/motion'
+import { DUR, EASE } from '@/lib/motion'
 
 /**
  * App shell.
@@ -38,7 +38,7 @@ export default function App() {
 
       <a
         href="#work"
-        className="font-head sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200 focus:border-2 focus:border-black focus:bg-primary focus:px-4 focus:py-2"
+        className="font-display sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200 focus:border focus:border-line focus:bg-primary focus:px-4 focus:py-2"
       >
         Skip to work
       </a>
@@ -54,7 +54,7 @@ export default function App() {
             // underneath an opaque panel just delays the incoming paint.
             initial={reduceMotion ? undefined : { opacity: 0 }}
             animate={reduceMotion ? undefined : { opacity: 1 }}
-            transition={{ duration: DUR.fast, ease: EASE_EXPO_OUT }}
+            transition={{ duration: DUR.fast, ease: EASE }}
             style={{ visibility: ready ? 'visible' : 'hidden' }}
           >
             <Routes location={location}>

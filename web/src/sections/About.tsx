@@ -17,26 +17,24 @@ export function About() {
       index="01"
       title="I orchestrate thousands of DAGs"
       subtitle="and most of the job is making sure nobody notices"
-      accent="#fc0"
-      stock="paper-200"
     >
       {/* Metrics. tabular-nums so the figures align rather than jitter. */}
       <Reveal>
-        <dl className="grid grid-cols-2 gap-0 border-2 border-black bg-card shadow-lg md:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-0 border border-line bg-card shadow-lg md:grid-cols-4">
           {metrics.map((m, i) => (
             <div
               key={m.label}
               className={[
                 'p-5 md:p-6',
                 // Interior rules only — no double border against the container.
-                i % 2 === 1 ? 'border-l-2 border-black' : '',
-                i < 2 ? 'border-b-2 border-black md:border-b-0' : '',
-                i === 2 ? 'md:border-l-2 md:border-black' : '',
+                i % 2 === 1 ? 'border-l border-line' : '',
+                i < 2 ? 'border-b border-line md:border-b-0' : '',
+                i === 2 ? 'md:border-l-2 md:border-line' : '',
               ].join(' ')}
             >
               <dt className="sr-only">{m.label}</dt>
               <dd>
-                <span className="font-head block text-3xl tabular-nums md:text-5xl">
+                <span className="font-display block text-3xl tabular-nums md:text-5xl">
                   <CountUp value={m.value} />
                 </span>
                 <span className="mt-2 block text-sm leading-snug">{m.label}</span>
@@ -53,8 +51,8 @@ export function About() {
         <div className="space-y-8">
           {experience.map((role) => (
             <Reveal key={role.company}>
-              <article className="border-l-4 border-[var(--section-accent)] pl-5">
-                <h3 className="font-head text-xl md:text-2xl">
+              <article className="border-l-4 border-[var(--accent)] pl-5">
+                <h3 className="font-display text-xl md:text-2xl">
                   {role.role} — {role.company}
                 </h3>
                 <p className="font-mono mt-1 text-xs text-muted-foreground">
@@ -65,7 +63,7 @@ export function About() {
                   {role.stack.map((tech) => (
                     <li
                       key={tech}
-                      className="font-mono border-2 border-black bg-paper-100 px-2 py-0.5 text-xs"
+                      className="font-mono border border-line bg-paper px-2 py-0.5 text-xs"
                     >
                       {tech}
                     </li>
@@ -77,12 +75,12 @@ export function About() {
         </div>
 
         <Reveal delay={0.1}>
-          <aside className="border-2 border-black bg-card p-5 shadow-md">
-            <h3 className="font-pixel text-xs tracking-widest uppercase">Certified</h3>
+          <aside className="border border-line bg-card p-5 shadow-md">
+            <h3 className="font-mono text-xs tracking-widest uppercase">Certified</h3>
             <ul className="mt-4 space-y-3">
               {certifications.map((c) => (
                 <li key={c.name}>
-                  <span className="font-head block text-sm">{c.name}</span>
+                  <span className="font-display block text-sm">{c.name}</span>
                   <span className="font-mono text-xs text-muted-foreground">{c.issuer}</span>
                 </li>
               ))}

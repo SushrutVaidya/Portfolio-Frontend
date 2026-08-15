@@ -28,8 +28,8 @@ export function Marquee({ items, duration = 28, reverse = false }: MarqueeProps)
     >
       {items.map((item, i) => (
         <li key={`${item}-${i}`} className="flex items-center gap-10 whitespace-nowrap">
-          <span className="font-head text-2xl uppercase md:text-4xl">{item}</span>
-          <span className="text-[var(--section-accent)]" aria-hidden="true">
+          <span className="font-display text-2xl uppercase md:text-4xl">{item}</span>
+          <span className="text-accent" aria-hidden="true">
             ✦
           </span>
         </li>
@@ -40,10 +40,10 @@ export function Marquee({ items, duration = 28, reverse = false }: MarqueeProps)
   // Reduced motion: render a static, wrapping list instead of a moving band.
   if (reduceMotion) {
     return (
-      <div className="border-y-4 border-black bg-secondary py-4 text-secondary-foreground">
+      <div className="border-y border-line bg-secondary py-4 text-secondary-foreground">
         <ul className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-8 gap-y-2 px-6">
           {items.map((item) => (
-            <li key={item} className="font-head text-lg uppercase">
+            <li key={item} className="font-display text-lg uppercase">
               {item}
             </li>
           ))}
@@ -53,7 +53,7 @@ export function Marquee({ items, duration = 28, reverse = false }: MarqueeProps)
   }
 
   return (
-    <div className="border-y-4 border-black bg-secondary py-4 text-secondary-foreground">
+    <div className="border-y border-line bg-secondary py-4 text-secondary-foreground">
       <div
         className="flex w-max animate-[marquee_var(--marquee-duration)_linear_infinite]"
         style={

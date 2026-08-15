@@ -213,7 +213,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
               src={active.visual.src}
               alt=""
               aria-hidden="true"
-              className="max-h-[42vh] max-w-[80vw] border-4 border-black object-contain shadow-2xl"
+              className="max-h-[42vh] max-w-[80vw] border border-line-strong object-contain shadow-2xl"
             />
           )}
           {/* Video element is always mounted so play() isn't racing a mount. */}
@@ -223,7 +223,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
             muted
             playsInline
             aria-hidden="true"
-            className={`max-h-[42vh] max-w-[80vw] border-4 border-black object-contain shadow-2xl ${
+            className={`max-h-[42vh] max-w-[80vw] border border-line-strong object-contain shadow-2xl ${
               active?.visual.kind === 'video' ? 'block' : 'hidden'
             }`}
           >

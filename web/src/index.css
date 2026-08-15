@@ -1,172 +1,149 @@
 @import "tailwindcss";
 
 /*
- * RetroUI neobrutalist theme (Tailwind v4).
- * Square corners + hard offset shadows keyed to --border are what make this
- * read as neobrutalist rather than "shadcn with a yellow accent".
+ * Refined-minimal theme.
  *
- * Fonts load via <link> in index.html (Vite has no next/font), and the stacks
- * are bound to --font-head / --font-sans in :root below.
+ * A deliberately subtractive rewrite of the neobrutalist token set. The
+ * observation that drove it: every reference chosen for this project
+ * (david-hckh, pacomepertant, yorukot, dennissnellenberg, rauno) is restrained,
+ * while neobrutalism - thick borders, hard offset shadows, bright accents -
+ * optimises for bold rather than beautiful. Adding motion on top of an
+ * inconsistent system made it louder, not better.
+ *
+ * The discipline, taken from what those sites actually do:
+ *   ONE easing curve, four durations.  ONE accent.  FIVE type sizes.
+ *   Hairline translucent borders instead of solid rules.
+ *   Fewer things moving, moving further.
+ *
+ * Anything not on that list was removed rather than tuned down.
  */
 @theme inline {
-  --font-head: var(--font-head);
+  /* Tailwind's default timing function, overridden so a bare `transition-*`
+     inherits the one site curve rather than falling back to ease-in-out. Without
+     this, every component that doesn't name a curve quietly adds a second one. */
+  --default-transition-timing-function: var(--ease);
+  --default-transition-duration: var(--dur-fast);
+
+  --font-display: var(--font-display);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-pixel: var(--font-pixel);
+
   --radius: var(--radius);
 
-  /* NOTE: motion tokens are deliberately NOT declared here.
-     Tailwind tree-shakes @theme tokens that no generated utility references,
-     and `--dur-*` / `--ease-*` are only ever consumed through arbitrary values
-     like duration-[var(--dur-fast)] — which Tailwind does not trace back to the
-     theme. Declared in @theme they vanish from the output and every transition
-     using them silently collapses. They live in :root below instead. */
+  /* Motion tokens are NOT declared here. Tailwind tree-shakes @theme entries
+     that no generated utility references, and these are only ever consumed
+     through arbitrary values like duration-[var(--dur-base)] - which Tailwind
+     cannot trace back to the theme. Declared here they vanish from the output
+     and every transition silently collapses to 0s. They live in :root. */
 
-  --shadow-xs: 1px 1px 0 0 var(--border);
-  --shadow-sm: 2px 2px 0 0 var(--border);
-  --shadow: 3px 3px 0 0 var(--border);
-  --shadow-md: 4px 4px 0 0 var(--border);
-  --shadow-lg: 6px 6px 0 0 var(--border);
-  --shadow-xl: 10px 10px 0 1px var(--border);
-  --shadow-2xl: 16px 16px 0 1px var(--border);
-
-  /* RetroUI's components hardcode `border-black` rather than `border-border`,
-     so overriding --foreground alone wouldn't reach them. Redefining Tailwind's
-     `black` is the single point that makes every component pick up the warm
-     off-black from david-hckh.com. */
-  --color-black: #2d2a24;
-
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary-hover: var(--primary-hover);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-accent-ink: var(--accent-ink);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
-  /* Paper stock scale (niccolomiranda.com + david-hckh.com) for banding
-     sections against each other without leaving the paper world. */
-  --color-paper-100: var(--paper-100);
-  --color-paper-200: var(--paper-200);
-  --color-paper-300: var(--paper-300);
-  --color-paper-400: var(--paper-400);
+  /* Aliases so shadcn-derived components keep resolving. */
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-border: var(--line);
+  --color-muted-foreground: var(--ink-muted);
+  --color-card: var(--paper-raised);
+  --color-card-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-ink);
+  --color-secondary: var(--ink);
+  --color-secondary-foreground: var(--paper);
+  --color-ring: var(--accent);
+  --color-input: var(--paper-raised);
+  --color-destructive: #b4402f;
+  --color-destructive-foreground: var(--paper);
 
-  /* The single per-section accent. One accent per band, never competing —
-     the one-pop-accent discipline borrowed from pacomepertant.com. */
-  --color-section-accent: var(--section-accent);
+  /* Shadows are near-invisible on purpose. The hard offset shadow was the
+     loudest thing in the old system; a wide, very low-alpha shadow reads as
+     depth rather than decoration. */
+  --shadow-xs: 0 1px 2px rgb(28 27 25 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(28 27 25 / 0.05);
+  --shadow: 0 2px 8px rgb(28 27 25 / 0.05);
+  --shadow-md: 0 4px 16px rgb(28 27 25 / 0.06);
+  --shadow-lg: 0 8px 32px rgb(28 27 25 / 0.07);
+  --shadow-xl: 0 16px 48px rgb(28 27 25 / 0.08);
+  --shadow-2xl: 0 24px 64px rgb(28 27 25 / 0.09);
 }
 
 :root {
-  /* Motion system (from pacomepertant.com). Plain custom properties so they're
-     always emitted and reachable from both CSS (duration-[var(--dur-fast)],
-     ease-[var(--ease-expo-out)]) and Motion's JS options — one set of curves
-     for the whole page. This is the "motion tokens" work PERFORMANCE_NOTES.md
-     deferred as "200+ rules to touch". */
-  --dur-fast: 150ms;
-  --dur-base: 350ms;
-  --dur-reveal: 600ms;
-  --dur-slow: 800ms;
-  --ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-quad-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  /* ---- Motion: one curve, four durations ------------------------------
+     dennissnellenberg.com (Awwwards) ships four durations against a single
+     cubic-bezier. That consistency is most of why its motion reads as
+     designed. The previous system used four different curves plus springs
+     plus Motion's defaults, so nothing felt related to anything else. */
+  --ease: cubic-bezier(0.7, 0, 0.3, 1);
+  --dur-fast: 300ms;
+  --dur-base: 500ms;
+  --dur-smooth: 700ms;
+  --dur-slow: 900ms;
 
-  --font-head: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  /* ---- Type: five sizes, nothing else --------------------------------- */
+  --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
-  /* Pixel bitmap face for section numerals and micro-labels — the nod to
-     david-hckh.com's ProFontWindows, and to the existing Gintama sprites. */
-  --font-pixel: "Silkscreen", "Space Mono", ui-monospace, monospace;
 
+  --text-display: clamp(2.75rem, 7vw, 7rem);
+  --text-heading: clamp(1.75rem, 4vw, 3.25rem);
+  --text-sub: clamp(1.0625rem, 1.9vw, 1.5rem);
+  --text-body: clamp(0.9375rem, 1vw, 1.0625rem);
+  --text-label: 0.6875rem;
+
+  /* ---- Colour: paper, ink, one accent --------------------------------- */
+  --paper: #f4f0e8;
+  --paper-raised: #faf7f1;
+  /* Warm near-black, never #000: pure black on warm paper reads as a hole. */
+  --ink: #1c1b19;
+  --ink-muted: #6f6a61;
+  --ink-faint: #a8a29a;
+  /* The single accent. Descended from the old site's electric blue, darkened
+     until it holds its own against warm paper without vibrating. */
+  --accent: #1b34d8;
+  --accent-ink: #faf7f1;
+
+  /* Hairlines, not rules. Translucent so they sit under the content rather
+     than boxing it in - the technique every reference site uses. */
+  --line: rgb(28 27 25 / 0.13);
+  --line-strong: rgb(28 27 25 / 0.26);
+
+  /* Square corners are kept: the one neobrutalist decision worth keeping,
+     because it reads as editorial rather than loud. */
   --radius: 0;
-
-  /* Paper stock — warm, not white. */
-  --paper-100: #fff7e8;
-  --paper-200: #f5efe6;
-  --paper-300: #e9ded0;
-  --paper-400: #dfd1bc;
-
-  --background: var(--paper-100);
-  /* Warm off-black rather than #000 (david-hckh.com). Pure black is harsh
-     across the large flat areas and thick borders this design leans on. */
-  --foreground: #2d2a24;
-  --card: #fff;
-  --card-foreground: #2d2a24;
-  --primary: #ffdc58;
-  --primary-hover: #ffd12e;
-  --primary-foreground: #2d2a24;
-  --secondary: #2d2a24;
-  --secondary-foreground: #fff7e8;
-  --muted: #efe7d6;
-  --muted-foreground: #6b6355;
-  --accent: #ffe7a3;
-  --accent-foreground: #2d2a24;
-  --destructive: #e63946;
-  --destructive-foreground: #fff;
-  --border: #2d2a24;
-  --input: #fff;
-  --ring: #2d2a24;
-
-  /* Overridden per section; defaults to the hero blue. */
-  --section-accent: #0b24fb;
 }
-
-.dark {
-  --paper-100: #1a1815;
-  --paper-200: #201d19;
-  --paper-300: #262320;
-  --paper-400: #2e2a24;
-
-  --background: var(--paper-100);
-  --foreground: #f5f0e6;
-  --card: #262320;
-  --card-foreground: #f5f0e6;
-  --primary: #ffdc58;
-  --primary-hover: #ffd12e;
-  --primary-foreground: #2d2a24;
-  --secondary: #3a352f;
-  --secondary-foreground: #f5f0e6;
-  --muted: #2e2a24;
-  --muted-foreground: #b3ac9e;
-  --accent: #38342b;
-  --accent-foreground: #f5f0e6;
-  --destructive: #ff6b6b;
-  --destructive-foreground: #1a1815;
-  --border: #0a0a0a;
-  --input: #262320;
-  --ring: #ffdc58;
-
-  /* Electric mint reads far better than blue on warm dark
-     (pacomepertant.com's --color-pop-green). */
-  --section-accent: #21ffc0;
-}
-
 
 @layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.65;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-head uppercase tracking-tight;
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
   }
 
-  /* Respect users who ask for less motion. Motion's own hooks read this too,
-     but CSS-driven marquee/scroll bits need it declared here as well. */
+  /* One focus treatment everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -179,31 +156,71 @@
   }
 }
 
-/* Marquee. Translating exactly -50% of a doubled track is what makes the loop
-   seamless — any other value produces a visible jump on each cycle. */
-@keyframes marquee {
-  from {
-    transform: translate3d(0, 0, 0);
+/* ---- The five type roles, as utilities ------------------------------- */
+
+@utility t-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+@utility t-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-heading);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+@utility t-sub {
+  font-size: var(--text-sub);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--ink-muted);
+}
+
+@utility t-body {
+  font-size: var(--text-body);
+  line-height: 1.7;
+}
+
+@utility t-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* ---- Interactions ---------------------------------------------------- */
+
+/* Replaces retro-press. The hard offset shadow is gone; what remains is a
+   quiet ground shift and an accent fill - enough to feel responsive without
+   announcing itself. */
+@utility lift {
+  transition: color var(--dur-fast) var(--ease),
+              background-color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+  &:hover {
+    transform: translateY(-2px);
   }
-  to {
-    transform: translate3d(-50%, 0, 0);
+  &:active {
+    transform: translateY(0);
   }
 }
 
-/* The signature neobrutalist interaction: lift toward the light on hover,
-   then slam flat into the shadow on press. Draws timing from the motion tokens
-   rather than hardcoding, so a change to --dur-fast moves every press together.
-   Shadow offsets match --shadow-lg / --shadow-xs. */
-@utility retro-press {
-  transition-property: transform, box-shadow;
-  transition-duration: var(--dur-fast);
-  transition-timing-function: var(--ease-expo-out);
+/* Underline that draws in from the left on hover, rather than a colour flip.
+   Uses background-size so it animates on the compositor. */
+@utility rule-in {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size var(--dur-base) var(--ease);
   &:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--border);
-  }
-  &:active {
-    transform: translate(0, 0);
-    box-shadow: 1px 1px 0 0 var(--border);
+    background-size: 100% 1px;
   }
 }

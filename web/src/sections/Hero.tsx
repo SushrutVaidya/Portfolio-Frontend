@@ -5,7 +5,7 @@ import { Magnetic } from '@/components/Magnetic'
 import { useLiveClock } from '@/hooks/useLiveClock'
 import { useStats } from '@/hooks/useStats'
 import { profile } from '@/content/site'
-import { DUR, EASE_EXPO_OUT, STAGGER_STEP } from '@/lib/motion'
+import { DUR, EASE, STAGGER_STEP } from '@/lib/motion'
 
 const GREETINGS = ['hello', 'नमस्कार', 'नमस्ते', 'నమస్కారం', 'ನಮಸ್ಕಾರ'] as const
 
@@ -29,7 +29,7 @@ export function Hero() {
   return (
     <header
       id="hero"
-      className="bg-paper-100 relative flex min-h-dvh flex-col justify-center px-6 py-24 md:px-12"
+      className="bg-paper relative flex min-h-dvh flex-col justify-center px-6 py-24 md:px-12"
     >
       <div className="mx-auto w-full max-w-5xl">
         {/* Multilingual greeting. aria-hidden on all but the first: the same
@@ -39,13 +39,13 @@ export function Hero() {
             <motion.span
               key={greeting}
               aria-hidden={i > 0 ? 'true' : undefined}
-              className="font-head text-lg md:text-2xl"
+              className="t-sub font-display"
               initial={reduceMotion ? undefined : { opacity: 0, y: 20 }}
               animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: DUR.base, delay: i * STAGGER_STEP, ease: EASE_EXPO_OUT }}
+              transition={{ duration: DUR.base, delay: i * STAGGER_STEP, ease: EASE }}
             >
               {greeting}
-              {i === 0 && <span className="text-[var(--section-accent)]">.</span>}
+              {i === 0 && <span className="text-accent">.</span>}
             </motion.span>
           ))}
         </div>
@@ -53,14 +53,14 @@ export function Hero() {
         {/* Character-level reveal — the name is short enough that per-char
             reads as deliberate rather than gimmicky, and long enough that the
             stagger has somewhere to go. */}
-        <h1 className="text-[clamp(2.75rem,11vw,9rem)] leading-[0.82]">
+        <h1 className="t-display">
           <SplitText by="char" immediate delay={0.5}>
             {profile.name}
           </SplitText>
         </h1>
 
         <motion.p
-          className="font-pixel mt-6 text-[0.7rem] tracking-[0.2em] uppercase md:text-xs"
+          className="t-label mt-8"
           initial={reduceMotion ? undefined : { opacity: 0 }}
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={{ duration: DUR.base, delay: 0.7 }}
@@ -70,13 +70,13 @@ export function Hero() {
 
         {/* The live sentence. Each trigger is a real button — see HoverTrigger. */}
         <motion.div
-          className="mt-12 max-w-3xl text-xl leading-relaxed md:text-3xl"
+          className="t-sub mt-14 max-w-3xl text-ink"
           initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: DUR.reveal, delay: 0.85, ease: EASE_EXPO_OUT }}
+          transition={{ duration: DUR.smooth, delay: 0.85, ease: EASE }}
         >
           <p>
-            It&apos;s <span className="font-head tabular-nums">{time}</span> where you are. I&apos;m
+            It&apos;s <span className="font-display tabular-nums">{time}</span> where you are. I&apos;m
             in{' '}
             <HoverTrigger
               spec={{ id: 'city', label: `${stats.location} city loop`, visual: { kind: 'image', src: '/img/Hyderabad.gif' } }}
@@ -128,7 +128,7 @@ export function Hero() {
 
         {/* Honest about data provenance. A recruiter who opens DevTools and
             sees a failed request next to confident copy notices. */}
-        <p className="font-mono mt-4 text-xs text-muted-foreground">
+        <p className="t-label mt-6">
           {live === null
             ? 'checking live data…'
             : live
@@ -140,7 +140,7 @@ export function Hero() {
           <Magnetic>
           <a
             href="#work"
-            className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-6 py-3 text-base text-[var(--section-accent-ink)] shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            className="lift font-display border border-line bg-accent px-6 py-3 text-base text-accent-ink shadow-md "
           >
             See the work ↓
           </a>
@@ -149,7 +149,7 @@ export function Hero() {
           <a
             href={profile.resume}
             download
-            className="retro-press font-head border-2 border-black bg-card px-6 py-3 text-base shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            className="lift font-display border border-line bg-card px-6 py-3 text-base shadow-md "
           >
             Résumé (PDF)
           </a>

@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { EASE_EXPO_OUT } from '@/lib/motion'
+import { DUR, EASE } from '@/lib/motion'
 
 interface MagneticProps {
   children: ReactNode
@@ -23,7 +23,7 @@ interface MagneticProps {
  *
  * Only transform is animated, so this never triggers layout.
  */
-export function Magnetic({ children, strength = 10, className }: MagneticProps) {
+export function Magnetic({ children, strength = 6, className }: MagneticProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const reduceMotion = useReducedMotion()
@@ -36,13 +36,9 @@ export function Magnetic({ children, strength = 10, className }: MagneticProps) 
       className={className}
       style={{ display: 'inline-block' }}
       animate={{ x: offset.x, y: offset.y }}
-      transition={
-        // Springy on the way back, immediate while tracking — a single tween
-        // for both makes the follow feel laggy.
-        offset.x === 0 && offset.y === 0
-          ? { type: 'spring', stiffness: 260, damping: 18, mass: 0.6 }
-          : { duration: 0.18, ease: EASE_EXPO_OUT }
-      }
+      // One curve everywhere, including here. A spring on the return read as
+      // a different design language from every other transition on the page.
+      transition={{ duration: offset.x === 0 && offset.y === 0 ? DUR.fast : 0.18, ease: EASE }}
       onPointerMove={(e) => {
         const el = ref.current
         if (!el) return

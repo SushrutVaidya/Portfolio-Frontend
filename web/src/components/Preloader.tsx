@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { DUR, EASE_EXPO_OUT } from '@/lib/motion'
+import { DUR, EASE } from '@/lib/motion'
 
 const MONOGRAM_PATH =
   'M12 4 L52 4 L52 14 L34 14 L34 60 L22 60 L22 14 L12 14 Z M60 4 L72 4 L82 34 L92 4 L104 4 L104 60 L93 60 L93 26 L84 52 L79 52 L70 26 L70 60 L60 60 Z'
@@ -51,11 +51,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="bg-paper-100 fixed inset-0 z-200 flex items-center justify-center"
+          className="bg-paper fixed inset-0 z-200 flex items-center justify-center"
           // Curtain lifts rather than fades — a wipe reads as intentional,
           // a fade reads as a loading spinner.
           exit={{ y: '-100%' }}
-          transition={{ duration: DUR.slow, ease: EASE_EXPO_OUT }}
+          transition={{ duration: DUR.slow, ease: EASE }}
           aria-hidden="true"
         >
           <div className="relative">
@@ -73,7 +73,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
                     style={{ transformOrigin: 'bottom' }}
                     initial={{ scaleY: 0 }}
                     animate={{ scaleY: 1 }}
-                    transition={{ duration: 1.2, ease: EASE_EXPO_OUT }}
+                    transition={{ duration: 1.2, ease: EASE }}
                   />
                 </mask>
               </defs>
@@ -83,7 +83,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
             </svg>
 
             <motion.p
-              className="font-pixel mt-6 text-center text-[0.6rem] tracking-[0.3em] uppercase"
+              className="font-mono mt-6 text-center text-[0.6rem] tracking-[0.3em] uppercase"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: DUR.base, delay: 0.6 }}

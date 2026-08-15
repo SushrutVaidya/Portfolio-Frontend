@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { EASE_EXPO_OUT } from '@/lib/motion'
+import { DUR, EASE } from '@/lib/motion'
 
 interface SplitTextProps {
   children: string
@@ -82,7 +82,7 @@ export function SplitText({
               hidden: { y: '110%' },
               visible: { y: '0%' },
             }}
-            transition={{ duration: 0.75, ease: EASE_EXPO_OUT, delay: delay + i * step }}
+            transition={{ duration: DUR.smooth, ease: EASE, delay: delay + i * step }}
           >
             {unit === ' ' ? ' ' : unit}
             {/* Re-insert the space that split() removed, inside the same mask so

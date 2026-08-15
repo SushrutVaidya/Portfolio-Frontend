@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { EASE_EXPO_OUT } from '@/lib/motion'
+import { EASE } from '@/lib/motion'
 
 /**
  * Route-change curtain.
@@ -42,10 +42,10 @@ export function RouteCurtain() {
           initial={{ y: '100%' }}
           animate={{ y: '0%' }}
           exit={{ y: '-100%' }}
-          transition={{ duration: 0.6, ease: EASE_EXPO_OUT }}
+          transition={{ duration: 0.6, ease: EASE }}
           aria-hidden="true"
         >
-          <span className="font-pixel text-[0.65rem] tracking-[0.4em] text-secondary-foreground uppercase">
+          <span className="font-mono text-[0.65rem] tracking-[0.4em] text-secondary-foreground uppercase">
             Sushrut Vaidya
           </span>
         </motion.div>

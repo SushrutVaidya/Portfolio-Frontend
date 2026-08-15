@@ -16,17 +16,15 @@ export function Patent() {
       index="04"
       title="I have a patent"
       subtitle="it's about solar panels, and I will bring it up unprompted"
-      accent="#9b59b6"
-      stock="paper-200"
     >
       <Reveal>
-        <article className="border-2 border-black bg-card p-6 shadow-lg md:p-8">
-          <h3 className="font-head text-xl md:text-3xl">
+        <article className="border border-line bg-card p-6 shadow-lg md:p-8">
+          <h3 className="t-heading">
             <a
               href={patent.url}
               target="_blank"
               rel="noreferrer noopener"
-              className="underline decoration-[var(--section-accent)] decoration-4 underline-offset-4 hover:bg-[var(--section-accent)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="underline decoration-[var(--accent)] decoration-1 underline-offset-4 hover:bg-accent hover:text-accent-ink "
             >
               {patent.title} ↗
             </a>
@@ -37,7 +35,7 @@ export function Patent() {
           <dl className="font-mono mt-6 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
             <div>
               <dt className="text-xs text-muted-foreground uppercase">Patent no.</dt>
-              <dd className="font-head mt-1 tabular-nums">{patent.number}</dd>
+              <dd className="font-display mt-1 tabular-nums">{patent.number}</dd>
             </div>
             <div>
               <dt className="text-xs text-muted-foreground uppercase">Filed</dt>
@@ -49,7 +47,7 @@ export function Patent() {
             </div>
           </dl>
 
-          <p className="font-pixel mt-6 text-[0.65rem] tracking-widest uppercase">
+          <p className="t-label mt-8">
             {patent.authority}
           </p>
         </article>

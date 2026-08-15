@@ -51,7 +51,7 @@ export function CaseStudy() {
         </p>
         <Link
           to="/"
-          className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2 text-[var(--section-accent-ink)] shadow-md"
+          className="lift font-display border border-line bg-accent px-5 py-2 text-accent-ink shadow-md"
         >
           ← Back
         </Link>
@@ -69,8 +69,8 @@ export function CaseStudy() {
    * while leaving everything outside it alone.
    */
   const themeVars = {
-    '--section-accent': project.theme.accent,
-    '--section-accent-ink': contrastInk(project.theme.accent),
+    '--accent': project.theme.accent,
+    '--accent-ink': contrastInk(project.theme.accent),
     '--foreground': project.theme.ink,
     '--background': project.theme.stock,
   } as CSSProperties
@@ -79,7 +79,7 @@ export function CaseStudy() {
     <div style={themeVars} className="bg-background text-foreground">
       {!reduceMotion && (
         <motion.div
-          className="fixed top-0 left-0 z-100 h-1 w-full origin-left bg-[var(--section-accent)]"
+          className="fixed top-0 left-0 z-100 h-1 w-full origin-left bg-accent"
           style={{ scaleX: progress }}
           aria-hidden="true"
         />
@@ -87,11 +87,11 @@ export function CaseStudy() {
 
       <main className="min-h-dvh">
         {/* Masthead */}
-        <header className="border-b-4 border-black px-6 py-20 md:px-12 md:py-28">
+        <header className="border-b border-line px-6 py-20 md:px-12 md:py-28">
           <div className="mx-auto max-w-5xl">
             <Link
               to="/"
-              className="font-mono inline-block text-xs underline decoration-2 underline-offset-4 hover:bg-[var(--section-accent)] hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="font-mono inline-block text-xs underline decoration-2 underline-offset-4 hover:bg-accent hover:text-black "
             >
               ← All work
             </Link>
@@ -125,7 +125,7 @@ export function CaseStudy() {
                   href={project.href}
                   target={project.href.startsWith('http') ? '_blank' : undefined}
                   rel={project.href.startsWith('http') ? 'noreferrer noopener' : undefined}
-                  className="retro-press font-head border-2 border-black bg-[var(--section-accent)] px-5 py-2.5 text-sm text-[var(--section-accent-ink)] shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="lift font-display border border-line bg-accent px-5 py-2.5 text-sm text-accent-ink shadow-md "
                 >
                   {project.status === 'live' ? 'Open it' : 'Read the filing'} →
                 </a>
@@ -135,7 +135,7 @@ export function CaseStudy() {
                   href={project.repo}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="retro-press font-head border-2 border-black px-5 py-2.5 text-sm shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="lift font-display border border-line px-5 py-2.5 text-sm shadow-md "
                 >
                   Source ↗
                 </a>
@@ -146,13 +146,13 @@ export function CaseStudy() {
 
         {/* Metrics band */}
         {project.metrics && (
-          <div className="border-b-4 border-black px-6 py-10 md:px-12">
+          <div className="border-b border-line px-6 py-10 md:px-12">
             <dl className="mx-auto flex max-w-5xl flex-wrap gap-x-16 gap-y-6">
               {project.metrics.map((m) => (
                 <div key={m.label}>
                   <dt className="sr-only">{m.label}</dt>
                   <dd>
-                    <span className="font-head block text-4xl tabular-nums md:text-6xl">
+                    <span className="font-display block text-4xl tabular-nums md:text-6xl">
                       <CountUp value={m.value} />
                     </span>
                     <span className="font-mono mt-1 block text-xs opacity-70">{m.label}</span>
@@ -167,13 +167,13 @@ export function CaseStudy() {
         {project.study && (
           <section
             aria-label="Case study"
-            className="border-b-4 border-black px-6 py-20 md:px-12 md:py-28"
+            className="border-b border-line px-6 py-20 md:px-12 md:py-28"
           >
             <div className="mx-auto max-w-6xl">
               <Pinned
                 aside={
                   <div>
-                    <p className="font-pixel text-[0.6rem] tracking-[0.3em] uppercase text-[var(--section-accent)]">
+                    <p className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-accent">
                       The write-up
                     </p>
                     <h2 className="mt-4 text-3xl leading-[0.95] md:text-5xl">
@@ -196,7 +196,7 @@ export function CaseStudy() {
                         <div className="flex items-baseline gap-4">
                           <span
                             aria-hidden="true"
-                            className="font-pixel shrink-0 text-xs text-[var(--section-accent)]"
+                            className="font-mono shrink-0 text-xs text-accent"
                           >
                             {block.index}
                           </span>
@@ -242,7 +242,7 @@ export function CaseStudy() {
                 {project.stack.map((tech) => (
                   <li
                     key={tech}
-                    className="font-mono border-2 border-black px-2.5 py-1 text-xs"
+                    className="font-mono border border-line px-2.5 py-1 text-xs"
                   >
                     {tech}
                   </li>
@@ -252,16 +252,16 @@ export function CaseStudy() {
 
             {/* Next project — keeps the reader inside the work. */}
             <Reveal delay={0.15}>
-              <nav aria-label="Next project" className="mt-20 border-t-4 border-black pt-10">
+              <nav aria-label="Next project" className="mt-20 border-t border-line pt-10">
                 {(() => {
                   const i = projects.findIndex((p) => p.slug === project.slug)
                   const next = projects[(i + 1) % projects.length]
                   return (
                     <Link to={`/work/${next.slug}`} className="group block">
-                      <span className="font-pixel text-[0.6rem] tracking-[0.3em] uppercase opacity-60">
+                      <span className="font-mono text-[0.6rem] tracking-[0.3em] uppercase opacity-60">
                         Next
                       </span>
-                      <span className="mt-3 block text-3xl leading-tight group-hover:text-[var(--section-accent)] md:text-5xl">
+                      <span className="mt-3 block text-3xl leading-tight group-hover:text-accent md:text-5xl">
                         {next.name} →
                       </span>
                     </Link>

@@ -7,6 +7,7 @@ import { Preloader } from '@/components/Preloader'
 import { Cursor } from '@/components/Cursor'
 import { RouteCurtain } from '@/components/RouteCurtain'
 import { SectionIndex } from '@/components/SectionIndex'
+import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { Footer } from '@/sections/Footer'
 import { Home } from '@/pages/Home'
 import { CaseStudy } from '@/pages/CaseStudy'
@@ -34,6 +35,7 @@ export default function App() {
       <Preloader onDone={onDone} />
       <Cursor />
       <RouteCurtain />
+      <ThemeSwitcher />
       {location.pathname === '/' && <SectionIndex />}
 
       <a

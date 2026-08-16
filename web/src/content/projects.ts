@@ -6,14 +6,20 @@
  */
 
 /**
- * Per-project palette. Applied to the case-study route so each project owns the
- * whole page, the way david-hckh.com re-themes via .project-* classes. `accent`
- * overrides --section-accent; `ink`/`stock` override foreground/background.
+ * Per-project accent, applied ONLY on the case-study route, where the project
+ * owns the whole page — the approach david-hckh.com takes with its .project-*
+ * classes.
+ *
+ * Deliberately NOT applied to the home page. The single-accent rule is what
+ * keeps the composition coherent; re-theming three consecutive frames there
+ * produced exactly the competing-colour problem it exists to prevent.
+ *
+ * Values are chosen against the near-black ground (#12100e). The previous set
+ * was picked for a cream background — #176cfe in particular is legible on paper
+ * and nearly invisible on this ground.
  */
 export interface ProjectTheme {
   accent: string
-  ink: string
-  stock: string
 }
 
 export interface CaseStudyBlock {
@@ -54,7 +60,8 @@ export const projects: readonly Project[] = [
     status: 'live',
     year: '2026',
     role: 'Sole engineer — API, frontend, infrastructure',
-    theme: { accent: '#ffdc58', ink: '#f5f0e6', stock: '#16295e' },
+    // DevQuest's own brand yellow, warmed so it doesn't glare on near-black.
+    theme: { accent: '#f2c14e' },
     href: '/devquest/landing.html',
     repo: 'https://github.com/SushrutVaidya/Portfolio-Backend',
     stack: [
@@ -146,7 +153,8 @@ export const projects: readonly Project[] = [
     status: 'live',
     year: '2026',
     role: 'Sole engineer — platform and deployment',
-    theme: { accent: '#176cfe', ink: '#141d25', stock: '#f9fbfe' },
+    // Lifted well off #176cfe, which fails contrast against this ground.
+    theme: { accent: '#6aa6ff' },
     repo: 'https://github.com/SushrutVaidya/Portfolio-Backend',
     stack: ['Docker Compose', 'nginx', 'certbot', 'PostgreSQL', 'Redis', 'Oracle Cloud'],
     study: [
@@ -198,7 +206,7 @@ export const projects: readonly Project[] = [
     status: 'archived',
     year: '2022–24',
     role: 'Co-inventor',
-    theme: { accent: '#fec600', ink: '#f5efe6', stock: '#2c2f2c' },
+    theme: { accent: '#dfd94f' },
     href: 'https://ycce.edu/wp-content/uploads/2025/01/107_202221077674.pdf',
     stack: ['PLC', 'IoT sensors', 'Control systems'],
     highlights: [

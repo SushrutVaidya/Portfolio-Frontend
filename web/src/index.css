@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
 /*
- * Refined-minimal theme.
+ * ══════════════════════════════════════════════════════════════════════
+ *  INSTRUMENTED — the design system
+ * ══════════════════════════════════════════════════════════════════════
  *
- * A deliberately subtractive rewrite of the neobrutalist token set. The
- * observation that drove it: every reference chosen for this project
- * (david-hckh, pacomepertant, yorukot, dennissnellenberg, rauno) is restrained,
- * while neobrutalism - thick borders, hard offset shadows, bright accents -
- * optimises for bold rather than beautiful. Adding motion on top of an
- * inconsistent system made it louder, not better.
+ * The concept, and the reason the site looks the way it does:
  *
- * The discipline, taken from what those sites actually do:
- *   ONE easing curve, four durations.  ONE accent.  FIVE type sizes.
- *   Hairline translucent borders instead of solid rules.
+ *   Sushrut's work is making opaque systems legible. Airflow DAGs that
+ *   nobody can see until they fail. Log streams nobody can read. A deploy
+ *   pipeline. Solar telemetry. So the site is an editorial page that is
+ *   also an instrument: it reads its own state - clock, API health, scroll
+ *   position - and prints it in the margins, in mono, the way a
+ *   well-instrumented system does.
+ *
+ * The register is EDITORIAL DARK, chosen against the alternative registers
+ * because it is the one that is not a developer-portfolio cliche:
+ *
+ *   - warm near-black ground, never #000 (pure black is a screen, not paper)
+ *   - a high-contrast SERIF at display scale, which is what separates an
+ *     art-directed page from a styled one. Every dark developer portfolio
+ *     on the internet sets its headings in a grotesk.
+ *   - MONO for every piece of instrumentation, so data never masquerades
+ *     as prose and prose never masquerades as data
+ *   - exactly ONE accent, a terracotta warm enough to belong to the ground
+ *
+ * The discipline, which matters more than any individual value here:
+ *
+ *   ONE easing curve. FOUR durations. SIX type roles. ONE accent.
+ *   Hairline translucent rules, never solid borders.
  *   Fewer things moving, moving further.
  *
- * Anything not on that list was removed rather than tuned down.
+ * Anything that did not earn a place on that list was deleted rather than
+ * tuned down. The three switchable directions that used to live in this
+ * file are gone: shipping a theme picker on a portfolio is shipping the
+ * indecision.
  */
+
 @theme inline {
   /* Tailwind's default timing function, overridden so a bare `transition-*`
-     inherits the one site curve rather than falling back to ease-in-out. Without
-     this, every component that doesn't name a curve quietly adds a second one. */
+     inherits the one site curve rather than falling back to ease-in-out.
+     Without this, every component that doesn't name a curve quietly
+     introduces a second easing curve into the system. */
   --default-transition-timing-function: var(--ease);
   --default-transition-duration: var(--dur-fast);
 
@@ -28,16 +49,9 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 
-  --radius: var(--radius);
-
-  /* Motion tokens are NOT declared here. Tailwind tree-shakes @theme entries
-     that no generated utility references, and these are only ever consumed
-     through arbitrary values like duration-[var(--dur-base)] - which Tailwind
-     cannot trace back to the theme. Declared here they vanish from the output
-     and every transition silently collapses to 0s. They live in :root. */
-
   --color-paper: var(--paper);
   --color-paper-raised: var(--paper-raised);
+  --color-paper-deep: var(--paper-deep);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
@@ -46,148 +60,80 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
 
-  /* Aliases so shadcn-derived components keep resolving. */
-  --color-background: var(--paper);
-  --color-foreground: var(--ink);
-  --color-border: var(--line);
-  --color-muted-foreground: var(--ink-muted);
-  --color-card: var(--paper-raised);
-  --color-card-foreground: var(--ink);
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--accent-ink);
-  --color-secondary: var(--ink);
-  --color-secondary-foreground: var(--paper);
-  --color-ring: var(--accent);
-  --color-input: var(--paper-raised);
-  --color-destructive: #b4402f;
-  --color-destructive-foreground: var(--paper);
+  /* The fourteen shadcn colour aliases that used to live here
+     (--color-background, --color-primary, --color-muted-foreground and the
+     rest) are gone along with the components/ui directory that was the only
+     thing consuming them. Nothing in src/ referenced a single one, so they were
+     a translation layer between this system and a system no longer present.
 
-  /* Shadows are near-invisible on purpose. The hard offset shadow was the
-     loudest thing in the old system; a wide, very low-alpha shadow reads as
-     depth rather than decoration. */
-  --shadow-xs: 0 1px 2px rgb(28 27 25 / 0.04);
-  --shadow-sm: 0 1px 3px rgb(28 27 25 / 0.05);
-  --shadow: 0 2px 8px rgb(28 27 25 / 0.05);
-  --shadow-md: 0 4px 16px rgb(28 27 25 / 0.06);
-  --shadow-lg: 0 8px 32px rgb(28 27 25 / 0.07);
-  --shadow-xl: 0 16px 48px rgb(28 27 25 / 0.08);
-  --shadow-2xl: 0 24px 64px rgb(28 27 25 / 0.09);
+     Likewise the shadow scale: on a near-black ground a drop shadow is
+     invisible, and depth comes from --paper-raised instead. Only 2xl survives,
+     used by the hover-media panel, where the media itself is the light source. */
+  --shadow-2xl: 0 32px 80px rgb(0 0 0 / 0.55);
 }
 
 :root {
-  /* ---- Motion: one curve, four durations ------------------------------
-     dennissnellenberg.com (Awwwards) ships four durations against a single
-     cubic-bezier. That consistency is most of why its motion reads as
-     designed. The previous system used four different curves plus springs
-     plus Motion's defaults, so nothing felt related to anything else. */
+  /* ---- Motion: one curve, four durations ----------------------------
+     A single cubic-bezier across every animation on the site is most of
+     why award-tier motion reads as designed rather than assembled. The
+     earlier version of this file had four curves plus springs plus
+     Motion's own defaults, so nothing felt related to anything else, and
+     adding more animation on top only made it louder. */
   --ease: cubic-bezier(0.7, 0, 0.3, 1);
   --dur-fast: 300ms;
   --dur-base: 500ms;
   --dur-smooth: 700ms;
   --dur-slow: 900ms;
 
-  /* ---- Type: five sizes, nothing else --------------------------------- */
-  --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+  /* Deliberately NOT declared in @theme: Tailwind tree-shakes theme
+     entries no generated utility references, and these are only consumed
+     through arbitrary values like duration-[var(--dur-base)], which
+     Tailwind cannot trace back to the theme. Declared there they vanish
+     from the output and every transition silently collapses to 0s. */
 
-  --text-display: clamp(3rem, 8.5vw, 8.5rem);
-  --text-heading: clamp(1.75rem, 4vw, 3.25rem);
-  --text-sub: clamp(1.0625rem, 1.9vw, 1.5rem);
+  /* ---- Colour: warm near-black, bone, one terracotta --------------- */
+  --paper: #12100e;
+  --paper-raised: #1b1815;
+  /* One step darker than the ground, for bands that need to recede.
+     A shade of the same ground is not a second colour. */
+  --paper-deep: #0c0a09;
+  --ink: #f3ede1;
+  --ink-muted: #968b7d;
+  /* 3.14:1 against the ground. Measured, not eyeballed: the previous value
+     (#564e44) came in at 2.32:1, and while everything using it is decorative —
+     the mega ordinals, the folio separators — at that level the ordinals were
+     not faint, they were absent. This clears WCAG large-text AA, which is the
+     right floor for something meant to be a visible ghost. */
+  --ink-faint: #6b6157;
+  --accent: #e4633a;
+  --accent-ink: #12100e;
+  --line: rgb(243 237 225 / 0.10);
+  --line-strong: rgb(243 237 225 / 0.22);
+
+  /* ---- Type -------------------------------------------------------- */
+  --font-display: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Six roles with real distance between them. The previous scale put
+     display and heading only 2.6x apart, which is why nothing on the page
+     read as more important than anything else. Extreme scale contrast is
+     not decoration - it IS the hierarchy. */
+  --text-mega: clamp(3.25rem, 12.5vw, 12rem);
+  --text-display: clamp(2.125rem, 5.6vw, 5rem);
+  --text-heading: clamp(1.5rem, 2.7vw, 2.375rem);
+  --text-sub: clamp(1.0625rem, 1.6vw, 1.375rem);
   --text-body: clamp(0.9375rem, 1vw, 1.0625rem);
   --text-label: 0.6875rem;
-
-  /* Colour and type face live in the theme blocks below, so a whole direction
-     is one data-attribute away. Everything else - motion, scale, spacing - is
-     shared, which is the point: the directions differ in character, not in
-     discipline. */
-}
-
-/* ======================================================================
-   THREE DIRECTIONS
-   Switch with data-theme on <html>, or press T in the browser.
-   Once one is chosen the other two blocks get deleted.
-   ====================================================================== */
-
-/* --- PAPER: the current cream. Kept only as a baseline for comparison. --- */
-:root,
-[data-theme="paper"] {
-  --paper: #f4f0e8;
-  --paper-raised: #faf7f1;
-  --ink: #1c1b19;
-  --ink-muted: #6f6a61;
-  --ink-faint: #a8a29a;
-  --accent: #1b34d8;
-  --accent-ink: #faf7f1;
-  --line: rgb(28 27 25 / 0.13);
-  --line-strong: rgb(28 27 25 / 0.26);
-
-  --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, monospace;
-
-  --display-case: uppercase;
-  --display-tracking: -0.03em;
-  --display-leading: 0.92;
-  --display-weight: 400;
-}
-
-/* --- MIDNIGHT: near-black, one electric accent, technical register.
-       What pacomepertant.com and yorukot.me actually are. --- */
-[data-theme="midnight"] {
-  --paper: #0b0b0c;
-  --paper-raised: #141416;
-  --ink: #ecebe8;
-  --ink-muted: #8b8a86;
-  --ink-faint: #55544f;
-  /* Electric mint on near-black: the one combination that reads as deliberate
-     rather than default dark mode. */
-  --accent: #4ef0b5;
-  --accent-ink: #06110c;
-  --line: rgb(236 235 232 / 0.10);
-  --line-strong: rgb(236 235 232 / 0.22);
-
-  /* Inter at tight weights, not a display face. On dark, heavy type turns to
-     mud; the contrast comes from scale and space instead. */
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-
-  --display-case: none;
-  --display-tracking: -0.045em;
-  --display-leading: 0.95;
-  --display-weight: 600;
-}
-
-/* --- EDITORIAL: high-contrast serif display on warm dark. The
-       art-directed magazine register - closest to niccolomiranda.com. --- */
-[data-theme="editorial"] {
-  --paper: #14120f;
-  --paper-raised: #1d1a16;
-  --ink: #f2ece1;
-  --ink-muted: #9a9186;
-  --ink-faint: #5f574c;
-  --accent: #e4633a;
-  --accent-ink: #14120f;
-  --line: rgb(242 236 225 / 0.11);
-  --line-strong: rgb(242 236 225 / 0.24);
-
-  /* Instrument Serif is the whole idea: a high-contrast serif at display scale
-     against a sans body is the single fastest way to read as art-directed. */
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-
-  --display-case: none;
-  --display-tracking: -0.02em;
-  --display-leading: 0.98;
-  --display-weight: 400;
 }
 
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Belt and braces with Lenis: if JS fails, in-page anchors still ease. */
+    scroll-behavior: smooth;
   }
 
   body {
@@ -195,7 +141,12 @@
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
+    font-weight: 350;
     line-height: 1.65;
+    /* A horizontal scrollbar is the single most common casualty of type
+       that bleeds past the frame edge. Clip rather than hide so
+       position: sticky keeps working. */
+    overflow-x: clip;
   }
 
   ::selection {
@@ -203,84 +154,106 @@
     color: var(--accent-ink);
   }
 
-  /* One focus treatment everywhere. */
+  /* One focus treatment everywhere, on the accent so it is unmistakable
+     against the dark ground. */
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
 
+  /* Serif display faces render optically heavy at large sizes; letting the
+     browser hyphenate would wreck the line breaks we're composing. */
+  h1, h2, h3 {
+    hyphens: none;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto !important;
+    }
     *,
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
     }
   }
 }
 
-/* ---- The five type roles, as utilities ------------------------------- */
+/* ══════════════════════════════════════════════════════════════════════
+   THE SIX TYPE ROLES
+   Every piece of text on the site is exactly one of these. If something
+   needs a seventh, the composition is wrong, not the scale.
+   ══════════════════════════════════════════════════════════════════════ */
 
+/* Reserved for the three things that carry the page: the name, the email
+   address, and project ordinals. Nothing else. */
+@utility t-mega {
+  font-family: var(--font-display);
+  font-size: var(--text-mega);
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: -0.025em;
+}
+
+/* Section statements - the one sentence per frame that does the work. */
 @utility t-display {
   font-family: var(--font-display);
   font-size: var(--text-display);
-  font-weight: var(--display-weight);
-  line-height: var(--display-leading);
-  letter-spacing: var(--display-tracking);
-  text-transform: var(--display-case);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
 }
 
 @utility t-heading {
   font-family: var(--font-display);
   font-size: var(--text-heading);
-  font-weight: var(--display-weight);
-  line-height: 1.06;
-  letter-spacing: var(--display-tracking);
-  text-transform: var(--display-case);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
 }
 
 @utility t-sub {
   font-size: var(--text-sub);
+  font-weight: 350;
   line-height: 1.45;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
   color: var(--ink-muted);
 }
 
 @utility t-body {
   font-size: var(--text-body);
+  font-weight: 350;
   line-height: 1.7;
 }
 
+/* Instrumentation. Every label, index, timestamp and readout. The mono/serif
+   split is load-bearing: it tells you at a glance which text is data. */
 @utility t-label {
   font-family: var(--font-mono);
   font-size: var(--text-label);
+  font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ink-muted);
+  /* Mono at 11px with wide tracking gains a trailing space that throws off
+     optical alignment against a left edge. */
+  text-indent: -0.02em;
 }
 
-/* ---- Interactions ---------------------------------------------------- */
+/* ══════════════════════════════════════════════════════════════════════
+   INTERACTIONS
+   ══════════════════════════════════════════════════════════════════════ */
 
-/* Replaces retro-press. The hard offset shadow is gone; what remains is a
-   quiet ground shift and an accent fill - enough to feel responsive without
-   announcing itself. */
-@utility lift {
-  transition: color var(--dur-fast) var(--ease),
-              background-color var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease),
-              transform var(--dur-fast) var(--ease);
-  &:hover {
-    transform: translateY(-2px);
-  }
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-/* Underline that draws in from the left on hover, rather than a colour flip.
-   Uses background-size so it animates on the compositor. */
+/* Underline that draws in from the left. Uses background-size so it
+   animates on the compositor rather than triggering layout, and it reads
+   as a considered response where a colour flip reads as a default. */
 @utility rule-in {
   background-image: linear-gradient(var(--accent), var(--accent));
   background-repeat: no-repeat;
@@ -289,5 +262,67 @@
   transition: background-size var(--dur-base) var(--ease);
   &:hover {
     background-size: 100% 1px;
+  }
+}
+
+/* Same device on a serif at display scale, where a 1px rule is too thin to
+   register against the stroke weight. */
+@utility rule-in-thick {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size var(--dur-smooth) var(--ease);
+  &:hover {
+    background-size: 100% 2px;
+  }
+}
+
+/* A quiet ground shift on press. Replaces the hard offset shadow, which was
+   the loudest element in the previous system. */
+@utility lift {
+  transition:
+    color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+  &:hover {
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Vertical mono label, for the frame edges. `writing-mode` rather than a
+   rotate transform so the text still selects and wraps sanely. */
+@utility t-label-vertical {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  writing-mode: vertical-rl;
+}
+
+/* Chapter register: hovering one row recedes the others, so the list reads as
+   a single object responding to attention rather than six independent links.
+   Written as real CSS because the two rules must land in a guaranteed
+   specificity order — `.register:hover .register-row` (0,3,0) would otherwise
+   always beat a `hover:` variant on the row itself (0,2,0), and the hovered
+   row would dim along with everything else. Ordering a hover state on
+   Tailwind's internal variant sort is not a bet worth taking.
+
+   Also gated on a fine pointer: on touch there is no hover, and :hover
+   emulation on tap would flash the whole list. */
+@media (hover: hover) and (pointer: fine) {
+  .register-row {
+    transition: opacity var(--dur-base) var(--ease);
+  }
+  .register:hover .register-row {
+    opacity: 0.3;
+  }
+  .register:hover .register-row:hover {
+    opacity: 1;
   }
 }

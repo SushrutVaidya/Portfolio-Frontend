@@ -2,55 +2,93 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- meta -->
-    <title>Sushrut Vaidya — Platform Engineer &amp; Developer</title>
-    <meta name="title" content="Sushrut Vaidya — Platform Engineer &amp; Developer" />
+    <title>Sushrut Vaidya — Platform Engineer</title>
     <meta
       name="description"
-      content="Platform Engineer at Apple AdPlatforms | Java, Spring Boot, Docker, Kubernetes, AWS"
+      content="Platform Engineer at Apple AdPlatforms via Quest Global. I keep thousands of Airflow DAGs on schedule for 10+ engineering teams. Java, Spring Boot, Kubernetes, AWS. Patent holder, Government of India."
     />
-    <meta name="theme-color" content="#fff7e8" />
+    <meta name="author" content="Sushrut Vaidya" />
+    <link rel="canonical" href="https://sushrutvaidya.in/" />
+    <!-- Matches --paper, so the mobile browser chrome continues the ground
+         instead of framing the page in white. -->
+    <meta name="theme-color" content="#12100e" />
+    <meta name="color-scheme" content="dark" />
 
-    <!-- facebook -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Sushrut Vaidya" />
     <meta property="og:url" content="https://sushrutvaidya.in/" />
-    <meta property="og:title" content="Sushrut Vaidya — Platform Engineer &amp; Developer" />
+    <meta property="og:title" content="Sushrut Vaidya — Platform Engineer" />
     <meta
       property="og:description"
-      content="Platform Engineer at Apple AdPlatforms | Java, Spring Boot, Docker, Kubernetes, AWS"
+      content="I keep thousands of Airflow DAGs on schedule at Apple AdPlatforms. Java, Spring Boot, Kubernetes, AWS."
     />
     <meta property="og:image" content="https://sushrutvaidya.in/img/meta.png" />
+    <meta property="og:image:alt" content="Sushrut Vaidya — Platform Engineer" />
 
-    <!-- twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://sushrutvaidya.in/" />
-    <meta property="twitter:title" content="Sushrut Vaidya — Platform Engineer &amp; Developer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sushrut Vaidya — Platform Engineer" />
     <meta
-      property="twitter:description"
-      content="Platform Engineer at Apple AdPlatforms | Java, Spring Boot, Docker, Kubernetes, AWS"
+      name="twitter:description"
+      content="I keep thousands of Airflow DAGs on schedule at Apple AdPlatforms. Java, Spring Boot, Kubernetes, AWS."
     />
-    <meta property="twitter:image" content="https://sushrutvaidya.in/img/meta.png" />
+    <meta name="twitter:image" content="https://sushrutvaidya.in/img/meta.png" />
 
-    <!-- Inline SVG favicon — no separate binary. nginx returns 204 for
-         /favicon.ico so the browser's default request isn't a 404. -->
+    <!-- Inline SVG favicon in the site palette — no separate binary, and no
+         extra request. nginx returns 204 for /favicon.ico so the browser's
+         default probe isn't a 404. -->
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23ffdc58' width='100' height='100'/%3E%3Crect fill='none' stroke='%232d2a24' stroke-width='8' width='100' height='100'/%3E%3Ctext x='50' y='70' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='900' font-size='54' fill='%232d2a24'%3ESV%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2312100e' width='100' height='100'/%3E%3Ctext x='50' y='72' text-anchor='middle' font-family='Georgia,serif' font-size='62' fill='%23e4633a'%3ESV%3C/text%3E%3C/svg%3E"
     />
+    <link rel="apple-touch-icon" href="/img/meta.png" />
 
-    <!-- Fonts. Vite has no next/font, so these load via <link>:
-         Archivo Black = display, Space Grotesk = body, Space Mono = readouts,
-         Silkscreen = pixel numerals and micro-labels. -->
+    <!-- Fonts. Vite has no next/font, so these load via <link>.
+         Three faces, one job each:
+           Instrument Serif — display, incl. italic for inline emphasis
+           Inter            — body
+           JetBrains Mono   — every readout, label and index
+         The previous build also pulled Archivo Black, Space Grotesk and
+         Space Mono; dropping the three unused families is ~120 kB of font
+         payload removed from first paint. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Inter:wght@300..800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300..600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Person schema. Only facts that appear on the page itself. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Sushrut Vaidya",
+        "url": "https://sushrutvaidya.in/",
+        "jobTitle": "Platform Engineer",
+        "email": "mailto:sushrutsv@outlook.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Hyderabad",
+          "addressCountry": "IN"
+        },
+        "worksFor": { "@type": "Organization", "name": "Quest Global" },
+        "knowsAbout": [
+          "Apache Airflow",
+          "Kubernetes",
+          "Java",
+          "Spring Boot",
+          "Docker",
+          "Platform Engineering"
+        ],
+        "sameAs": [
+          "https://github.com/SushrutVaidya",
+          "https://linkedin.com/in/Sushrutsvaidya"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

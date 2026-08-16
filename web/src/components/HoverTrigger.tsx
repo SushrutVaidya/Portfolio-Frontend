@@ -33,11 +33,15 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
       onBlur={() => close(spec.id)}
       onClick={hasHover ? undefined : () => toggle(spec.id)}
       className={[
-        'font-display cursor-pointer border-b px-0.5 transition-colors duration-[var(--dur-fast)]',
-        '',
+        // Italic serif inside a roman serif sentence: an editorial device that
+        // marks exactly which words are the live, changing ones. A filled accent
+        // block (what this used to be) is far too heavy at display scale on a
+        // dark ground — it read as five highlighter marks across the frame.
+        'cursor-pointer font-display italic underline decoration-1 underline-offset-[0.16em]',
+        'transition-colors duration-[var(--dur-fast)]',
         isActive
-          ? 'border-line bg-accent text-accent-ink'
-          : 'border-[var(--accent)] hover:bg-accent',
+          ? 'text-accent decoration-accent decoration-2'
+          : 'decoration-line-strong hover:text-accent hover:decoration-accent',
       ].join(' ')}
     >
       {children}

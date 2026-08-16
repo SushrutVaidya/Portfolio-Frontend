@@ -76,3 +76,54 @@ export const stack = {
   observability: ['OpenTelemetry', 'Grafana', 'Datadog'],
   cloud: ['AWS', 'Oracle Cloud (OCI)', 'GCP'],
 } as const
+
+/**
+ * The stack, regrouped by CAPABILITY rather than by category.
+ *
+ * "Languages / Frameworks / Infrastructure" is a taxonomy of tools, and a
+ * taxonomy of tools tells a reader nothing a CV wouldn't. Grouping by what the
+ * tools let you *do*, with one line on what each grouping actually bought, is
+ * the difference between listing technologies and demonstrating capability.
+ *
+ * Every tool named here also appears in `stack` above — this is a re-cut of the
+ * same set, not an expansion of it. `buys` lines are drawn from work that
+ * actually happened and appears in the project write-ups; none is aspirational.
+ */
+export const capabilities = [
+  {
+    label: 'Ship services',
+    tools: ['Java', 'Spring Boot', 'JPA / Hibernate', 'Flyway'],
+    buys:
+      'Versioned migrations that run before the application context starts, with baseline-on-migrate so a database predating version control gets adopted rather than dropped.',
+  },
+  {
+    label: 'Schedule the work',
+    tools: ['Apache Airflow', 'Jenkins', 'Bash'],
+    buys:
+      'Thousands of DAGs across ten-plus teams. Most of the job is making a dependency graph fail loudly at the right step instead of quietly at 4am.',
+  },
+  {
+    label: 'Run it anywhere',
+    tools: ['Docker', 'Kubernetes', 'nginx', 'Terraform', 'AWS', 'Oracle Cloud (OCI)', 'GCP'],
+    buys:
+      'Least-privilege containers, TLS renewed on a timer, rate limiting at the edge — and the judgement to run six containers on Compose rather than stand up a control plane for them.',
+  },
+  {
+    label: 'Store the state',
+    tools: ['PostgreSQL', 'Redis', 'SQL'],
+    buys:
+      'Advisory locks scoped to one invariant instead of a SERIALIZABLE transaction over everything, and a cache that stores failures too so a broken upstream is not also a latency regression.',
+  },
+  {
+    label: 'See inside it',
+    tools: ['OpenTelemetry', 'Grafana', 'Datadog'],
+    buys:
+      'Single-line JSON correlated by request ID, so a user can quote an ID from a response header and one grep finds their request. No log shipper required.',
+  },
+  {
+    label: 'Build the surface',
+    tools: ['TypeScript', 'React'],
+    buys:
+      'This page. Backend and platform is where I am strongest, and I would rather write that down than pretend otherwise.',
+  },
+] as const

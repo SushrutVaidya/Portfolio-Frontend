@@ -38,7 +38,8 @@ export function CountUp({ value, durationMs = 1400 }: CountUpProps) {
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs)
-      // easeOutExpo — matches --ease-expo-out's character.
+      // easeOutExpo: a counter has to decelerate into its final value or the
+      // last digits land too fast to read.
       const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
       const el = ref.current
       if (el) el.textContent = `${prefix}${(target * eased).toFixed(decimals)}${suffix}`

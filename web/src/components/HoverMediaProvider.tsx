@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useReducedMotion } from 'motion/react'
 
 /**
  * The hover-media system behind the hero sentence.
@@ -185,6 +186,98 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  /**
+   * The overlay follows the pointer.
+   *
+   * This is the site's signature interaction, and a panel parked in the middle
+   * of the screen while the reader's attention is on a word in the sentence is
+   * the version that reads as a modal rather than a response. Trailing the
+   * cursor with a lag ties the image to the word that opened it.
+   *
+   * Three things it deliberately does:
+   *   - writes `transform` in a rAF loop reading refs, never setState. A
+   *     setState per pointermove re-renders the provider — and therefore the
+   *     entire page beneath it — at pointer frequency.
+   *   - clamps against the measured panel size so the media never leaves the
+   *     viewport, measured ONCE per open rather than per frame.
+   *   - falls back to dead-centre on touch and under reduced motion, where a
+   *     pointer-chasing panel is either impossible or unwelcome.
+   */
+  const followRef = useRef<HTMLDivElement>(null)
+  const pointer = useRef({ x: 0, y: 0 })
+  const eased = useRef({ x: 0, y: 0 })
+  const seeded = useRef(false)
+  const reduceMotion = useReducedMotion()
+
+  // One passive listener for the whole app, so the panel already knows where the
+  // cursor is the instant it opens instead of flying in from the origin.
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      pointer.current.x = e.clientX
+      pointer.current.y = e.clientY
+      if (!seeded.current) {
+        eased.current.x = e.clientX
+        eased.current.y = e.clientY
+        seeded.current = true
+      }
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [])
+
+  useEffect(() => {
+    const el = followRef.current
+    if (!el) return
+
+    const centre = () => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+    const chase = hasHover && !reduceMotion && Boolean(activeId)
+
+    if (!chase) {
+      const c = centre()
+      el.style.transform = `translate3d(${c.x}px, ${c.y}px, 0) translate(-50%, -50%)`
+      return
+    }
+
+    /**
+     * Size, for the clamp. Not measured once: the effect runs before the browser
+     * has painted the <img>, so at that moment the panel is genuinely 0x0 and a
+     * clamp built on it would let a 46vw GIF run off the right edge.
+     *
+     * So it re-reads until the media reports a size, then stops. That is a
+     * handful of layout reads at the start of an open, not one per frame for as
+     * long as the overlay is up.
+     */
+    let halfW = 0
+    let halfH = 0
+    const margin = 16
+
+    let frame = 0
+    const tick = () => {
+      if (halfW === 0 || halfH === 0) {
+        const rect = el.getBoundingClientRect()
+        halfW = rect.width / 2
+        halfH = rect.height / 2
+      }
+
+      const targetX = Math.min(
+        Math.max(pointer.current.x + halfW + 28, halfW + margin),
+        window.innerWidth - halfW - margin
+      )
+      const targetY = Math.min(
+        Math.max(pointer.current.y, halfH + margin),
+        window.innerHeight - halfH - margin
+      )
+      // Exponential smoothing. The lag is the whole effect — an overlay locked
+      // to the cursor reads as a bug in the cursor.
+      eased.current.x += (targetX - eased.current.x) * 0.14
+      eased.current.y += (targetY - eased.current.y) * 0.14
+      el.style.transform = `translate3d(${eased.current.x}px, ${eased.current.y}px, 0) translate(-50%, -50%)`
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [activeId, hasHover, reduceMotion])
+
   const value = useMemo(
     () => ({ activeId, open, close, toggle, register, hasHover }),
     [activeId, open, close, toggle, register, hasHover]
@@ -197,14 +290,15 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
       {children}
       {/* Single overlay surface. aria-live announces what opened, since the
           visual is decorative and conveys nothing to a screen reader. */}
-      <div
-        className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="pointer-events-none fixed inset-0 z-50" aria-live="polite" aria-atomic="true">
         <span className="sr-only">{active ? `Showing ${active.label}` : ''}</span>
+        {/* Positioned from the top-left origin and moved entirely by transform.
+            Anchoring with left/top would force layout on every frame of the
+            follow loop — the exact mistake PERFORMANCE_NOTES.md recorded on the
+            previous site's cursor. */}
         <div
-          className={`transition-opacity duration-[var(--dur-base)] ${
+          ref={followRef}
+          className={`absolute top-0 left-0 transition-opacity duration-[var(--dur-base)] ${
             active ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -213,7 +307,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
               src={active.visual.src}
               alt=""
               aria-hidden="true"
-              className="max-h-[42vh] max-w-[80vw] border border-line-strong object-contain shadow-2xl"
+              className="max-h-[34vh] max-w-[46vw] border border-line-strong object-contain shadow-2xl"
             />
           )}
           {/* Video element is always mounted so play() isn't racing a mount. */}
@@ -223,7 +317,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
             muted
             playsInline
             aria-hidden="true"
-            className={`max-h-[42vh] max-w-[80vw] border border-line-strong object-contain shadow-2xl ${
+            className={`max-h-[34vh] max-w-[46vw] border border-line-strong object-contain shadow-2xl ${
               active?.visual.kind === 'video' ? 'block' : 'hidden'
             }`}
           >

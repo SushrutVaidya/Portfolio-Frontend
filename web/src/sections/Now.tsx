@@ -1,0 +1,114 @@
+import { Corner, EdgeLabel, Folio, Frame, Grid, col } from '@/components/layout/Frame'
+import { HoverTrigger } from '@/components/HoverTrigger'
+import { Reveal } from '@/components/Reveal'
+import { useLiveClock } from '@/hooks/useLiveClock'
+import { useStats } from '@/hooks/useStats'
+import { folio } from '@/content/chapters'
+
+/**
+ * 01 — Now.
+ *
+ * The only genuinely live content on the site, so it gets a whole viewport
+ * rather than being tucked under the name. Five values come off /api/stats and
+ * each one is an inline trigger: hover reveals a GIF or a clip, and the song
+ * keeps playing from where it left off across separate hovers rather than
+ * restarting — one continuous listen, which is the whole conceit.
+ *
+ * Two composition decisions worth naming:
+ *
+ *   - the frame is offset into the right-hand columns, because two consecutive
+ *     full-height frames with content in the same place read as one long column
+ *     no matter what's in them
+ *   - the provenance line in the bottom margin is NOT decorative and is not
+ *     aria-hidden. A reader who opens DevTools, sees a failed /api/stats and
+ *     then reads confident copy above it has caught the site lying. Saying
+ *     "cached · api unreachable" costs nothing and buys everything.
+ */
+export function Now() {
+  const { stats, live } = useStats()
+  const time = useLiveClock()
+
+  return (
+    <Frame full rule id="now" aria-labelledby="now-heading">
+      <Folio index={folio('now')} title="Now" />
+      <EdgeLabel>Live · /api/stats</EdgeLabel>
+
+      <Grid>
+        <h2 id="now-heading" className="sr-only">
+          Right now
+        </h2>
+
+        <Reveal className={col.wide} distance={16}>
+          <p className="t-display">
+            It&apos;s <span className="tabular-nums italic">{time}</span> where you are. I&apos;m in{' '}
+            <HoverTrigger
+              spec={{
+                id: 'city',
+                label: `${stats.location} city loop`,
+                visual: { kind: 'image', src: '/img/Hyderabad.gif' },
+              }}
+            >
+              {stats.location}
+            </HoverTrigger>
+            , the last song was{' '}
+            <HoverTrigger
+              spec={{
+                id: 'song',
+                label: `${stats.songName}, playing`,
+                visual: { kind: 'image', src: '/img/gintamaBreakDancing.gif' },
+                // resume:true — one continuous listen across hovers, not a
+                // restart each time. The detail that sells it.
+                audio: stats.songURL
+                  ? { src: stats.songURL, volume: 0.5, resume: true }
+                  : undefined,
+              }}
+            >
+              {stats.songName}
+            </HoverTrigger>
+            , the last game was{' '}
+            <HoverTrigger
+              spec={{
+                id: 'game',
+                label: `${stats.game} clip`,
+                visual: { kind: 'image', src: '/img/counterStrike2.gif' },
+              }}
+            >
+              {stats.game}
+            </HoverTrigger>
+            , and I&apos;m reading{' '}
+            <HoverTrigger
+              spec={{
+                id: 'book',
+                label: `${stats.bookName ?? 'this book'}, with crickets`,
+                visual: {
+                  kind: 'video',
+                  // .mov (hvc1) first for Safari's better codec support;
+                  // .mp4 fallback for everything else.
+                  sources: [
+                    { src: '/img/study.mov', type: 'video/mp4; codecs="hvc1"' },
+                    { src: '/img/study.mp4', type: 'video/mp4' },
+                  ],
+                },
+                audio: { src: '/img/crickets.mp3', volume: 0.3, loop: true },
+              }}
+            >
+              {stats.bookName ?? 'this book'}
+            </HoverTrigger>
+            .
+          </p>
+        </Reveal>
+
+        <Reveal className={`${col.right} mt-2`} delay={0.1}>
+          <p className="t-body max-w-sm text-ink-muted">
+            Four of those five come off a Spring Boot API on the same host, cached in
+            Redis. Hover any of them.
+          </p>
+        </Reveal>
+      </Grid>
+
+      <Corner at="bottom-left" decorative={false}>
+        {live === null ? 'checking…' : live ? 'live · /api/stats' : 'cached · api unreachable'}
+      </Corner>
+    </Frame>
+  )
+}

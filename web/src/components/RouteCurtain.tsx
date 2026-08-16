@@ -38,14 +38,14 @@ export function RouteCurtain() {
     <AnimatePresence>
       {playing && (
         <motion.div
-          className="pointer-events-none fixed inset-0 z-190 flex items-center justify-center bg-secondary"
+          className="pointer-events-none fixed inset-0 z-190 flex items-center justify-center bg-ink"
           initial={{ y: '100%' }}
           animate={{ y: '0%' }}
           exit={{ y: '-100%' }}
           transition={{ duration: 0.6, ease: EASE }}
           aria-hidden="true"
         >
-          <span className="font-mono text-[0.65rem] tracking-[0.4em] text-secondary-foreground uppercase">
+          <span className="t-label text-paper">
             Sushrut Vaidya
           </span>
         </motion.div>

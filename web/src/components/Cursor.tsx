@@ -72,8 +72,13 @@ export function Cursor() {
         // Circle, not a bordered square: at 16px with mix-blend-difference a
         // square read as a stray UI artifact floating over the text.
         'pointer-events-none fixed top-0 left-0 z-150 rounded-full mix-blend-difference',
-        'transition-[width,height,opacity] duration-[var(--dur-fast)] ease-[var(--ease-expo-out)]',
-        hot ? 'size-10 bg-white opacity-90' : 'size-3 bg-white opacity-70',
+        // --ease-expo-out was deleted with the old token set; an unresolvable
+        // timing function silently falls back to `ease`, which meant the one
+        // element the reader watches constantly used a curve nothing else did.
+        'transition-[width,height,opacity] duration-[var(--dur-fast)] ease-[var(--ease)]',
+        // bg-white is required by mix-blend-difference, not a palette choice:
+        // difference against white is what inverts whatever is underneath.
+        hot ? 'size-9 bg-white opacity-90' : 'size-2.5 bg-white opacity-60',
       ].join(' ')}
     />
   )

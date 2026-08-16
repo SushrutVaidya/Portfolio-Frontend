@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import Lenis from 'lenis'
 import { useLocation } from 'react-router-dom'
+import { registerLenis } from '@/lib/scroll'
 
 /**
  * Smooth scroll.
@@ -25,7 +26,8 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
 
     const lenis = new Lenis({
       duration: 1.1,
-      // Matches --ease-expo-out so scroll settles like everything else.
+      // Expo-out. Not --ease: scroll has to decelerate hard at the end or it
+      // feels like the page is still moving after you stopped asking it to.
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       wheelMultiplier: 1,
       touchMultiplier: 1.6,
@@ -33,6 +35,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       syncTouch: false,
     })
     lenisRef.current = lenis
+    // Published so the preloader and the chapter register can genuinely freeze
+    // the page. `overflow: hidden` alone does nothing here: Lenis listens on
+    // window, so the wheel event never reaches the element that is clipped.
+    registerLenis(lenis)
 
     let frame = 0
     const raf = (time: number) => {
@@ -58,6 +64,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame)
       lenis.destroy()
       lenisRef.current = null
+      registerLenis(null)
     }
   }, [])
 

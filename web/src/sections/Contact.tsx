@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Corner, Frame, Grid, col } from '@/components/layout/Frame'
+import { Bleed, Corner, Folio, Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { Magnetic } from '@/components/Magnetic'
 import { useRickroll } from '@/hooks/useRickroll'
+import { folio } from '@/content/chapters'
 import { links, profile } from '@/content/site'
 import { DUR, EASE } from '@/lib/motion'
 
@@ -15,63 +16,77 @@ const ELSEWHERE = [
 ] as const
 
 /**
- * Contact.
+ * 06 — Contact.
  *
- * The email address at display scale is the whole section. Previous versions had
- * a heading, a subheading, a button, a row of six links and a copyright line -
- * five competing elements for one instruction. Here the address IS the call to
- * action, and everything else is edge annotation.
+ * The address at mega scale IS the call to action. Previous versions had a
+ * heading, a subheading, a button, a row of six links and a copyright line —
+ * five competing elements delivering one instruction, which is how a closing
+ * frame ends up being the weakest one on the page.
+ *
+ * Everything that remains is either the address or margin annotation.
  */
 export function Contact() {
   const { trigger, victimNumber, dismiss } = useRickroll()
 
   return (
     <Frame full rule id="contact" aria-labelledby="contact-heading">
-      <Corner at="top-left">06 — contact</Corner>
+      <Folio index={folio('contact')} title="Contact" />
 
       <Grid>
-        <div className={col.full}>
+        <div className={col.bleed}>
           <h2 id="contact-heading" className="t-label">
             Get in touch
           </h2>
 
           <Reveal>
-            <Magnetic strength={8}>
-              <a
-                href={`mailto:${profile.email}`}
-                className="t-display rule-in mt-8 inline-block normal-case"
-              >
-                {profile.email}
-              </a>
-            </Magnetic>
+            <Bleed className="mt-8">
+              {/* Magnetic pull is small here deliberately: the target is nearly
+                  the width of the frame, and a large offset on an element this
+                  size reads as a bug rather than a response.
+
+                  Set at t-display rather than t-mega. A 21-character address at
+                  mega scale is wider than any viewport, and the only ways out
+                  are breaking it mid-word or letting it overflow — both worse
+                  than one step down the scale. */}
+              <Magnetic strength={6}>
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="t-display rule-in-thick inline-block break-words"
+                >
+                  {profile.email}
+                </a>
+              </Magnetic>
+            </Bleed>
           </Reveal>
 
           <Reveal delay={0.08}>
-            <p className="t-sub mt-12 max-w-lg">
-              Open to platform and backend roles. Happiest arguing about whether
-              the thing needed Kubernetes.
+            <p className="t-sub mt-14 max-w-lg">
+              Open to platform and backend roles. Happiest arguing about whether the thing
+              needed Kubernetes.
             </p>
           </Reveal>
         </div>
 
         <nav aria-label="Elsewhere" className={`${col.full} mt-24`}>
           <ul className="flex flex-wrap gap-x-10 gap-y-3 border-t border-line pt-8">
-            {ELSEWHERE.map((l) => (
-              <li key={l.label}>
+            {ELSEWHERE.map((link) => (
+              <li key={link.label}>
                 <a
-                  href={l.href}
-                  {...(l.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
-                  {...('download' in l && l.download ? { download: true } : {})}
+                  href={link.href}
+                  {...(link.external
+                    ? { target: '_blank', rel: 'noreferrer noopener' }
+                    : {})}
+                  {...('download' in link && link.download ? { download: true } : {})}
                   className="t-label rule-in"
                 >
-                  {l.label}
-                  {l.external ? ' ↗' : ''}
+                  {link.label}
+                  {link.external ? ' ↗' : ''}
                 </a>
               </li>
             ))}
             <li>
               {/* The counter behind this is a real Redis-backed endpoint, which
-                  is the joke. */}
+                  is the entire joke. */}
               <a
                 href={links.youtube}
                 target="_blank"
@@ -89,7 +104,12 @@ export function Contact() {
       <Corner at="bottom-left">
         {profile.name} · {new Date().getFullYear()}
       </Corner>
-      <Corner at="bottom-right">React · Motion · nginx</Corner>
+      {/* Hidden below sm: both labels run to ~150px at 11px mono with 0.18em
+          tracking, and a 375px viewport minus the frame inset leaves 327px for
+          the pair. They overlapped. */}
+      <Corner at="bottom-right" className="hidden sm:block">
+        React · Motion · nginx
+      </Corner>
 
       {/* role="status" so it is announced without stealing focus. */}
       <AnimatePresence>

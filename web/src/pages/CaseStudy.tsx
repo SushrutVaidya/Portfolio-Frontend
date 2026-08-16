@@ -1,277 +1,315 @@
 import { useEffect, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+import { Corner, EdgeLabel, Frame, Grid, Marker, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
-import { Pinned } from '@/components/Pinned'
-import { SplitText } from '@/components/SplitText'
 import { CountUp } from '@/components/CountUp'
 import { projects } from '@/content/projects'
-import { contrastInk } from '@/lib/color'
+import { profile } from '@/content/site'
 
 /**
- * Case study route — /work/:slug.
+ * Case study — /work/:slug.
  *
- * The project owns the entire page: its palette is applied to a wrapper element
- * so headings, rules and buttons all recolour — the approach david-hckh.com
- * takes with its .project-* classes. Scoped rather than global, so it cannot
- * leak into the shared footer.
+ * Built on the same Frame/Grid primitives as the home page, which is the point:
+ * the previous version of this route was a centred `max-w-5xl` column, so
+ * following a link from a composed page landed you in a document. Same geometry,
+ * same margins, same folios — only the accent changes.
  *
- * Structure is deliberately long-form: masthead, then narrative blocks, then
- * the engineering decisions. A recruiter reads the masthead and outcome; an
- * engineer reads the rest.
+ * The project owns the accent for the whole route. It is applied to a wrapper
+ * element rather than to documentElement: writing it to :root leaked the palette
+ * into everything mounted outside this route, which on an earlier build turned
+ * the shared footer unreadable. Custom properties inherit, so scoping them here
+ * themes the case study completely and leaks nothing.
+ *
+ * Structure is long-form on purpose. A recruiter reads the masthead and the
+ * numbers; an engineer reads the narrative and the decisions. Neither is served
+ * by collapsing the interesting parts behind accordion triggers, which is what
+ * this used to do.
  */
 export function CaseStudy() {
   const { slug } = useParams<{ slug: string }>()
   const project = projects.find((p) => p.slug === slug)
-  const reduceMotion = useReducedMotion()
-
-  // Scroll progress bar — cheap orientation cue on a long page.
-  const { scrollYProgress } = useScroll()
-  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 })
 
   useEffect(() => {
-    if (project) document.title = `${project.name} — Sushrut Vaidya`
+    if (!project) return
+    document.title = `${project.name} — ${profile.name}`
     return () => {
-      document.title = 'Sushrut Vaidya — Platform Engineer & Developer'
+      document.title = `${profile.name} — ${profile.role}`
     }
   }, [project])
 
-  if (!project) {
-    return (
-      <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-        <h1 className="text-4xl">Nothing here</h1>
-        <p className="font-mono text-sm text-muted-foreground">
-          No project matches “{slug}”.
-        </p>
-        <Link
-          to="/"
-          className="lift font-display border border-line bg-accent px-5 py-2 text-accent-ink shadow-md"
-        >
-          ← Back
-        </Link>
-      </main>
-    )
-  }
+  if (!project) return <NotFound slug={slug} />
 
-  /**
-   * Theme is scoped to this wrapper, NOT documentElement.
-   *
-   * Writing --foreground/--background to :root leaked the project palette into
-   * the Footer, which renders outside this route but in the same tree — cream
-   * ink landed on tan paper and the whole footer became unreadable. Custom
-   * properties inherit, so scoping them here themes the case study completely
-   * while leaving everything outside it alone.
-   */
-  const themeVars = {
-    '--accent': project.theme.accent,
-    '--accent-ink': contrastInk(project.theme.accent),
-    '--foreground': project.theme.ink,
-    '--background': project.theme.stock,
-  } as CSSProperties
+  const index = projects.findIndex((p) => p.slug === project.slug)
+  const next = projects[(index + 1) % projects.length]
+  const ordinal = String(index + 1).padStart(2, '0')
+  const external = project.href?.startsWith('http')
+
+  // Only --accent is overridden. The ground, the ink and the type scale stay
+  // put — a case study is a chapter of this site, not a different site.
+  const accent = { '--accent': project.theme.accent } as CSSProperties
 
   return (
-    <div style={themeVars} className="bg-background text-foreground">
-      {!reduceMotion && (
-        <motion.div
-          className="fixed top-0 left-0 z-100 h-1 w-full origin-left bg-accent"
-          style={{ scaleX: progress }}
-          aria-hidden="true"
-        />
-      )}
+    <div style={accent}>
+      <main>
+        {/* ─── Masthead ──────────────────────────────────────────── */}
+        <Frame full aria-labelledby="study-title">
+          <Corner at="top-left">
+            <span className="text-accent">{ordinal}</span>
+            <span className="mx-2 text-ink-faint">/</span>
+            work
+          </Corner>
+          <Corner at="top-right">
+            {project.year} · {project.status}
+          </Corner>
+          <EdgeLabel>{project.role}</EdgeLabel>
 
-      <main className="min-h-dvh">
-        {/* Masthead */}
-        <header className="border-b border-line px-6 py-20 md:px-12 md:py-28">
-          <div className="mx-auto max-w-5xl">
-            <Link
-              to="/"
-              className="font-mono inline-block text-xs underline decoration-2 underline-offset-4 hover:bg-accent hover:text-black "
-            >
-              ← All work
-            </Link>
+          <Grid>
+            <div className={`${col.rail} hidden lg:block`}>
+              <span aria-hidden="true" className="t-mega block text-ink-faint">
+                {ordinal}
+              </span>
+            </div>
 
-            <h1 className="mt-8 text-[clamp(2.5rem,9vw,7rem)] leading-[0.85]">
-              <SplitText immediate delay={0.15}>
+            <div className={col.main}>
+              <Link to="/" className="t-label rule-in">
+                ← All work
+              </Link>
+
+              {/* t-display, not t-mega: one of these titles is 33 characters
+                  long, and at mega scale it would set as four full-height
+                  lines. The ordinal in the rail carries the scale instead. */}
+              <h1 id="study-title" className="t-display mt-8">
                 {project.name}
-              </SplitText>
-            </h1>
+              </h1>
 
-            <p className="mt-6 max-w-2xl text-lg md:text-2xl">{project.tagline}</p>
+              <p className="t-sub mt-7 max-w-2xl font-display italic">{project.tagline}</p>
 
-            <dl className="font-mono mt-12 grid gap-x-8 gap-y-4 text-sm sm:grid-cols-3">
-              <div>
-                <dt className="text-[0.65rem] uppercase opacity-60">Year</dt>
-                <dd className="mt-1">{project.year}</dd>
-              </div>
-              <div>
-                <dt className="text-[0.65rem] uppercase opacity-60">Role</dt>
-                <dd className="mt-1">{project.role}</dd>
-              </div>
-              <div>
-                <dt className="text-[0.65rem] uppercase opacity-60">Status</dt>
-                <dd className="mt-1 capitalize">{project.status}</dd>
-              </div>
-            </dl>
+              <p className="t-body mt-8 max-w-xl text-ink-muted">{project.summary}</p>
 
-            <div className="mt-10 flex flex-wrap gap-3">
-              {project.href && (
-                <a
-                  href={project.href}
-                  target={project.href.startsWith('http') ? '_blank' : undefined}
-                  rel={project.href.startsWith('http') ? 'noreferrer noopener' : undefined}
-                  className="lift font-display border border-line bg-accent px-5 py-2.5 text-sm text-accent-ink shadow-md "
-                >
-                  {project.status === 'live' ? 'Open it' : 'Read the filing'} →
-                </a>
-              )}
-              {project.repo && (
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="lift font-display border border-line px-5 py-2.5 text-sm shadow-md "
-                >
-                  Source ↗
-                </a>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {/* Metrics band */}
-        {project.metrics && (
-          <div className="border-b border-line px-6 py-10 md:px-12">
-            <dl className="mx-auto flex max-w-5xl flex-wrap gap-x-16 gap-y-6">
-              {project.metrics.map((m) => (
-                <div key={m.label}>
-                  <dt className="sr-only">{m.label}</dt>
-                  <dd>
-                    <span className="font-display block text-4xl tabular-nums md:text-6xl">
-                      <CountUp value={m.value} />
-                    </span>
-                    <span className="font-mono mt-1 block text-xs opacity-70">{m.label}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-
-        {/* Narrative — pinned heading, scrolling body */}
-        {project.study && (
-          <section
-            aria-label="Case study"
-            className="border-b border-line px-6 py-20 md:px-12 md:py-28"
-          >
-            <div className="mx-auto max-w-6xl">
-              <Pinned
-                aside={
-                  <div>
-                    <p className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-accent">
-                      The write-up
-                    </p>
-                    <h2 className="mt-4 text-3xl leading-[0.95] md:text-5xl">
-                      How it was built
-                    </h2>
-                    <ul className="font-mono mt-8 hidden space-y-2 text-xs md:block">
-                      {project.study.map((b) => (
-                        <li key={b.index} className="opacity-60">
-                          {b.index} · {b.heading}
-                        </li>
-                      ))}
-                    </ul>
+              <dl className="mt-14 flex flex-wrap gap-x-14 gap-y-7 border-t border-line pt-8">
+                {[
+                  ['Year', project.year],
+                  ['Role', project.role],
+                  ['Status', project.status],
+                ].map(([key, value]) => (
+                  <div key={key}>
+                    <dt className="t-label">{key}</dt>
+                    <dd className="t-body mt-2 text-ink">{value}</dd>
                   </div>
-                }
-              >
-                <div className="space-y-14">
-                  {project.study.map((block) => (
-                    <Reveal key={block.index}>
-                      <article>
-                        <div className="flex items-baseline gap-4">
-                          <span
-                            aria-hidden="true"
-                            className="font-mono shrink-0 text-xs text-accent"
-                          >
-                            {block.index}
-                          </span>
-                          <h3 className="text-xl leading-tight md:text-3xl">{block.heading}</h3>
-                        </div>
-                        <p className="mt-4 max-w-prose leading-relaxed opacity-90 md:pl-10">
-                          {block.body}
-                        </p>
-                      </article>
-                    </Reveal>
-                  ))}
-                </div>
-              </Pinned>
+                ))}
+              </dl>
+
+              <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-4">
+                {project.href && (
+                  <a
+                    href={project.href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noreferrer noopener' : undefined}
+                    className="t-sub rule-in text-ink"
+                  >
+                    {project.status === 'live' ? 'Open it ↗' : 'Read the filing ↗'}
+                  </a>
+                )}
+                {project.repo && (
+                  <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="t-label rule-in"
+                  >
+                    Source ↗
+                  </a>
+                )}
+              </div>
             </div>
-          </section>
+          </Grid>
+        </Frame>
+
+        {/* ─── Numbers ───────────────────────────────────────────── */}
+        {project.metrics && (
+          <Frame rule tone="deep" aria-label="Numbers">
+            <Grid>
+              <dl className={`${col.full} grid grid-cols-2 gap-x-8 gap-y-14 lg:grid-cols-4`}>
+                {project.metrics.map((metric, i) => (
+                  <Reveal key={metric.label} delay={i * 0.06}>
+                    <div className="border-t border-line pt-6">
+                      <dt className="sr-only">{metric.label}</dt>
+                      <dd>
+                        <span className="t-display block tabular-nums">
+                          <CountUp value={metric.value} />
+                        </span>
+                        <span className="t-label mt-4 block max-w-[20ch]">{metric.label}</span>
+                      </dd>
+                    </div>
+                  </Reveal>
+                ))}
+              </dl>
+            </Grid>
+          </Frame>
         )}
 
-        {/* Engineering decisions */}
-        <section aria-label="Engineering decisions" className="px-6 py-20 md:px-12 md:py-28">
-          <div className="mx-auto max-w-5xl">
-            <Reveal>
-              <h2 className="text-2xl md:text-4xl">Decisions &amp; trade-offs</h2>
-              <p className="font-mono mt-3 text-sm opacity-70">
-                Each one states what was chosen and why the alternative was rejected.
+        {/* ─── Narrative ─────────────────────────────────────────── */}
+        {project.study && (
+          <Frame rule aria-labelledby="study-narrative">
+            <Grid>
+              <div className={col.full}>
+                {/* Letters, not numbers: the home page owns 01-06, and a
+                    second numeric sequence inside a chapter of it would read as
+                    a numbering bug rather than a sub-section. */}
+                <Marker index="A" label="how it was built" />
+              </div>
+
+              {/* Sticky contents rail. On a page this long the reader loses
+                  track of where they are, and a fixed list of the blocks is a
+                  cheaper orientation cue than a progress ring. */}
+              <div className={`${col.rail} mt-14 lg:sticky lg:top-24 lg:self-start`}>
+                <h2 id="study-narrative" className="t-heading">
+                  How it was built
+                </h2>
+                <ol className="mt-8 hidden space-y-3 lg:block">
+                  {project.study.map((block, i) => (
+                    <li key={block.index} className="t-label">
+                      <span className="text-accent">A.{i + 1}</span>
+                      <span className="mx-2 text-ink-faint">/</span>
+                      {block.heading}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div className={`${col.main} mt-14 space-y-20`}>
+                {project.study.map((block, i) => (
+                  <Reveal key={block.index}>
+                    <article>
+                      <div className="flex items-baseline gap-5">
+                        <span aria-hidden="true" className="t-label shrink-0 text-accent">
+                          A.{i + 1}
+                        </span>
+                        <h3 className="t-heading">{block.heading}</h3>
+                      </div>
+                      <p className="t-body mt-6 max-w-xl text-ink-muted lg:pl-12">
+                        {block.body}
+                      </p>
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+            </Grid>
+          </Frame>
+        )}
+
+        {/* ─── Decisions ─────────────────────────────────────────── */}
+        <Frame rule tone="deep" aria-labelledby="study-decisions">
+          <Grid>
+            <div className={col.full}>
+              <Marker index="B" label="decisions & trade-offs" />
+            </div>
+
+            <div className={`${col.rail} mt-14`}>
+              <h2 id="study-decisions" className="t-heading">
+                Decisions &amp; trade-offs
+              </h2>
+              <p className="t-body mt-6 max-w-[26ch] text-ink-muted">
+                Each states what was chosen and why the alternative was rejected.
               </p>
-            </Reveal>
+            </div>
 
-            <Reveal delay={0.05}>
-              <Accordion type="single" collapsible className="mt-10 w-full">
-                {project.highlights.map((h, i) => (
-                  <AccordionItem key={h.title} value={`h-${i}`}>
-                    <AccordionTrigger className="text-left">{h.title}</AccordionTrigger>
-                    <AccordionContent>
-                      <p className="max-w-prose leading-relaxed opacity-80">{h.detail}</p>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <ul className="mt-12 flex flex-wrap gap-2" aria-label="Full stack">
-                {project.stack.map((tech) => (
-                  <li
-                    key={tech}
-                    className="font-mono border border-line px-2.5 py-1 text-xs"
-                  >
-                    {tech}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-
-            {/* Next project — keeps the reader inside the work. */}
-            <Reveal delay={0.15}>
-              <nav aria-label="Next project" className="mt-20 border-t border-line pt-10">
-                {(() => {
-                  const i = projects.findIndex((p) => p.slug === project.slug)
-                  const next = projects[(i + 1) % projects.length]
-                  return (
-                    <Link to={`/work/${next.slug}`} className="group block">
-                      <span className="font-mono text-[0.6rem] tracking-[0.3em] uppercase opacity-60">
-                        Next
+            {/* Rendered open, not behind accordion triggers. This is the part an
+                engineer came for; making them click six times to read it is
+                optimising the page for the reader who was never going to. */}
+            <ul className={`${col.main} mt-14 border-t border-line`}>
+              {project.highlights.map((highlight, i) => (
+                // Reveal inside the li: it renders a div, and <ul><div> is
+                // invalid markup that silently costs the list its semantics.
+                <li key={highlight.title} className="border-b border-line py-8">
+                  <Reveal delay={i * 0.03}>
+                    <div className="flex items-baseline gap-5">
+                      <span aria-hidden="true" className="t-label shrink-0 text-accent">
+                        B.{i + 1}
                       </span>
-                      <span className="mt-3 block text-3xl leading-tight group-hover:text-accent md:text-5xl">
-                        {next.name} →
-                      </span>
-                    </Link>
-                  )
-                })()}
-              </nav>
-            </Reveal>
-          </div>
-        </section>
+                      <h3 className="t-heading">{highlight.title}</h3>
+                    </div>
+                    <p className="t-body mt-4 max-w-xl text-ink-muted lg:pl-12">
+                      {highlight.detail}
+                    </p>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+
+            <div className={`${col.full} mt-16`}>
+              <h3 className="t-label">Full stack</h3>
+              <p className="t-label mt-4">{project.stack.join('  ·  ')}</p>
+            </div>
+          </Grid>
+        </Frame>
+
+        {/* ─── Next ──────────────────────────────────────────────── */}
+        <Frame rule aria-label="Next project">
+          <Grid>
+            <div className={col.full}>
+              <Link to={`/work/${next.slug}`} className="group/next block">
+                <span className="t-label">Next</span>
+                <span className="t-display mt-5 block transition-transform duration-[var(--dur-base)] group-hover/next:translate-x-3">
+                  {next.name} →
+                </span>
+                <span className="t-sub mt-4 block font-display italic">{next.tagline}</span>
+              </Link>
+            </div>
+          </Grid>
+
+          <Corner at="bottom-left">
+            {profile.name} · {new Date().getFullYear()}
+          </Corner>
+        </Frame>
       </main>
     </div>
+  )
+}
+
+/**
+ * Unknown slug, and the catch-all route.
+ *
+ * Kept deliberately plain and in the site's own register — a joke 404 on a
+ * portfolio is a page that wastes the one interaction a lost reader has left.
+ */
+export function NotFound({ slug }: { slug?: string }) {
+  useEffect(() => {
+    document.title = `Not found — ${profile.name}`
+    return () => {
+      document.title = `${profile.name} — ${profile.role}`
+    }
+  }, [])
+
+  return (
+    <main>
+      <Frame full aria-labelledby="notfound-heading">
+        <Corner at="top-left">
+          <span className="text-accent">404</span>
+          <span className="mx-2 text-ink-faint">/</span>
+          not found
+        </Corner>
+
+        <Grid>
+          <div className={col.main}>
+            <h1 id="notfound-heading" className="t-display">
+              Nothing here.
+            </h1>
+            <p className="t-sub mt-8 max-w-md">
+              {slug ? (
+                <>
+                  No project matches <span className="font-mono text-ink">{slug}</span>.
+                </>
+              ) : (
+                'That address does not resolve to anything on this site.'
+              )}
+            </p>
+            <Link to="/" className="t-sub rule-in mt-12 inline-block text-ink">
+              ← Back to the start
+            </Link>
+          </div>
+        </Grid>
+      </Frame>
+    </main>
   )
 }

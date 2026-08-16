@@ -1,17 +1,24 @@
-import { Hero } from '@/sections/Hero'
-import { About } from '@/sections/About'
-import { ShowcaseScroll } from '@/sections/ShowcaseScroll'
-import { Stack } from '@/sections/Stack'
-import { Patent } from '@/sections/Patent'
+import { Intro, Statement } from '@/sections/Intro'
+import { Work } from '@/sections/Work'
+import { Ledger } from '@/sections/Ledger'
+import { Contact } from '@/sections/Contact'
 
-export function Home() {
+/**
+ * Home.
+ *
+ * Six numbered frames, one idea each. The previous composition had nine sections
+ * plus two marquees, all inside centred columns - which is why no single thing
+ * read as important. Work now occupies four consecutive full-height frames and is
+ * unmistakably the centre of the page.
+ */
+export function Home({ ready }: { ready: boolean }) {
   return (
     <>
-      <Hero />
-      <About />
-      <ShowcaseScroll />
-      <Stack />
-      <Patent />
+      <Intro ready={ready} />
+      <Statement />
+      <Work />
+      <Ledger />
+      <Contact />
     </>
   )
 }

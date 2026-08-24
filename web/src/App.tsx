@@ -8,6 +8,7 @@ import { RouteCurtain } from '@/components/RouteCurtain'
 import { Nav } from '@/components/Nav'
 import { Home } from '@/pages/Home'
 import { CaseStudy, NotFound } from '@/pages/CaseStudy'
+import { Loglens } from '@/pages/Loglens'
 import { trackPageView } from '@/lib/analytics'
 import { DUR, EASE } from '@/lib/motion'
 
@@ -69,6 +70,7 @@ export default function App() {
           >
             <Routes location={location}>
               <Route path="/" element={<Home ready={ready} />} />
+              <Route path="/loglens" element={<Loglens />} />
               <Route path="/work/:slug" element={<CaseStudy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

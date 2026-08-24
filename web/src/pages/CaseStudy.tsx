@@ -44,18 +44,31 @@ export function CaseStudy() {
   const ordinal = String(index + 1).padStart(2, '0')
   const external = project.href?.startsWith('http')
 
-  // Only --accent is overridden. The ground, the ink and the type scale stay
-  // put — a case study is a chapter of this site, not a different site.
-  const accent = { '--accent': project.theme.accent } as CSSProperties
+  // The project's hue drives the whole route: --accent for links/markers, and a
+  // soft tint wash on the masthead so each case study is unmistakably its own
+  // colour (loglens green, Forge purple, DevQuest yellow), the way the home
+  // cards are. Ground, ink and type scale stay put; only colour changes.
+  const hue = `var(--color-${project.hue})`
+  const accent = {
+    '--accent': `var(--color-${project.hue})`,
+  } as CSSProperties
 
   return (
     <div style={accent}>
       <main>
         {/* ─── Masthead ──────────────────────────────────────────── */}
-        <Frame full aria-labelledby="study-title">
+        <Frame
+          full
+          aria-labelledby="study-title"
+          style={{ backgroundColor: `color-mix(in oklab, ${hue} 8%, var(--color-paper))` }}
+        >
           <Grid>
             <div className={`${col.rail} hidden lg:block`}>
-              <span aria-hidden="true" className="t-mega block text-ink-faint">
+              <span
+                aria-hidden="true"
+                className="t-mega block font-display font-extrabold"
+                style={{ color: hue }}
+              >
                 {ordinal}
               </span>
             </div>
@@ -76,7 +89,7 @@ export function CaseStudy() {
 
               <p className="t-body mt-8 max-w-xl text-ink-muted">{project.summary}</p>
 
-              <dl className="mt-14 flex flex-wrap gap-x-14 gap-y-7 border-t border-line pt-8">
+              <dl className="mt-14 flex flex-wrap gap-x-14 gap-y-7 border-t-2 border-line-strong pt-8">
                 {[
                   ['Year', project.year],
                   ['Role', project.role],
@@ -84,28 +97,41 @@ export function CaseStudy() {
                 ].map(([key, value]) => (
                   <div key={key}>
                     <dt className="t-label">{key}</dt>
-                    <dd className="t-body mt-2 text-ink">{value}</dd>
+                    <dd className="t-body mt-2 font-display font-bold text-ink">{value}</dd>
                   </div>
                 ))}
               </dl>
 
-              <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-4">
-                {project.href && (
-                  <a
-                    href={project.href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noreferrer noopener' : undefined}
-                    className="t-sub rule-in text-ink"
-                  >
-                    {project.status === 'live' ? 'Open it ↗' : 'Read the filing ↗'}
-                  </a>
-                )}
+              <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
+                {project.href &&
+                  (external ? (
+                    <a
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="btn-pop"
+                      style={{ backgroundColor: hue, color: '#fff' }}
+                    >
+                      {project.status === 'live' ? 'Open it' : 'Read the filing'}
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    // Internal href (loglens product page): client-route, no reload.
+                    <Link
+                      to={project.href}
+                      className="btn-pop"
+                      style={{ backgroundColor: hue, color: '#fff' }}
+                    >
+                      {project.status === 'live' ? 'Open it' : 'Read the filing'}
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  ))}
                 {project.repo && (
                   <a
                     href={project.repo}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="t-label rule-in"
+                    className="btn-pop bg-paper-raised"
                   >
                     Source ↗
                   </a>
@@ -117,15 +143,18 @@ export function CaseStudy() {
 
         {/* ─── Numbers ───────────────────────────────────────────── */}
         {project.metrics && (
-          <Frame rule tone="deep" aria-label="Numbers">
-            <Grid>
+          <Frame
+            rule
+            aria-label="Numbers"
+            style={{ backgroundColor: `color-mix(in oklab, ${hue} 6%, var(--color-paper))` }}
+          >            <Grid>
               <dl className={`${col.full} grid grid-cols-2 gap-x-8 gap-y-14 lg:grid-cols-4`}>
                 {project.metrics.map((metric, i) => (
                   <Reveal key={metric.label} delay={i * 0.06}>
-                    <div className="border-t border-line pt-6">
+                    <div className="border-t-2 border-line-strong pt-6">
                       <dt className="sr-only">{metric.label}</dt>
                       <dd>
-                        <span className="t-display block tabular-nums">
+                        <span className="t-display block tabular-nums" style={{ color: hue }}>
                           <CountUp value={metric.value} />
                         </span>
                         <span className="t-label mt-4 block max-w-[20ch]">{metric.label}</span>

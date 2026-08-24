@@ -75,7 +75,7 @@ export const projects: readonly Project[] = [
       alt: 'loglens --stats collapsing near-identical errors into distinct problems',
       kind: 'image',
     },
-    href: 'https://github.com/SushrutVaidya/loglens',
+    href: '/loglens',
     repo: 'https://github.com/SushrutVaidya/loglens',
     stack: ['Java 21', 'Picocli', 'Jackson', 'JUnit 5', 'Maven', 'GraalVM native-image'],
     metrics: [

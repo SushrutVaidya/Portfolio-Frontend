@@ -94,6 +94,9 @@ await shoot('desktop-hover', {
 // A case study, on the same primitives as home.
 await shoot('desktop-case-study', { width: 1512, height: 945, path: `${BASE}/work/devquest` })
 
+// The loglens product page (long, full-page capture).
+await shoot('desktop-loglens', { width: 1512, height: 945, path: `${BASE}/loglens` })
+
 // Mobile: full page + the two frames most likely to break at 390px.
 await shoot('mobile-full', { width: 390, height: 844, path: BASE })
 for (const id of ['intro', 'now', 'contact']) {

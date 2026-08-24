@@ -4,7 +4,6 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { HoverMediaProvider } from '@/components/HoverMediaProvider'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { Preloader } from '@/components/Preloader'
-import { Cursor } from '@/components/Cursor'
 import { RouteCurtain } from '@/components/RouteCurtain'
 import { Nav } from '@/components/Nav'
 import { Home } from '@/pages/Home'
@@ -41,7 +40,6 @@ export default function App() {
   return (
     <SmoothScroll>
       <Preloader onDone={onDone} />
-      <Cursor />
       <RouteCurtain />
       <Nav />
 

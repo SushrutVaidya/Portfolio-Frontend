@@ -1,19 +1,11 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Bleed, Corner, Folio, Frame, Grid, col } from '@/components/layout/Frame'
+import { Bleed, Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { Magnetic } from '@/components/Magnetic'
+import { Swap } from '@/components/Swap'
 import { useRickroll } from '@/hooks/useRickroll'
-import { folio } from '@/content/chapters'
-import { links, profile } from '@/content/site'
-import { DUR, EASE } from '@/lib/motion'
-
-const ELSEWHERE = [
-  { label: 'GitHub', href: links.github, external: true },
-  { label: 'LinkedIn', href: links.linkedin, external: true },
-  { label: 'Steam', href: links.steam, external: true },
-  { label: 'DevQuest', href: links.devquest, external: false },
-  { label: 'Résumé', href: profile.resume, external: false, download: true },
-] as const
+import { elsewhere, profile } from '@/content/site'
+import { DUR, EASE, STAGGER_STEP } from '@/lib/motion'
 
 /**
  * 06 — Contact.
@@ -30,8 +22,6 @@ export function Contact() {
 
   return (
     <Frame full rule id="contact" aria-labelledby="contact-heading">
-      <Folio index={folio('contact')} title="Contact" />
-
       <Grid>
         <div className={col.bleed}>
           <h2 id="contact-heading" className="t-label">
@@ -67,49 +57,71 @@ export function Contact() {
           </Reveal>
         </div>
 
-        <nav aria-label="Elsewhere" className={`${col.full} mt-24`}>
-          <ul className="flex flex-wrap gap-x-10 gap-y-3 border-t border-line pt-8">
-            {ELSEWHERE.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  {...(link.external
-                    ? { target: '_blank', rel: 'noreferrer noopener' }
-                    : {})}
-                  {...('download' in link && link.download ? { download: true } : {})}
-                  className="t-label rule-in"
-                >
-                  {link.label}
-                  {link.external ? ' ↗' : ''}
-                </a>
-              </li>
-            ))}
-            <li>
-              {/* The counter behind this is a real Redis-backed endpoint, which
-                  is the entire joke. */}
-              <a
-                href={links.youtube}
-                target="_blank"
-                rel="noreferrer noopener"
-                onClick={trigger}
-                className="t-label rule-in"
-              >
-                Do not click ↗
-              </a>
-            </li>
+        {/* Elsewhere, given real room.
+            This used to be a single flat row of six 11px mono words, which made
+            the last thing on the page also the least designed thing on it. Now
+            each destination is a register row: an ordinal, the label at heading
+            scale swapping on hover, and one line on why you'd follow it. Same
+            hover-dim device as the chapter register and the work index, so it's
+            the third use of one interaction rather than a third invention. */}
+        <nav aria-label="Elsewhere" className={`${col.full} mt-28`}>
+          <h3 className="t-label">Elsewhere</h3>
+
+          <ul className="register mt-7 border-t border-line">
+            {elsewhere.map((link, i) => {
+              const glyph = link.download ? '↓' : link.external ? '↗' : '→'
+              return (
+                <li key={link.label} className="register-row border-b border-line">
+                  <Reveal delay={i * (STAGGER_STEP * 0.4)} distance={14}>
+                    <a
+                      href={link.href}
+                      {...(link.external
+                        ? { target: '_blank', rel: 'noreferrer noopener' }
+                        : {})}
+                      {...(link.download ? { download: true } : {})}
+                      {...(link.rickroll ? { onClick: trigger } : {})}
+                      // items-center, not items-baseline. Swap's clipping box
+                      // has overflow:hidden, which makes it a scroll container,
+                      // and a scroll container's flex baseline is synthesized
+                      // from its bottom edge rather than its text — so every
+                      // mono label in the row would sit a line too low.
+                      className="group/swap group/row flex items-center gap-6 py-5 lg:gap-10"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="t-label w-6 shrink-0 transition-colors group-hover/row:text-accent"
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+
+                      <Swap className="t-heading">{link.label}</Swap>
+
+                      <span className="t-label ml-auto hidden shrink-0 sm:block">
+                        {link.note}
+                      </span>
+
+                      <span
+                        aria-hidden="true"
+                        className="t-label shrink-0 transition-transform duration-[var(--dur-base)] group-hover/row:translate-x-2"
+                      >
+                        {glyph}
+                      </span>
+                    </a>
+                  </Reveal>
+                </li>
+              )
+            })}
           </ul>
         </nav>
-      </Grid>
 
-      <Corner at="bottom-left">
-        {profile.name} · {new Date().getFullYear()}
-      </Corner>
-      {/* Hidden below sm: both labels run to ~150px at 11px mono with 0.18em
-          tracking, and a 375px viewport minus the frame inset leaves 327px for
-          the pair. They overlapped. */}
-      <Corner at="bottom-right" className="hidden sm:block">
-        React · Motion · nginx
-      </Corner>
+        {/* Colophon, in flow rather than a floating corner: the two bottom
+            Corners here (name/year and a "React · Motion · nginx" strip) were
+            margin decoration, and the second chained middots. One quiet prose
+            line carries the same information. */}
+        <p className={`${col.full} t-label mt-24`}>
+          © {new Date().getFullYear()} {profile.name}. Built with React, Motion and nginx.
+        </p>
+      </Grid>
 
       {/* role="status" so it is announced without stealing focus. */}
       <AnimatePresence>

@@ -1,9 +1,8 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { Corner, EdgeLabel, Folio, Frame, Grid, Marker, col } from '@/components/layout/Frame'
+import { Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
-import { folio } from '@/content/chapters'
 import { projects, type Project } from '@/content/projects'
 
 /**
@@ -29,20 +28,14 @@ export function Work() {
   return (
     <>
       <Frame rule id="work" aria-labelledby="work-heading">
-        <Folio index={folio('work')} title="Work" />
-
         <Grid>
-          <div className={col.full}>
-            <Marker index={folio('work')} label="selected work" />
-          </div>
-
-          <div className={`${col.wide} mt-14`}>
+          <div className={col.wide}>
             <h2 id="work-heading" className="t-display">
-              Three systems I built, shipped and still maintain.
+              Open-source tools, systems, and a patent.
             </h2>
             <p className="t-sub mt-8 max-w-xl">
-              Each has a write-up covering the decisions and the trade-offs, including the
-              ones that turned out wrong.
+              Most have a write-up covering the decisions and the trade-offs, including
+              the ones that turned out wrong.
             </p>
           </div>
 
@@ -106,21 +99,6 @@ function ProjectFrame({ project, ordinal }: { project: Project; ordinal: number 
 
   return (
     <Frame full rule aria-labelledby={`project-${project.slug}`}>
-      {/* Sub-folio: the chapter number, then the item within it. The whole page
-          is numbered as one document, which is what makes six frames read as a
-          sequence rather than a scroll. */}
-      <Corner at="top-left">
-        <span className="text-accent">
-          {folio('work')}.{ordinal}
-        </span>
-        <span className="mx-2 text-ink-faint">/</span>
-        {project.name}
-      </Corner>
-      <Corner at="top-right">
-        {project.year} · {project.status}
-      </Corner>
-      <EdgeLabel>{project.stack.slice(0, 3).join(' · ')}</EdgeLabel>
-
       <div ref={ref}>
         <Grid className="items-start">
           {/* The ordinal at mega scale, faint, parallaxed. It is allowed to run
@@ -146,6 +124,12 @@ function ProjectFrame({ project, ordinal }: { project: Project; ordinal: number 
                   {project.name}
                 </Link>
               </h3>
+            </Reveal>
+
+            <Reveal delay={0.04}>
+              <p className="t-label mt-4">
+                {project.year} · {project.status}
+              </p>
             </Reveal>
 
             <Reveal delay={0.06}>

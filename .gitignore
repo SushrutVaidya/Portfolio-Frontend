@@ -10,3 +10,13 @@ sprite-buffer/
 /devquest/test/photo.jpg
 
 /devquest/test/room.jpg
+
+### Session tooling & build output (not for git) ###
+/.agents/
+/.claude/
+/skills-lock.json
+/tests/shots/
+/web/dist/
+/AWSCLIV2.pkg
+/venv/
+/reference-architecture-examples/

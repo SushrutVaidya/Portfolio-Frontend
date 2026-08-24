@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { Bleed, Corner, Frame, Grid, col } from '@/components/layout/Frame'
-import { chapters } from '@/content/chapters'
+import { Bleed, Frame, Grid, col } from '@/components/layout/Frame'
 import { experience, profile } from '@/content/site'
 import { DUR, EASE, STAGGER_STEP } from '@/lib/motion'
 
@@ -33,8 +32,6 @@ export function Intro({ ready }: { ready: boolean }) {
 
   return (
     <Frame full id="intro" aria-labelledby="intro-name">
-      <Corner at="top-right">{profile.location}</Corner>
-
       <Grid>
         <div className={col.full}>
           {/* Three ways of saying hello is one piece of information, so only
@@ -103,13 +100,10 @@ export function Intro({ ready }: { ready: boolean }) {
             keep thousands of Airflow DAGs on schedule for ten-plus engineering teams.
           </p>
           <p className="t-body mt-5 text-ink-muted">
-            I also built this — and it reads its own state as you scroll.
+            I also built this, and it reads its own state as you scroll.
           </p>
         </motion.div>
       </Grid>
-
-      <Corner at="bottom-left">Scroll</Corner>
-      <Corner at="bottom-right">{chapters.length} chapters</Corner>
     </Frame>
   )
 }

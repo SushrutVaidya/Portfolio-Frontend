@@ -135,16 +135,11 @@ const CORNER_POSITION = {
 } as const
 
 /**
- * Margin micro-copy: a folio, a label, a count, a status.
- *
- * Absolutely positioned against the Frame so it reads as annotation on a page
- * rather than content in a flow. This one device does more for perceived
- * art-direction than any amount of motion.
- *
- * aria-hidden by default, because these are usually decorative restatements of
- * something a heading already says, and announcing "zero four" before every
- * section is noise. Pass `decorative={false}` when the content is genuinely
- * only available here — the API status line, for instance.
+ * Margin micro-copy: kept deliberately sparse. After the de-tell pass this is
+ * used for exactly one thing on the page - the honest API-provenance line in
+ * the Now frame (`decorative={false}`). It is NOT for section numbers, locale
+ * strips, or restating a heading; those read as "trying to look designed" and
+ * were removed. The chapter numbers live in one place only: the nav register.
  */
 export function Corner({
   children,
@@ -161,37 +156,6 @@ export function Corner({
     <span
       aria-hidden={decorative ? 'true' : undefined}
       className={`t-label absolute ${CORNER_POSITION[at]} z-10 select-none ${className}`}
-    >
-      {children}
-    </span>
-  )
-}
-
-/**
- * The chapter folio: number in the accent, title in muted mono, on one line in
- * the top-left margin. Every numbered frame opens with this, which is what makes
- * the page read as a sequence rather than a scroll.
- */
-export function Folio({ index, title }: { index: string; title: string }) {
-  return (
-    <Corner at="top-left">
-      <span className="text-accent">{index}</span>
-      <span className="mx-2 text-ink-faint">/</span>
-      {title}
-    </Corner>
-  )
-}
-
-/**
- * Vertical label pinned to the right edge. Uses writing-mode rather than a
- * rotate transform so the text still selects, and hidden below `lg` where the
- * margin isn't wide enough to hold it without crowding the measure.
- */
-export function EdgeLabel({ children }: { children: ReactNode }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="t-label-vertical pointer-events-none absolute top-1/2 right-4 hidden -translate-y-1/2 select-none lg:block"
     >
       {children}
     </span>

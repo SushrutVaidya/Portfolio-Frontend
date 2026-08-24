@@ -1,6 +1,5 @@
-import { EdgeLabel, Folio, Frame, Grid, Marker, col } from '@/components/layout/Frame'
+import { Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
-import { folio } from '@/content/chapters'
 import { capabilities, certifications } from '@/content/site'
 
 /**
@@ -21,15 +20,8 @@ import { capabilities, certifications } from '@/content/site'
 export function Stack() {
   return (
     <Frame rule tone="deep" id="stack" aria-labelledby="stack-heading">
-      <Folio index={folio('stack')} title="Stack" />
-      <EdgeLabel>{capabilities.length} capabilities</EdgeLabel>
-
       <Grid>
-        <div className={col.full}>
-          <Marker index={folio('stack')} label="what it buys" />
-        </div>
-
-        <div className={`${col.rail} mt-14`}>
+        <div className={col.rail}>
           <h2 id="stack-heading" className="t-heading">
             The stack, by what it lets me do.
           </h2>
@@ -42,7 +34,7 @@ export function Stack() {
           </ul>
         </div>
 
-        <div className={`${col.main} mt-14`}>
+        <div className={col.main}>
           <ul className="border-t border-line">
             {capabilities.map((capability, i) => (
               // Reveal is INSIDE the li, not around it: Reveal renders a div,
@@ -50,19 +42,23 @@ export function Stack() {
               // screen reader stops announcing "list, 6 items".
               <li key={capability.label} className="border-b border-line py-8">
                 <Reveal delay={i * 0.04}>
-                  <div className="flex items-baseline gap-5">
-                    <span aria-hidden="true" className="t-label shrink-0 text-accent">
-                      {folio('stack')}.{i + 1}
-                    </span>
-                    <h3 className="t-heading">{capability.label}</h3>
-                  </div>
+                  <h3 className="t-heading">{capability.label}</h3>
 
                   <p className="t-body mt-4 max-w-xl text-ink-muted">{capability.buys}</p>
 
-                  {/* Tools as a plain mono line. Middots rather than pills: a
-                      border around each word triples the visual weight of
-                      something that is only there to be scanned. */}
-                  <p className="t-label mt-5">{capability.tools.join('  ·  ')}</p>
+                  {/* Tools as spaced mono items, not a middot-joined string:
+                      chaining `·` between six items is the separator overuse the
+                      anti-slop rubric rations. Spacing carries the list. */}
+                  <ul
+                    className="mt-5 flex flex-wrap gap-x-4 gap-y-1"
+                    aria-label={`${capability.label} tools`}
+                  >
+                    {capability.tools.map((tool) => (
+                      <li key={tool} className="t-label">
+                        {tool}
+                      </li>
+                    ))}
+                  </ul>
                 </Reveal>
               </li>
             ))}

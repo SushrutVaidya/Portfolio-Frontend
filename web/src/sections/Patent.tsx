@@ -1,6 +1,5 @@
-import { Corner, EdgeLabel, Folio, Frame, Grid, col } from '@/components/layout/Frame'
+import { Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
-import { folio } from '@/content/chapters'
 import { patent } from '@/content/site'
 
 /**
@@ -16,10 +15,6 @@ import { patent } from '@/content/site'
 export function Patent() {
   return (
     <Frame full rule id="patent" aria-labelledby="patent-heading">
-      <Folio index={folio('patent')} title="Patent" />
-      <Corner at="top-right">{patent.authority}</Corner>
-      <EdgeLabel>Granted {patent.granted}</EdgeLabel>
-
       <Grid>
         <div className={`${col.rail} hidden lg:block`}>
           <span aria-hidden="true" className="t-label">

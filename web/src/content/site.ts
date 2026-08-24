@@ -12,7 +12,8 @@ export const profile = {
   role: 'Platform Engineer',
   location: 'Hyderabad, IN',
   // Verbatim from the previous site's meta description.
-  tagline: 'Platform Engineer at Apple AdPlatforms — Java, Spring Boot, Docker, Kubernetes, AWS',
+  tagline:
+    'Platform Engineer at Apple AdPlatforms. Java, Spring Boot, Docker, Kubernetes, AWS.',
   email: 'sushrutsv@outlook.com',
   resume: '/assets/resume.pdf',
 } as const
@@ -28,13 +29,93 @@ export const links = {
 } as const
 
 /**
+ * Everywhere else, with a line each.
+ *
+ * A bare row of five words — GitHub, LinkedIn, Steam — is the least considered
+ * element on any portfolio, and it's usually the last thing a reader looks at
+ * before deciding whether to follow one. Giving each destination a note costs
+ * one line and turns a list of logos into a set of reasons.
+ *
+ * Consumed by both the contact frame and the chapter register, so the two can't
+ * drift apart.
+ */
+export interface Destination {
+  label: string
+  href: string
+  /** One line on why a reader would follow it. */
+  note: string
+  external: boolean
+  download?: boolean
+  /** Wired to the victim counter. Filtered out of the navigation. */
+  rickroll?: boolean
+}
+
+// Typed rather than `as const`: a const-asserted heterogeneous array widens to a
+// union of literal shapes, so members without `download` have no such property
+// at all and `link.download` fails to compile at every call site.
+export const elsewhere: readonly Destination[] = [
+  {
+    label: 'GitHub',
+    href: links.github,
+    note: 'the repos behind everything on this page',
+    external: true,
+  },
+  {
+    label: 'LinkedIn',
+    href: links.linkedin,
+    note: 'the formal version',
+    external: true,
+  },
+  {
+    label: 'Steam',
+    href: links.steam,
+    note: 'the honest version',
+    external: true,
+  },
+  {
+    label: 'DevQuest',
+    href: links.devquest,
+    note: 'the five-stage game, on this domain',
+    external: false,
+  },
+  {
+    label: 'Résumé',
+    href: profile.resume,
+    note: 'PDF',
+    external: false,
+    download: true,
+  },
+  {
+    label: 'Do not click',
+    href: links.youtube,
+    note: 'the counter behind this one is real',
+    external: true,
+    // Wired to the Redis-backed victim counter in the contact frame; omitted
+    // from the navigation, where a prank has no business being.
+    rickroll: true,
+  },
+]
+
+/**
  * Headline metrics. Each one must be defensible in an interview — if you
  * can't explain how it was measured, remove it.
  */
 export const metrics = [
-  { value: '90%', label: 'fewer deployment failures', detail: 'via automation and custom tooling' },
-  { value: '60%', label: 'faster pipeline execution', detail: 'Airflow DAG optimisation' },
-  { value: '10+', label: 'engineering teams supported', detail: 'internal platform tooling' },
+  {
+    value: '90%',
+    label: 'fewer deployment failures',
+    detail: 'via automation and custom tooling',
+  },
+  {
+    value: '60%',
+    label: 'faster pipeline execution',
+    detail: 'Airflow DAG optimisation',
+  },
+  {
+    value: '10+',
+    label: 'engineering teams supported',
+    detail: 'internal platform tooling',
+  },
   { value: '1', label: 'granted patent', detail: 'Government of India, 2024' },
 ] as const
 
@@ -93,37 +174,39 @@ export const capabilities = [
   {
     label: 'Ship services',
     tools: ['Java', 'Spring Boot', 'JPA / Hibernate', 'Flyway'],
-    buys:
-      'Versioned migrations that run before the application context starts, with baseline-on-migrate so a database predating version control gets adopted rather than dropped.',
+    buys: 'Versioned migrations that run before the application context starts, with baseline-on-migrate so a database predating version control gets adopted rather than dropped.',
   },
   {
     label: 'Schedule the work',
     tools: ['Apache Airflow', 'Jenkins', 'Bash'],
-    buys:
-      'Thousands of DAGs across ten-plus teams. Most of the job is making a dependency graph fail loudly at the right step instead of quietly at 4am.',
+    buys: 'Thousands of DAGs across ten-plus teams. Most of the job is making a dependency graph fail loudly at the right step instead of quietly at 4am.',
   },
   {
     label: 'Run it anywhere',
-    tools: ['Docker', 'Kubernetes', 'nginx', 'Terraform', 'AWS', 'Oracle Cloud (OCI)', 'GCP'],
-    buys:
-      'Least-privilege containers, TLS renewed on a timer, rate limiting at the edge — and the judgement to run six containers on Compose rather than stand up a control plane for them.',
+    tools: [
+      'Docker',
+      'Kubernetes',
+      'nginx',
+      'Terraform',
+      'AWS',
+      'Oracle Cloud (OCI)',
+      'GCP',
+    ],
+    buys: 'Least-privilege containers, TLS renewed on a timer, rate limiting at the edge, and the judgement to run six containers on Compose rather than stand up a control plane for them.',
   },
   {
     label: 'Store the state',
     tools: ['PostgreSQL', 'Redis', 'SQL'],
-    buys:
-      'Advisory locks scoped to one invariant instead of a SERIALIZABLE transaction over everything, and a cache that stores failures too so a broken upstream is not also a latency regression.',
+    buys: 'Advisory locks scoped to one invariant instead of a SERIALIZABLE transaction over everything, and a cache that stores failures too so a broken upstream is not also a latency regression.',
   },
   {
     label: 'See inside it',
     tools: ['OpenTelemetry', 'Grafana', 'Datadog'],
-    buys:
-      'Single-line JSON correlated by request ID, so a user can quote an ID from a response header and one grep finds their request. No log shipper required.',
+    buys: 'Single-line JSON correlated by request ID, so a user can quote an ID from a response header and one grep finds their request. No log shipper required.',
   },
   {
     label: 'Build the surface',
     tools: ['TypeScript', 'React'],
-    buys:
-      'This page. Backend and platform is where I am strongest, and I would rather write that down than pretend otherwise.',
+    buys: 'This page. Backend and platform is where I am strongest, and I would rather write that down than pretend otherwise.',
   },
 ] as const

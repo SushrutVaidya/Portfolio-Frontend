@@ -1,7 +1,6 @@
-import { Corner, EdgeLabel, Folio, Frame, Grid, Marker, col } from '@/components/layout/Frame'
+import { Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { CountUp } from '@/components/CountUp'
-import { folio } from '@/content/chapters'
 import { experience, metrics } from '@/content/site'
 
 /**
@@ -24,17 +23,10 @@ export function Practice() {
 
   return (
     <Frame rule id="practice" aria-labelledby="practice-heading">
-      <Folio index={folio('practice')} title="Practice" />
-      <EdgeLabel>{role.company}</EdgeLabel>
-
       <Grid>
-        <div className={col.full}>
-          <Marker index={folio('practice')} label="the practice" />
-        </div>
-
         {/* Manifest: mono keys, mono values, hairline-separated. Set as a
             definition list because that is genuinely what it is. */}
-        <dl className={`${col.rail} mt-14 space-y-5`}>
+        <dl className={`${col.rail} space-y-5`}>
           {[
             ['Company', role.company],
             ['Via', role.via],
@@ -48,7 +40,7 @@ export function Practice() {
           ))}
         </dl>
 
-        <div className={`${col.main} mt-14`}>
+        <div className={col.main}>
           <Reveal>
             <h2 id="practice-heading" className="t-display">
               {role.summary}
@@ -85,8 +77,6 @@ export function Practice() {
           ))}
         </dl>
       </Grid>
-
-      <Corner at="bottom-right">Figures measured, not estimated</Corner>
     </Frame>
   )
 }

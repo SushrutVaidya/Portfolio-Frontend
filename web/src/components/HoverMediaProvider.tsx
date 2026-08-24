@@ -59,7 +59,8 @@ const HoverMediaContext = createContext<HoverMediaContextValue | null>(null)
 
 export function useHoverMediaContext() {
   const ctx = useContext(HoverMediaContext)
-  if (!ctx) throw new Error('useHoverMediaContext must be used inside <HoverMediaProvider>')
+  if (!ctx)
+    throw new Error('useHoverMediaContext must be used inside <HoverMediaProvider>')
   return ctx
 }
 
@@ -114,7 +115,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
       // Autoplay can be refused before any user gesture — never throw for it.
       void el.play().catch(() => {})
     },
-    [specs]
+    [specs],
   )
 
   const open = useCallback(
@@ -123,27 +124,24 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
       setActiveId(id)
       playFor(id)
     },
-    [playFor, stopAllAudio]
+    [playFor, stopAllAudio],
   )
 
-  const close = useCallback(
-    (id: string) => {
-      setActiveId((current) => (current === id ? null : current))
-      const el = audioCache.current.get(id)
-      if (el) {
-        el.pause()
-        if (!el.dataset.resume) el.currentTime = 0
-      }
-    },
-    []
-  )
+  const close = useCallback((id: string) => {
+    setActiveId((current) => (current === id ? null : current))
+    const el = audioCache.current.get(id)
+    if (el) {
+      el.pause()
+      if (!el.dataset.resume) el.currentTime = 0
+    }
+  }, [])
 
   const toggle = useCallback(
     (id: string) => {
       if (activeId === id) close(id)
       else open(id)
     },
-    [activeId, close, open]
+    [activeId, close, open],
   )
 
   // Video follows the active overlay.
@@ -183,7 +181,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
       audioCache.current.forEach((el) => el.pause())
       audioCache.current.clear()
     },
-    []
+    [],
   )
 
   /**
@@ -260,12 +258,15 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
       }
 
       const targetX = Math.min(
-        Math.max(pointer.current.x + halfW + 28, halfW + margin),
-        window.innerWidth - halfW - margin
+        Math.max(pointer.current.x + halfW + 44, halfW + margin),
+        window.innerWidth - halfW - margin,
       )
+      // Nudged UP by a third of the plate height so it sits beside-and-above the
+      // word rather than centred on it — a plate centred on the pointer covers
+      // the line above and below the word you're actually reading.
       const targetY = Math.min(
-        Math.max(pointer.current.y, halfH + margin),
-        window.innerHeight - halfH - margin
+        Math.max(pointer.current.y - halfH * 0.35, halfH + margin),
+        window.innerHeight - halfH - margin,
       )
       // Exponential smoothing. The lag is the whole effect — an overlay locked
       // to the cursor reads as a bug in the cursor.
@@ -280,50 +281,90 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({ activeId, open, close, toggle, register, hasHover }),
-    [activeId, open, close, toggle, register, hasHover]
+    [activeId, open, close, toggle, register, hasHover],
   )
 
   const active = activeId ? specs.get(activeId) : null
+
+  /**
+   * The last thing shown, retained after close.
+   *
+   * `active` goes null the instant the pointer leaves, so rendering the media
+   * from it meant the image unmounted immediately and the 500ms fade-out played
+   * over an empty box — the overlay appeared to vanish rather than dismiss.
+   * `shown` keeps the media and its caption mounted through the fade.
+   */
+  const [shown, setShown] = useState<MediaSpec | null>(null)
+  useEffect(() => {
+    if (active) setShown(active)
+  }, [active])
 
   return (
     <HoverMediaContext.Provider value={value}>
       {children}
       {/* Single overlay surface. aria-live announces what opened, since the
           visual is decorative and conveys nothing to a screen reader. */}
-      <div className="pointer-events-none fixed inset-0 z-50" aria-live="polite" aria-atomic="true">
+      <div
+        className="pointer-events-none fixed inset-0 z-50"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <span className="sr-only">{active ? `Showing ${active.label}` : ''}</span>
         {/* Positioned from the top-left origin and moved entirely by transform.
             Anchoring with left/top would force layout on every frame of the
             follow loop — the exact mistake PERFORMANCE_NOTES.md recorded on the
             previous site's cursor. */}
-        <div
-          ref={followRef}
-          className={`absolute top-0 left-0 transition-opacity duration-[var(--dur-base)] ${
-            active ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          {active?.visual.kind === 'image' && (
-            <img
-              src={active.visual.src}
-              alt=""
-              aria-hidden="true"
-              className="max-h-[34vh] max-w-[46vw] border border-line-strong object-contain shadow-2xl"
-            />
-          )}
-          {/* Video element is always mounted so play() isn't racing a mount. */}
-          <video
-            ref={videoRef}
-            loop
-            muted
-            playsInline
+        <div ref={followRef} className="absolute top-0 left-0">
+          {/* Scale and opacity live on THIS element, not the one above it: the
+              follow loop owns the outer transform, and animating transform on
+              the same node would have the two fighting frame by frame.
+
+              A plate, not a floating image. The media sits in a bordered panel
+              with a mono cutline under it, the way a figure in print does — which
+              is what makes it read as a considered inset rather than something
+              stuck to the cursor. Sized at ~30rem: the previous 34vh/46vw was
+              small enough that on a 15" display it genuinely looked like part of
+              the pointer. */}
+          <figure
             aria-hidden="true"
-            className={`max-h-[34vh] max-w-[46vw] border border-line-strong object-contain shadow-2xl ${
-              active?.visual.kind === 'video' ? 'block' : 'hidden'
+            className={`w-fit border border-line-strong bg-paper-raised shadow-2xl transition-[opacity,transform] duration-[var(--dur-base)] ${
+              active ? 'scale-100 opacity-100' : 'scale-[0.96] opacity-0'
             }`}
           >
-            {active?.visual.kind === 'video' &&
-              active.visual.sources.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
-          </video>
+            {shown?.visual.kind === 'image' && (
+              // No explicit width/height: this is a fixed, aria-hidden overlay,
+              // not in-flow content, so it causes no layout shift, and the GIFs
+              // are mixed aspect ratios that fixed dims would distort. object-
+              // contain within the max box handles sizing; decoding async keeps
+              // the first hover from blocking the main thread.
+              <img
+                src={shown.visual.src}
+                alt=""
+                decoding="async"
+                className="block max-h-[38vh] max-w-[min(22rem,64vw)] object-contain"
+              />
+            )}
+            {/* Always mounted so play() is never racing a mount. */}
+            <video
+              ref={videoRef}
+              loop
+              muted
+              playsInline
+              className={`max-h-[38vh] max-w-[min(22rem,64vw)] object-contain ${
+                shown?.visual.kind === 'video' ? 'block' : 'hidden'
+              }`}
+            >
+              {shown?.visual.kind === 'video' &&
+                shown.visual.sources.map((s) => (
+                  <source key={s.src} src={s.src} type={s.type} />
+                ))}
+            </video>
+
+            <figcaption className="t-label flex items-baseline gap-3 border-t border-line px-3 py-2.5">
+              <span className="text-accent">◆</span>
+              {shown?.label}
+            </figcaption>
+          </figure>
         </div>
       </div>
     </HoverMediaContext.Provider>

@@ -1,9 +1,8 @@
-import { Corner, EdgeLabel, Folio, Frame, Grid, col } from '@/components/layout/Frame'
+import { Corner, Frame, Grid, col } from '@/components/layout/Frame'
 import { HoverTrigger } from '@/components/HoverTrigger'
 import { Reveal } from '@/components/Reveal'
 import { useLiveClock } from '@/hooks/useLiveClock'
 import { useStats } from '@/hooks/useStats'
-import { folio } from '@/content/chapters'
 
 /**
  * 01 — Now.
@@ -30,9 +29,6 @@ export function Now() {
 
   return (
     <Frame full rule id="now" aria-labelledby="now-heading">
-      <Folio index={folio('now')} title="Now" />
-      <EdgeLabel>Live · /api/stats</EdgeLabel>
-
       <Grid>
         <h2 id="now-heading" className="sr-only">
           Right now

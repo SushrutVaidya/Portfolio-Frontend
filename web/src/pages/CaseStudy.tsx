@@ -1,6 +1,6 @@
 import { useEffect, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Corner, EdgeLabel, Frame, Grid, Marker, col } from '@/components/layout/Frame'
+import { Frame, Grid, Marker, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { CountUp } from '@/components/CountUp'
 import { projects } from '@/content/projects'
@@ -11,8 +11,8 @@ import { profile } from '@/content/site'
  *
  * Built on the same Frame/Grid primitives as the home page, which is the point:
  * the previous version of this route was a centred `max-w-5xl` column, so
- * following a link from a composed page landed you in a document. Same geometry,
- * same margins, same folios — only the accent changes.
+ * following a link from a composed page landed you in a document. Same geometry
+ * and margins; only the accent changes.
  *
  * The project owns the accent for the whole route. It is applied to a wrapper
  * element rather than to documentElement: writing it to :root leaked the palette
@@ -31,9 +31,9 @@ export function CaseStudy() {
 
   useEffect(() => {
     if (!project) return
-    document.title = `${project.name} — ${profile.name}`
+    document.title = `${project.name} · ${profile.name}`
     return () => {
-      document.title = `${profile.name} — ${profile.role}`
+      document.title = `${profile.name} · ${profile.role}`
     }
   }, [project])
 
@@ -53,16 +53,6 @@ export function CaseStudy() {
       <main>
         {/* ─── Masthead ──────────────────────────────────────────── */}
         <Frame full aria-labelledby="study-title">
-          <Corner at="top-left">
-            <span className="text-accent">{ordinal}</span>
-            <span className="mx-2 text-ink-faint">/</span>
-            work
-          </Corner>
-          <Corner at="top-right">
-            {project.year} · {project.status}
-          </Corner>
-          <EdgeLabel>{project.role}</EdgeLabel>
-
           <Grid>
             <div className={`${col.rail} hidden lg:block`}>
               <span aria-hidden="true" className="t-mega block text-ink-faint">
@@ -239,7 +229,13 @@ export function CaseStudy() {
 
             <div className={`${col.full} mt-16`}>
               <h3 className="t-label">Full stack</h3>
-              <p className="t-label mt-4">{project.stack.join('  ·  ')}</p>
+              <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1" aria-label="Full stack">
+                {project.stack.map((tech) => (
+                  <li key={tech} className="t-label">
+                    {tech}
+                  </li>
+                ))}
+              </ul>
             </div>
           </Grid>
         </Frame>
@@ -256,11 +252,11 @@ export function CaseStudy() {
                 <span className="t-sub mt-4 block font-display italic">{next.tagline}</span>
               </Link>
             </div>
-          </Grid>
 
-          <Corner at="bottom-left">
-            {profile.name} · {new Date().getFullYear()}
-          </Corner>
+            <p className={`${col.full} t-label mt-16`}>
+              © {new Date().getFullYear()} {profile.name}
+            </p>
+          </Grid>
         </Frame>
       </main>
     </div>
@@ -275,24 +271,19 @@ export function CaseStudy() {
  */
 export function NotFound({ slug }: { slug?: string }) {
   useEffect(() => {
-    document.title = `Not found — ${profile.name}`
+    document.title = `Not found · ${profile.name}`
     return () => {
-      document.title = `${profile.name} — ${profile.role}`
+      document.title = `${profile.name} · ${profile.role}`
     }
   }, [])
 
   return (
     <main>
       <Frame full aria-labelledby="notfound-heading">
-        <Corner at="top-left">
-          <span className="text-accent">404</span>
-          <span className="mx-2 text-ink-faint">/</span>
-          not found
-        </Corner>
-
         <Grid>
           <div className={col.main}>
-            <h1 id="notfound-heading" className="t-display">
+            <span className="t-label text-accent">404</span>
+            <h1 id="notfound-heading" className="t-display mt-4">
               Nothing here.
             </h1>
             <p className="t-sub mt-8 max-w-md">

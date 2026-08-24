@@ -33,15 +33,14 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
       onBlur={() => close(spec.id)}
       onClick={hasHover ? undefined : () => toggle(spec.id)}
       className={[
-        // Italic serif inside a roman serif sentence: an editorial device that
-        // marks exactly which words are the live, changing ones. A filled accent
-        // block (what this used to be) is far too heavy at display scale on a
-        // dark ground — it read as five highlighter marks across the frame.
-        'cursor-pointer font-display italic underline decoration-1 underline-offset-[0.16em]',
-        'transition-colors duration-[var(--dur-fast)]',
+        // A bold accent-underlined word inside the sentence: the playful
+        // register wants the live words to pop, not whisper. On hover/focus the
+        // word fills with the accent block. Thick underline matches the chunky
+        // display face.
+        'cursor-pointer font-bold underline decoration-2 underline-offset-[0.14em] transition-colors duration-[var(--dur-fast)]',
         isActive
-          ? 'text-accent decoration-accent decoration-2'
-          : 'decoration-line-strong hover:text-accent hover:decoration-accent',
+          ? 'bg-accent text-accent-ink decoration-transparent'
+          : 'text-accent decoration-accent hover:bg-accent hover:text-accent-ink hover:decoration-transparent',
       ].join(' ')}
     >
       {children}

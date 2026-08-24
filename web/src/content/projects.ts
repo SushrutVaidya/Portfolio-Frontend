@@ -43,6 +43,14 @@ export interface Project {
   repo?: string
   stack: readonly string[]
   theme: ProjectTheme
+  /**
+   * Optional preview media shown on the project card. `img` is served from the
+   * repo /img/ root (nginx), not bundled. Only loglens has a real one today;
+   * cards without media get a typographic treatment instead of a fake mockup.
+   */
+  preview?: { src: string; alt: string; kind: 'image' | 'video' }
+  /** A palette colour key the card paints with. */
+  hue: 'red' | 'blue' | 'yellow' | 'green' | 'purple'
   /** The interesting engineering, not the feature list. */
   highlights: readonly { title: string; detail: string }[]
   metrics?: readonly { value: string; label: string }[]
@@ -60,8 +68,13 @@ export const projects: readonly Project[] = [
     status: 'live',
     year: '2026',
     role: 'Sole engineer',
-    // Terminal green, lifted to read on the near-black ground.
-    theme: { accent: '#7ecb8f' },
+    theme: { accent: '#2f9e57' },
+    hue: 'green',
+    preview: {
+      src: '/img/loglens-stats.gif',
+      alt: 'loglens --stats collapsing near-identical errors into distinct problems',
+      kind: 'image',
+    },
     href: 'https://github.com/SushrutVaidya/loglens',
     repo: 'https://github.com/SushrutVaidya/loglens',
     stack: ['Java 21', 'Picocli', 'Jackson', 'JUnit 5', 'Maven', 'GraalVM native-image'],
@@ -119,8 +132,8 @@ export const projects: readonly Project[] = [
     status: 'wip',
     year: '2026',
     role: 'Creator',
-    // Ember copper, for a thing called Forge.
-    theme: { accent: '#e0894c' },
+    theme: { accent: '#9b6dff' },
+    hue: 'purple',
     repo: 'https://github.com/SushrutVaidya/forge',
     stack: ['Java', 'Custom DI container', 'Annotation processing', 'LLM providers'],
     highlights: [
@@ -150,8 +163,8 @@ export const projects: readonly Project[] = [
     status: 'live',
     year: '2026',
     role: 'Sole engineer: API, frontend, infrastructure',
-    // DevQuest's own brand yellow, warmed so it doesn't glare on near-black.
-    theme: { accent: '#f2c14e' },
+    theme: { accent: '#f7c948' },
+    hue: 'yellow',
     href: '/devquest/landing.html',
     repo: 'https://github.com/SushrutVaidya/Portfolio-Backend',
     stack: [
@@ -243,8 +256,8 @@ export const projects: readonly Project[] = [
     status: 'live',
     year: '2026',
     role: 'Sole engineer: platform and deployment',
-    // Lifted well off #176cfe, which fails contrast against this ground.
-    theme: { accent: '#6aa6ff' },
+    theme: { accent: '#2f6fed' },
+    hue: 'blue',
     repo: 'https://github.com/SushrutVaidya/Portfolio-Backend',
     stack: ['Docker Compose', 'nginx', 'certbot', 'PostgreSQL', 'Redis', 'Oracle Cloud'],
     study: [
@@ -296,7 +309,8 @@ export const projects: readonly Project[] = [
     status: 'archived',
     year: '2022-24',
     role: 'Co-inventor',
-    theme: { accent: '#dfd94f' },
+    theme: { accent: '#f54e00' },
+    hue: 'red',
     href: 'https://ycce.edu/wp-content/uploads/2025/01/107_202221077674.pdf',
     stack: ['PLC', 'IoT sensors', 'Control systems'],
     highlights: [

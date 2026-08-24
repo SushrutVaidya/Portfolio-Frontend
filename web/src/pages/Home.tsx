@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { Intro } from '@/sections/Intro'
 import { Now } from '@/sections/Now'
 import { Work } from '@/sections/Work'
+import { Playground } from '@/sections/Playground'
 import { Practice } from '@/sections/Practice'
 import { Stack } from '@/sections/Stack'
 import { Patent } from '@/sections/Patent'
@@ -38,6 +39,7 @@ export function Home({ ready }: { ready: boolean }) {
       <Intro ready={ready} />
       <Now />
       <Work />
+      <Playground />
       <Practice />
       <Stack />
       <Patent />

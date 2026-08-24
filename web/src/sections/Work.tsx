@@ -1,204 +1,176 @@
-import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { Frame, Grid, col } from '@/components/layout/Frame'
-import { Reveal } from '@/components/Reveal'
+import { motion, useReducedMotion } from 'motion/react'
+import { Frame, Grid } from '@/components/layout/Frame'
 import { projects, type Project } from '@/content/projects'
+import { DUR, EASE } from '@/lib/motion'
 
 /**
- * 02 — Work.
+ * Work.
  *
- * The centrepiece, and it's built to look like one.
+ * The centrepiece, as a colour bento of sticker-cards rather than one full-height
+ * frame per project. Each card carries its project's hue as a soft ground and a
+ * bold accent; loglens is featured wide with its real demo GIF. Cards press into
+ * their offset shadow on hover (card-pop) and link through to the long-form
+ * case study at /work/:slug, where the depth lives.
  *
- * Structure: an index frame that lists all three as a register — the same
- * hover-dimming device as the navigation, so the reader learns one interaction
- * and reuses it — then one project per FULL-HEIGHT frame.
- *
- * Cards were the wrong container. A row of cards says "here are three
- * comparable items, pick one"; a frame says "look at this one thing". Since the
- * claim being made is that these are substantial pieces of engineering, they get
- * the room to be substantial in.
- *
- * There are no project screenshots in the repo and none are invented here, so
- * the visual treatment is typographic: the ordinal set at mega scale in a rail,
- * parallaxing gently against the content, with the axis mirroring on every other
- * project so the chapter doesn't read as one layout repeated three times.
+ * Bento rhythm: loglens is the full-width feature card (it has a real preview),
+ * then the other four sit as equal quarter-cards in one row. Five cells for five
+ * projects, and no card is left stretched tall-and-empty.
  */
+
+// Column spans per card. Base col-span-4 is full width on the 4-col mobile grid.
+const SPAN = [
+  'col-span-4 lg:col-span-12',
+  'col-span-4 sm:col-span-2 lg:col-span-3',
+  'col-span-4 sm:col-span-2 lg:col-span-3',
+  'col-span-4 sm:col-span-2 lg:col-span-3',
+  'col-span-4 sm:col-span-2 lg:col-span-3',
+] as const
+
 export function Work() {
   return (
-    <>
-      <Frame rule id="work" aria-labelledby="work-heading">
-        <Grid>
-          <div className={col.wide}>
-            <h2 id="work-heading" className="t-display">
-              Open-source tools, systems, and a patent.
-            </h2>
-            <p className="t-sub mt-8 max-w-xl">
-              Most have a write-up covering the decisions and the trade-offs, including
-              the ones that turned out wrong.
-            </p>
-          </div>
+    <Frame id="work" aria-labelledby="work-heading">
+      <Grid>
+        <div className="col-span-4 lg:col-span-12">
+          <h2 id="work-heading" className="t-display">
+            Open-source tools, systems,
+            <br />
+            and <span className="text-accent">a patent</span>.
+          </h2>
+          <p className="t-sub mt-6 max-w-xl">
+            Most have a write-up covering the decisions and the trade-offs, including the
+            ones that turned out wrong.
+          </p>
+        </div>
+      </Grid>
 
-          {/* The register. Doubles as a table of contents and as the fastest
-              route for a reader who already knows what they're looking for. */}
-          <nav aria-label="Projects" className={`${col.full} mt-24`}>
-            <ul className="register border-t border-line">
-              {projects.map((project, i) => (
-                <li key={project.slug} className="register-row border-b border-line">
-                  <Link
-                    to={`/work/${project.slug}`}
-                    className="group/row flex flex-wrap items-baseline gap-x-6 gap-y-1 py-5 lg:gap-x-10"
-                  >
-                    <span className="t-label w-8 shrink-0 transition-colors group-hover/row:text-accent">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="t-heading transition-transform duration-[var(--dur-base)] group-hover/row:translate-x-3">
-                      {project.name}
-                    </span>
-                    <span className="t-label ml-auto shrink-0">
-                      {project.year} · {project.status}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </Grid>
-      </Frame>
-
-      {projects.map((project, i) => (
-        <ProjectFrame key={project.slug} project={project} ordinal={i + 1} />
-      ))}
-    </>
+      <Grid className="mt-14 lg:mt-20">
+        {projects.map((project, i) => (
+          <ProjectCard key={project.slug} project={project} ordinal={i + 1} span={SPAN[i]} />
+        ))}
+      </Grid>
+    </Frame>
   )
 }
 
-function ProjectFrame({ project, ordinal }: { project: Project; ordinal: number }) {
-  const ref = useRef<HTMLDivElement>(null)
+function ProjectCard({
+  project,
+  ordinal,
+  span,
+}: {
+  project: Project
+  ordinal: number
+  span: string
+}) {
   const reduceMotion = useReducedMotion()
+  const featured = Boolean(project.preview)
+  const hueVar = `var(--color-${project.hue})`
+  // A pastel ground: the hue mixed into white so ink stays readable on it.
+  const tint = `color-mix(in oklab, ${hueVar} 12%, white)`
 
-  /**
-   * Every other project mirrors: measure on the left, ordinal rail on the right.
-   *
-   * Three consecutive frames with identical geometry is a template applied three
-   * times, and it reads as one. Flipping the axis costs two class strings and
-   * makes the chapter feel art-directed per project rather than generated from
-   * a loop — which, to be fair, it still is.
-   */
-  const mirrored = ordinal % 2 === 0
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  })
-  // Small on purpose. A large parallax on type is motion sickness, not design.
-  const numberY = useTransform(scrollYProgress, [0, 1], ['14%', '-14%'])
-
-  const label = String(ordinal).padStart(2, '0')
-  const external = project.href?.startsWith('http')
+  const statusLabel =
+    project.status === 'live' ? 'Live' : project.status === 'wip' ? 'In progress' : 'Archived'
 
   return (
-    <Frame full rule aria-labelledby={`project-${project.slug}`}>
-      <div ref={ref}>
-        <Grid className="items-start">
-          {/* The ordinal at mega scale, faint, parallaxed. It is allowed to run
-              wider than its two-column rail: type spilling into the gutter is
-              the effect, not a bug. */}
-          <div className={`${mirrored ? col.railRight : col.rail} hidden lg:block`}>
-            <motion.span
+    <motion.article
+      className={span}
+      initial={reduceMotion ? undefined : { opacity: 0, y: 28 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: DUR.base, ease: EASE, delay: (ordinal - 1) * 0.06 }}
+    >
+      <Link
+        to={`/work/${project.slug}`}
+        aria-label={`${project.name}: read the write-up`}
+        className="card-pop group/card flex h-full flex-col overflow-hidden"
+        style={{ backgroundColor: tint }}
+      >
+        {/* Featured preview: the real loglens GIF, in a bordered inset. */}
+        {project.preview && (
+          <div className="border-b-2 border-line-strong bg-paper-deep">
+            <img
+              src={project.preview.src}
+              alt={project.preview.alt}
+              loading="lazy"
+              decoding="async"
+              className="block max-h-[42vh] w-full object-contain object-center"
+            />
+          </div>
+        )}
+
+        <div className="flex flex-1 flex-col p-6 lg:p-8">
+          {/* Top row: ordinal in the hue + status pill. */}
+          <div className="flex items-center justify-between">
+            <span
               aria-hidden="true"
-              className="t-mega block text-ink-faint"
-              style={reduceMotion ? undefined : { y: numberY }}
+              className="font-display text-3xl font-extrabold tabular-nums"
+              style={{ color: hueVar }}
             >
-              {label}
-            </motion.span>
+              {String(ordinal).padStart(2, '0')}
+            </span>
+            <span className="t-label inline-flex items-center gap-2 rounded-full border-2 border-line-strong bg-paper-raised px-3 py-1 text-ink">
+              <span
+                aria-hidden="true"
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: hueVar }}
+              />
+              {statusLabel}
+            </span>
           </div>
 
-          <div className={mirrored ? col.mainLeft : col.main}>
-            <Reveal>
-              {/* The project name IS the link to its write-up. A separate
-                  "read more" button under a non-interactive heading is a
-                  smaller target for more markup. */}
-              <h3 id={`project-${project.slug}`} className="t-display">
-                <Link to={`/work/${project.slug}`} className="rule-in-thick">
-                  {project.name}
-                </Link>
-              </h3>
-            </Reveal>
+          <h3 className="t-heading mt-5">
+            <span className="rule-in-thick">{project.name}</span>
+          </h3>
+          <p className="t-sub mt-3">{project.tagline}</p>
 
-            <Reveal delay={0.04}>
-              <p className="t-label mt-4">
-                {project.year} · {project.status}
-              </p>
-            </Reveal>
+          {/* Featured card gets the summary + metrics; the rest stay compact so
+              the bento row-heights don't diverge wildly. */}
+          {featured && (
+            <p className="t-body mt-5 max-w-xl text-ink-muted">{project.summary}</p>
+          )}
 
-            <Reveal delay={0.06}>
-              <p className="t-sub mt-7 max-w-2xl font-display italic">{project.tagline}</p>
-            </Reveal>
+          {featured && project.metrics && (
+            <dl className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
+              {project.metrics.slice(0, 3).map((m) => (
+                <div key={m.label}>
+                  <dt className="sr-only">{m.label}</dt>
+                  <dd>
+                    <span className="font-display text-2xl font-extrabold tabular-nums">
+                      {m.value}
+                    </span>
+                    <span className="t-label mt-1 block max-w-[16ch]">{m.label}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
 
-            <Reveal delay={0.1}>
-              <p className="t-body mt-8 max-w-xl text-ink-muted">{project.summary}</p>
-            </Reveal>
-
-            {project.metrics && (
-              <Reveal delay={0.14}>
-                <dl className="mt-14 flex flex-wrap gap-x-14 gap-y-7">
-                  {project.metrics.slice(0, 3).map((m) => (
-                    <div key={m.label}>
-                      <dt className="sr-only">{m.label}</dt>
-                      <dd>
-                        <span className="t-heading block tabular-nums">{m.value}</span>
-                        <span className="t-label mt-2 block max-w-[16ch]">{m.label}</span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </Reveal>
-            )}
-
-            <Reveal delay={0.18}>
-              <ul
-                className="mt-14 flex flex-wrap gap-x-5 gap-y-2"
-                aria-label={`${project.name} stack`}
+          {/* Stack chips, capped so cards stay tidy. */}
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label={`${project.name} stack`}>
+            {project.stack.slice(0, featured ? 6 : 4).map((tech) => (
+              <li
+                key={tech}
+                className="t-label rounded-full border border-line-strong bg-paper-raised px-2.5 py-1 text-ink"
               >
-                {project.stack.map((tech) => (
-                  <li key={tech} className="t-label">
-                    {tech}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
+                {tech}
+              </li>
+            ))}
+          </ul>
 
-            <Reveal delay={0.22}>
-              <div className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-line pt-8">
-                <Link to={`/work/${project.slug}`} className="t-sub rule-in text-ink">
-                  Read the write-up
-                </Link>
-                {project.href && (
-                  <a
-                    href={project.href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noreferrer noopener' : undefined}
-                    className="t-label rule-in"
-                  >
-                    {project.status === 'live' ? 'Open ↗' : 'Filing ↗'}
-                  </a>
-                )}
-                {project.repo && (
-                  <a
-                    href={project.repo}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="t-label rule-in"
-                  >
-                    Source ↗
-                  </a>
-                )}
-              </div>
-            </Reveal>
+          {/* CTA pinned to the card foot. */}
+          <div className="mt-auto flex items-center gap-2 pt-8">
+            <span className="t-label text-ink">
+              {project.study ? 'Read the write-up' : 'See the repo'}
+            </span>
+            <span
+              aria-hidden="true"
+              className="transition-transform duration-[var(--dur-fast)] ease-[var(--ease-pop)] group-hover/card:translate-x-1"
+            >
+              →
+            </span>
           </div>
-        </Grid>
-      </div>
-    </Frame>
+        </div>
+      </Link>
+    </motion.article>
   )
 }

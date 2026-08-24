@@ -24,11 +24,12 @@ export interface Chapter {
 
 export const chapters: readonly Chapter[] = [
   { id: 'now', index: '01', title: 'Now', note: 'live state, read from the API' },
-  { id: 'work', index: '02', title: 'Work', note: 'three systems, with write-ups' },
-  { id: 'practice', index: '03', title: 'Practice', note: 'the role, and what came of it' },
-  { id: 'stack', index: '04', title: 'Stack', note: 'grouped by what it buys' },
-  { id: 'patent', index: '05', title: 'Patent', note: 'granted, Government of India' },
-  { id: 'contact', index: '06', title: 'Contact', note: 'one address' },
+  { id: 'work', index: '02', title: 'Work', note: 'tools, systems, a patent' },
+  { id: 'playground', index: '03', title: 'Playground', note: 'run loglens, see Forge' },
+  { id: 'practice', index: '04', title: 'Practice', note: 'the role, and what came of it' },
+  { id: 'stack', index: '05', title: 'Stack', note: 'grouped by what it buys' },
+  { id: 'patent', index: '06', title: 'Patent', note: 'granted, Government of India' },
+  { id: 'contact', index: '07', title: 'Contact', note: 'one address' },
 ] as const
 
 /** Folio lookup, so a section can't disagree with the nav about its number. */

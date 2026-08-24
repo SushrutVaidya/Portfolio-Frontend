@@ -59,10 +59,28 @@ export function Frame({
   style,
   ...aria
 }: FrameProps) {
+  // A `deep` frame is a dark colour-block inside the cream page. Because every
+  // token is a CSS variable, flipping the ink/line vars here re-colours all
+  // descendants automatically, so the same sections read correctly on light or
+  // dark ground without per-child overrides. Merged after `style` so an
+  // incoming accent (case-study route) still wins on --accent.
+  const deepVars: CSSProperties =
+    tone === 'deep'
+      ? ({
+          '--ink': '#f4f2ea',
+          '--ink-muted': '#b3ada0',
+          '--ink-faint': '#6d685c',
+          '--line': 'rgb(244 242 234 / 0.16)',
+          '--line-strong': '#f4f2ea',
+          '--paper-raised': '#2a2723',
+          color: 'var(--ink)',
+        } as CSSProperties)
+      : {}
+
   return (
     <section
       id={id}
-      style={style}
+      style={{ ...deepVars, ...style }}
       {...aria}
       className={[
         'relative w-full px-6 sm:px-10 lg:px-16',

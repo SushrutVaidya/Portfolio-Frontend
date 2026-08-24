@@ -1,13 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-// Self-hosted fonts (via @fontsource), NOT a Google Fonts <link>: a render-
-// blocking third-party request on first paint is both a perf and a privacy
-// cost, and the guidelines call it out. Newsreader carries the display serif
-// incl. its italic (used for inline emphasis); Inter the body; JetBrains Mono
-// every readout. All variable, so one axis file covers every weight.
-import '@fontsource-variable/newsreader'
-import '@fontsource-variable/newsreader/standard-italic.css'
+// Self-hosted fonts (via @fontsource), NOT a Google Fonts <link>. Bricolage
+// Grotesque carries the chunky playful display; Inter the body; JetBrains Mono
+// the readouts. All variable, so one axis file covers every weight.
+import '@fontsource-variable/bricolage-grotesque'
 import '@fontsource-variable/inter'
 import '@fontsource-variable/jetbrains-mono'
 import './index.css'

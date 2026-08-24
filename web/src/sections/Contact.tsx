@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Bleed, Frame, Grid, col } from '@/components/layout/Frame'
+import { Frame, Grid, col } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { Magnetic } from '@/components/Magnetic'
 import { Swap } from '@/components/Swap'
@@ -24,33 +24,29 @@ export function Contact() {
     <Frame full rule id="contact" aria-labelledby="contact-heading">
       <Grid>
         <div className={col.bleed}>
-          <h2 id="contact-heading" className="t-label">
-            Get in touch
+          <h2 id="contact-heading" className="t-display">
+            Let&apos;s build something
+            <br />
+            <span className="text-accent">unnecessarily robust</span>.
           </h2>
 
           <Reveal>
-            <Bleed className="mt-8">
-              {/* Magnetic pull is small here deliberately: the target is nearly
-                  the width of the frame, and a large offset on an element this
-                  size reads as a bug rather than a response.
-
-                  Set at t-display rather than t-mega. A 21-character address at
-                  mega scale is wider than any viewport, and the only ways out
-                  are breaking it mid-word or letting it overflow — both worse
-                  than one step down the scale. */}
-              <Magnetic strength={6}>
+            <div className="mt-10">
+              <Magnetic strength={8}>
                 <a
                   href={`mailto:${profile.email}`}
-                  className="t-display rule-in-thick inline-block break-words"
+                  className="btn-pop bg-accent text-accent-ink"
+                  style={{ fontSize: 'var(--text-sub)' }}
                 >
                   {profile.email}
+                  <span aria-hidden="true">→</span>
                 </a>
               </Magnetic>
-            </Bleed>
+            </div>
           </Reveal>
 
           <Reveal delay={0.08}>
-            <p className="t-sub mt-14 max-w-lg">
+            <p className="t-sub mt-10 max-w-lg">
               Open to platform and backend roles. Happiest arguing about whether the thing
               needed Kubernetes.
             </p>

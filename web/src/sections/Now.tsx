@@ -34,9 +34,14 @@ export function Now() {
           Right now
         </h2>
 
-        <Reveal className={col.wide} distance={16}>
+        <div className={col.wide}>
+          <span className="t-label text-accent">Now</span>
+        </div>
+
+        <Reveal className={`${col.wide} mt-4`} distance={16}>
           <p className="t-display">
-            It&apos;s <span className="tabular-nums italic">{time}</span> where you are. I&apos;m in{' '}
+            It&apos;s <span className="tabular-nums italic text-accent">{time}</span> where you
+            are. I&apos;m in{' '}
             <HoverTrigger
               spec={{
                 id: 'city',

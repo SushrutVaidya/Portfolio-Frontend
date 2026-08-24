@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   AnimatePresence,
@@ -36,7 +36,6 @@ const DESTINATIONS = elsewhere.filter((l) => !l.rickroll)
  */
 export function Nav() {
   const [open, setOpen] = useState(false)
-  const [retracted, setRetracted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -44,7 +43,6 @@ export function Nav() {
 
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
-  const lastY = useRef(0)
 
   const { scrollY, scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, {
@@ -53,16 +51,11 @@ export function Nav() {
     mass: 0.25,
   })
 
-  /* Retract on scroll-down, return on scroll-up. Driven off Motion's scrollY
-     (rAF-batched, no layout reads) rather than a raw window scroll listener,
-     which the guidelines flag as a reflow/mobile-perf hazard. setState only
-     flips at the thresholds, so React bails on the no-op frames. */
+  /* Just a solid-background flag once you leave the top; the bar itself no
+     longer retracts. Driven off Motion's scrollY (rAF-batched, no layout
+     reads), and setState only flips once at the threshold. */
   useMotionValueEvent(scrollY, 'change', (y) => {
     setScrolled(y > 24)
-    if (Math.abs(y - lastY.current) > 8) {
-      setRetracted(y > lastY.current && y > 160)
-      lastY.current = y
-    }
   })
 
   const close = useCallback(() => setOpen(false), [])
@@ -129,20 +122,15 @@ export function Nav() {
   return (
     <>
       {/* ─── The bar ─────────────────────────────────────────────── */}
-      <motion.header
+      {/* Always visible: a plain <header>, not a retracting one. The bar used to
+          slide away on scroll-down, which read as the nav "vanishing"; keeping
+          it fixed and static is calmer and means Index is always one click
+          away. Solid ground once scrolled so it never sits over content. */}
+      <header
         className={[
-          'fixed top-0 left-0 z-180 w-full',
-          // Solid ground rather than a backdrop blur: blur over a full-bleed
-          // dark composition costs a compositor layer for an effect nobody
-          // can see, and glassmorphism is the AI-portfolio house style.
-          scrolled && !open ? 'border-b border-line bg-paper' : '',
+          'fixed top-0 left-0 z-180 w-full transition-colors duration-[var(--dur-base)]',
+          scrolled && !open ? 'border-b-2 border-line-strong bg-paper' : '',
         ].join(' ')}
-        // Never retracts under reduced motion: a bar sliding the full height of
-        // itself is exactly the kind of large moving surface that setting exists
-        // to suppress, and Motion's JS animations are not covered by the
-        // transition-duration override in index.css.
-        animate={{ y: retracted && !open && !reduceMotion ? '-100%' : '0%' }}
-        transition={{ duration: DUR.base, ease: EASE }}
       >
         {/* Progress hairline, welded to the very top edge. */}
         {!reduceMotion && (
@@ -187,7 +175,7 @@ export function Nav() {
             </span>
           </button>
         </div>
-      </motion.header>
+      </header>
 
       {/* ─── The chapter register ────────────────────────────────── */}
       <AnimatePresence>
@@ -204,6 +192,20 @@ export function Nav() {
             // that scrolling cannot get back. mt-auto on the inner wrapper keeps
             // the bottom-anchored composition when it does fit.
             className="fixed inset-0 z-170 flex flex-col overflow-y-auto overscroll-contain bg-paper-deep px-6 pt-24 pb-10 sm:px-10 lg:px-16"
+            // The register is a dark colour-block over the cream page. Ink is
+            // dark by default now, so re-scope the ink/line vars to light here
+            // or every chapter title renders dark-on-dark and vanishes.
+            style={
+              {
+                '--ink': '#f4f2ea',
+                '--ink-muted': '#b3ada0',
+                '--ink-faint': '#6d685c',
+                '--line': 'rgb(244 242 234 / 0.16)',
+                '--line-strong': '#f4f2ea',
+                '--paper-raised': '#2a2723',
+                color: 'var(--ink)',
+              } as CSSProperties
+            }
             initial={reduceMotion ? { opacity: 0 } : { y: '-100%' }}
             animate={reduceMotion ? { opacity: 1 } : { y: '0%' }}
             exit={reduceMotion ? { opacity: 0 } : { y: '-100%' }}

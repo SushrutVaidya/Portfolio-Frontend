@@ -23,7 +23,7 @@ const BASE = process.argv[2] ?? 'http://localhost:5173'
 const OUT = new URL('./shots/', import.meta.url).pathname
 
 // The chapters, in order. Ids match content/chapters.ts + the intro/project frames.
-const SECTIONS = ['intro', 'now', 'work', 'practice', 'stack', 'patent', 'contact']
+const SECTIONS = ['intro', 'now', 'work', 'playground', 'practice', 'stack', 'patent', 'contact']
 
 await mkdir(OUT, { recursive: true })
 
@@ -35,7 +35,10 @@ async function shoot(label, { width, height, path, actions }) {
     deviceScaleFactor: 2, // retina, so type rendering is judged at real fidelity
   })
   const page = await ctx.newPage()
-  await page.goto(path, { waitUntil: 'networkidle' })
+  // domcontentloaded, not networkidle: the page has a looping animation (the
+  // Forge ritual) and lazy GIFs, so the network never goes fully idle and
+  // networkidle would time out. The fixed wait below covers settle.
+  await page.goto(path, { waitUntil: 'domcontentloaded' })
   // Let the preloader (1.2s) clear and entrance animations settle.
   await page.waitForTimeout(2600)
   if (actions) await actions(page)

@@ -349,3 +349,18 @@
     transform: translateX(2px);
   }
 }
+
+/* Jukebox equaliser bars: bounce while a track plays. */
+@media (prefers-reduced-motion: no-preference) {
+  .jb-eq {
+    animation: jb-eq 0.7s var(--ease) infinite alternate;
+  }
+}
+@keyframes jb-eq {
+  from {
+    height: 4px;
+  }
+  to {
+    height: 16px;
+  }
+}

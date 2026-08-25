@@ -87,3 +87,48 @@ export const testimonial = {
 
 /** Rarity/trait hue helper. */
 export const hueVar = (h: string) => `var(--color-${h})`
+
+/**
+ * The gaming corner, restored from the old page but made honest.
+ *
+ * `tracks` is the OST rotation used as a fallback when /api/jukebox/tracks is
+ * unreachable: these are real game soundtracks, so listing them is true even
+ * without audio. `regulars` are games actually played, WITHOUT the invented
+ * hour counts the old page faked. `jokeStats` and the leaderboard are kept as
+ * openly comedic bits (they read as humour, not telemetry), which is the only
+ * honest way to reproduce data that never had a backend.
+ */
+export const tracks = [
+  { title: 'Corridors of Time', from: 'Chrono Trigger' },
+  { title: 'Weight of the World', from: 'NieR: Automata' },
+  { title: 'To Zanarkand', from: 'Final Fantasy X' },
+  { title: 'One-Winged Angel', from: 'Final Fantasy VII' },
+  { title: 'Dragonborn', from: 'Skyrim' },
+  { title: 'Megalovania', from: 'Undertale' },
+] as const
+
+export const regulars = [
+  { name: 'Counter-Strike 2', emoji: '🔫' },
+  { name: 'Elden Ring', emoji: '⚔️' },
+  { name: 'Hades', emoji: '🔥' },
+  { name: 'Hollow Knight', emoji: '🦋' },
+  { name: 'Stardew Valley', emoji: '🌾' },
+  { name: 'Sekiro', emoji: '🗡️' },
+] as const
+
+// Deliberately unscientific: framed as a joke, not a metric.
+export const jokeStats = [
+  { label: 'Malenia attempts', value: '47', note: 'and counting', hue: 'red' },
+  { label: 'Backlog', value: 'growing', note: 'faster than I play', hue: 'purple' },
+  { label: 'Rage quits', value: 'classified', note: 'for legal reasons', hue: 'yellow' },
+  { label: 'Completion rate', value: 'optimistic', note: 'we do not talk about it', hue: 'green' },
+] as const
+
+// A leaderboard that is honestly a bit: it is about me, not fake strangers.
+export const leaderboard = [
+  { rank: 1, name: 'The backlog', note: 'undefeated' },
+  { rank: 2, name: 'The 6am alarm', note: 'also undefeated' },
+  { rank: 3, name: 'Me', note: 'trying my best' },
+  { rank: 4, name: 'Malenia', note: 'rent free' },
+] as const
+

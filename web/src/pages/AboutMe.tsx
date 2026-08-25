@@ -4,9 +4,20 @@ import { motion, useReducedMotion } from 'motion/react'
 import { Frame, Grid } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { SkillBar } from '@/components/SkillBar'
+import { Jukebox } from '@/components/Jukebox'
 import { useStats } from '@/hooks/useStats'
 import { api, type SteamGame } from '@/lib/api'
-import { character, interests, lore, testimonial, traits, hueVar } from '@/content/aboutme'
+import {
+  character,
+  interests,
+  jokeStats,
+  leaderboard,
+  lore,
+  regulars,
+  testimonial,
+  traits,
+  hueVar,
+} from '@/content/aboutme'
 import { profile } from '@/content/site'
 import { DUR, EASE } from '@/lib/motion'
 
@@ -145,12 +156,12 @@ export function AboutMe() {
           </div>
         </Frame>
 
-        {/* ═══ NOW (live) ═══ */}
+        {/* ═══ NOW (live) + JUKEBOX ═══ */}
         <Frame rule aria-labelledby="am-now" style={{ backgroundColor: tint('blue') }}>
           <Grid>
-            <div className="col-span-4 lg:col-span-12">
+            <div className="col-span-4 lg:col-span-7">
               <span className="t-label text-blue">Right now</span>
-              <h2 id="am-now" className="t-display mt-4 max-w-4xl">
+              <h2 id="am-now" className="t-display mt-4">
                 Lately: {stats.game}, {stats.songName}, and {stats.bookName ?? 'a book'}.
               </h2>
               <p className="t-label mt-6">
@@ -161,11 +172,67 @@ export function AboutMe() {
                     : 'cached · api unreachable'}
               </p>
             </div>
+            <div className="col-span-4 lg:col-span-5">
+              <Jukebox />
+            </div>
           </Grid>
         </Frame>
 
         {/* ═══ STEAM LIBRARY (live, honest empty state) ═══ */}
         <SteamShelf />
+
+        {/* ═══ GAMING CORNER: honest joke stats + leaderboard ═══ */}
+        <Frame rule aria-labelledby="am-gaming" style={{ backgroundColor: tint('red') }}>
+          <Grid>
+            <div className="col-span-4 lg:col-span-12">
+              <span className="t-label text-accent">Completely unscientific</span>
+              <h2 id="am-gaming" className="t-display mt-4">
+                The stats that matter.
+              </h2>
+              <p className="t-body mt-4 max-w-xl text-ink-muted">
+                None of these are real metrics. All of them are true.
+              </p>
+            </div>
+          </Grid>
+
+          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {jokeStats.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.05}>
+                <div className="card-pop h-full bg-paper-raised p-6">
+                  <div
+                    className="font-display text-3xl font-extrabold lg:text-4xl"
+                    style={{ color: hueVar(s.hue) }}
+                  >
+                    {s.value}
+                  </div>
+                  <div className="mt-3 font-display font-bold text-ink">{s.label}</div>
+                  <div className="t-label mt-1">{s.note}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* The "leaderboard": a bit about me, not fake strangers. */}
+          <div className="mt-10">
+            <h3 className="t-label">The real leaderboard</h3>
+            <ol className="mt-4 flex flex-col divide-y-2 divide-line border-t-2 border-line-strong">
+              {leaderboard.map((row, i) => (
+                <Reveal key={row.name} delay={i * 0.05}>
+                  <li className="flex items-center gap-5 py-3">
+                    <span
+                      className="font-display text-xl font-extrabold tabular-nums"
+                      style={{ color: i === leaderboard.length - 1 ? 'var(--color-ink)' : 'var(--color-accent)' }}
+                    >
+                      #{row.rank}
+                    </span>
+                    <span className="font-display font-bold text-ink">{row.name}</span>
+                    <span className="t-label ml-auto">{row.note}</span>
+                  </li>
+                </Reveal>
+              ))}
+            </ol>
+          </div>
+        </Frame>
 
         {/* ═══ THE LORE ═══ */}
         <Frame rule aria-labelledby="am-lore">
@@ -281,22 +348,36 @@ function SteamShelf() {
           ))}
         </div>
       ) : (
-        <div className="card-pop mt-8 max-w-xl bg-paper-raised p-7">
-          <p className="t-sub text-ink">
-            {failed
-              ? 'Steam is not answering right now.'
-              : 'The live Steam feed is not wired up on this deploy yet.'}{' '}
-            The backend has the endpoint; it just needs a key. In the meantime: mostly
-            Counter-Strike 2, and a backlog I am in denial about.
-          </p>
-          <a
-            href="https://steamcommunity.com/profiles/76561199065609624"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="t-label rule-in mt-5 inline-block text-ink"
-          >
-            My Steam profile ↗
-          </a>
+        <div className="mt-8">
+          <div className="card-pop max-w-xl bg-paper-raised p-7">
+            <p className="t-sub text-ink">
+              {failed
+                ? 'Steam is not answering right now.'
+                : 'The live Steam feed is not wired up on this deploy yet.'}{' '}
+              The backend has the endpoint; it just needs a key. Playtimes show up here once
+              it does. In the meantime, the regulars:
+            </p>
+            <a
+              href="https://steamcommunity.com/profiles/76561199065609624"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="t-label rule-in mt-5 inline-block text-ink"
+            >
+              My Steam profile ↗
+            </a>
+          </div>
+          {/* Real games, no invented hour counts. */}
+          <ul className="mt-6 flex flex-wrap gap-3">
+            {regulars.map((g) => (
+              <li
+                key={g.name}
+                className="card-pop flex items-center gap-2 bg-paper-raised px-4 py-2"
+              >
+                <span aria-hidden="true">{g.emoji}</span>
+                <span className="font-display font-bold text-ink">{g.name}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </Frame>

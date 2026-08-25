@@ -255,7 +255,7 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
           active ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {media('nowbg-media h-full w-full scale-110 object-cover blur-[4px]')}
+        {media('nowbg-media h-full w-full scale-110 object-cover blur-[2px]')}
         {/* Cream veil, a touch heavier top and bottom so the type reads no matter
             which line it lands on. Mid-band kept high enough that a dark clip
             frame (e.g. gameplay) can't drop the display text below ~3:1. */}

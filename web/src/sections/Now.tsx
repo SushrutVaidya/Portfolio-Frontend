@@ -87,13 +87,21 @@ export function Now() {
           <p className="t-display">
             It&apos;s <span className="tabular-nums italic text-accent">{time}</span> where you
             are. I&apos;m in{' '}
-            <HoverTrigger spec={citySpec}>{stats.location}</HoverTrigger>
-            , the last song was{' '}
-            <HoverTrigger spec={songSpec}>{stats.songName}</HoverTrigger>
-            , the last game was{' '}
-            <HoverTrigger spec={gameSpec}>{stats.game}</HoverTrigger>
-            , and I&apos;m reading{' '}
-            <HoverTrigger spec={bookSpec}>{stats.bookName ?? 'this book'}</HoverTrigger>.
+            <HoverTrigger spec={citySpec} punct=",">
+              {stats.location}
+            </HoverTrigger>{' '}
+            the last song was{' '}
+            <HoverTrigger spec={songSpec} punct=",">
+              {stats.songName}
+            </HoverTrigger>{' '}
+            the last game was{' '}
+            <HoverTrigger spec={gameSpec} punct=",">
+              {stats.game}
+            </HoverTrigger>{' '}
+            and I&apos;m reading{' '}
+            <HoverTrigger spec={bookSpec} punct=".">
+              {stats.bookName ?? 'this book'}
+            </HoverTrigger>
           </p>
         </Reveal>
 

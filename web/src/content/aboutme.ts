@@ -13,7 +13,7 @@ export const character = {
   hp: '420 / 420',
   location: 'Hyderabad, IN',
   blurb:
-    'The person behind the platform engineering. Anime encyclopaedia, biryani partisan, and permanently one week away from starting a gym arc.',
+    'The person behind the platform engineering. Anime encyclopaedia, pasta partisan, and permanently one week away from starting a gym arc.',
 } as const
 
 /** Self-aware trait bars, 0..100. These are character, not a skills matrix. */
@@ -56,11 +56,11 @@ export const interests = [
     desc: 'Next destination: always planning. Passport collecting dust, though.',
   },
   {
-    emoji: '🍜',
+    emoji: '🍝',
     name: 'Food',
     rarity: 'Legendary',
     hue: 'yellow',
-    desc: 'Biryani is a love language. Hyderabadi, of course. Do not start a debate.',
+    desc: 'Pasta, in every shape. The one hill I will happily die on.',
   },
   {
     emoji: '💪',
@@ -74,8 +74,8 @@ export const interests = [
 /** "The Lore": short answers, dialogue-style. */
 export const lore = [
   { tag: 'Favourite anime', text: 'Gintama. Obviously. If you know, you know.' },
-  { tag: 'Favourite food', text: 'Biryani, Hyderabadi, of course. Do not start a debate.' },
-  { tag: 'Fun fact', text: 'Can quote entire Gintama episodes from memory. It is a skill.' },
+  { tag: 'Favourite food', text: 'Pasta. Any shape, any sauce, non-negotiable.' },
+  { tag: 'Fun fact', text: 'Can quote entire Family Guy episodes from memory. It is a skill.' },
   { tag: 'On repeat', text: 'Lo-fi while shipping, Bollywood while everything else.' },
 ] as const
 
@@ -91,20 +91,22 @@ export const hueVar = (h: string) => `var(--color-${h})`
 /**
  * The gaming corner, restored from the old page but made honest.
  *
- * `tracks` is the OST rotation used as a fallback when /api/jukebox/tracks is
- * unreachable: these are real game soundtracks, so listing them is true even
- * without audio. `regulars` are games actually played, WITHOUT the invented
+ * `tracks` mirrors the backend's real jukebox (JukeboxService.java) exactly, so
+ * the fallback shown when /api/jukebox/tracks is unreachable lists the same
+ * songs the API actually serves, just without the audio (which lives on the
+ * backend feed). `regulars` are games actually played, WITHOUT the invented
  * hour counts the old page faked. `jokeStats` and the leaderboard are kept as
  * openly comedic bits (they read as humour, not telemetry), which is the only
  * honest way to reproduce data that never had a backend.
  */
 export const tracks = [
-  { title: 'Corridors of Time', from: 'Chrono Trigger' },
-  { title: 'Weight of the World', from: 'NieR: Automata' },
-  { title: 'To Zanarkand', from: 'Final Fantasy X' },
-  { title: 'One-Winged Angel', from: 'Final Fantasy VII' },
-  { title: 'Dragonborn', from: 'Skyrim' },
-  { title: 'Megalovania', from: 'Undertale' },
+  { title: 'Welcome to Los Santos', from: 'GTA V' },
+  { title: 'Soviet Connection', from: 'GTA IV' },
+  { title: 'Bury the Light', from: 'Devil May Cry 5' },
+  { title: 'Oioi, Seisyundesuka?', from: 'Gintama OST' },
+  { title: 'Teme-raaaa!! Soredemo Gintama Tsuitennokaaaa!', from: 'Gintama OST' },
+  { title: "Can't Poop in Strange Places", from: 'Family Guy' },
+  { title: 'Everybody Wants to Rule the World', from: 'Josh Gad Cover' },
 ] as const
 
 export const regulars = [

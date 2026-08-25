@@ -5,6 +5,7 @@ import { Frame, Grid } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { SkillBar } from '@/components/SkillBar'
 import { Jukebox } from '@/components/Jukebox'
+import { ClipTV } from '@/components/ClipTV'
 import { useStats } from '@/hooks/useStats'
 import { api, type SteamGame } from '@/lib/api'
 import {
@@ -162,7 +163,7 @@ export function AboutMe() {
             <div className="col-span-4 lg:col-span-7">
               <span className="t-label text-blue">Right now</span>
               <h2 id="am-now" className="t-display mt-4">
-                Lately: {stats.game}, {stats.songName}, and {stats.bookName ?? 'a book'}.
+                Lately: {stats.game}.
               </h2>
               <p className="t-label mt-6">
                 {live === null
@@ -266,6 +267,26 @@ export function AboutMe() {
               </Reveal>
             </div>
           </Grid>
+        </Frame>
+
+        {/* ═══ THE TV (real recovered clips) ═══ */}
+        <Frame rule id="am-moments" aria-labelledby="am-moments-h" style={{ backgroundColor: tint('yellow') }}>
+          <Grid>
+            <div className="col-span-4 lg:col-span-12">
+              <span className="t-label text-accent">The TV</span>
+              <h2 id="am-moments-h" className="t-display mt-4">
+                Off the clock, on camera.
+              </h2>
+              <p className="t-body mt-4 max-w-xl text-ink-muted">
+                Real clips, not stock. Flip through what I actually play and watch,
+                two clips a channel.
+              </p>
+            </div>
+          </Grid>
+
+          <div className="mt-10 mx-auto max-w-2xl">
+            <ClipTV />
+          </div>
         </Frame>
 
         {/* ═══ CLOSE ═══ */}

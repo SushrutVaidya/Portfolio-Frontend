@@ -1,9 +1,9 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import { Frame, Grid } from '@/components/layout/Frame'
 import { Reveal } from '@/components/Reveal'
 import { LoglensDemo } from '@/components/LoglensDemo'
+import { SiteLink } from '@/components/SiteLink'
 import { DUR, EASE } from '@/lib/motion'
 
 /**
@@ -186,9 +186,9 @@ export function Loglens() {
         <Frame full aria-labelledby="ll-hero">
           <Grid className="items-center">
             <div className="col-span-4 lg:col-span-6">
-              <Link to="/#work" className="t-label rule-in">
+              <SiteLink to="/#work" className="t-label rule-in">
                 ← Back to work
-              </Link>
+              </SiteLink>
 
               <div className="mt-8 mb-6 inline-flex items-center gap-2.5 rounded-full border-2 border-line-strong bg-paper-raised px-4 py-1.5">
                 <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-green" />
@@ -533,10 +533,10 @@ export function Loglens() {
                   Star it on GitHub
                   <span aria-hidden="true">↗</span>
                 </a>
-                <Link to="/work/loglens" className="btn-pop bg-paper-raised">
+                <SiteLink to="/work/loglens" className="btn-pop bg-paper-raised">
                   Read the write-up
                   <span aria-hidden="true">→</span>
-                </Link>
+                </SiteLink>
               </div>
               <p className="t-label mt-10">loglens · Apache 2.0 · built by Sushrut Vaidya</p>
             </div>

@@ -11,6 +11,7 @@ import { CaseStudy, NotFound } from '@/pages/CaseStudy'
 import { Loglens } from '@/pages/Loglens'
 import { AboutMe } from '@/pages/AboutMe'
 import { trackPageView } from '@/lib/analytics'
+import { isLoglensHost } from '@/lib/host'
 import { DUR, EASE } from '@/lib/motion'
 
 /**
@@ -43,7 +44,9 @@ export default function App() {
     <SmoothScroll>
       <Preloader onDone={onDone} />
       <RouteCurtain />
-      <Nav />
+      {/* On the loglens.* subdomain the product page stands alone: the home-page
+          nav (with its section anchors that don't exist there) is suppressed. */}
+      {!isLoglensHost && <Nav />}
 
       <a
         href="#work"
@@ -70,7 +73,12 @@ export default function App() {
             style={{ visibility: ready ? 'visible' : 'hidden' }}
           >
             <Routes location={location}>
-              <Route path="/" element={<Home ready={ready} />} />
+              {/* loglens.* subdomain serves the product page at its own root;
+                  the apex serves the full home page there. */}
+              <Route
+                path="/"
+                element={isLoglensHost ? <Loglens /> : <Home ready={ready} />}
+              />
               <Route path="/about" element={<AboutMe />} />
               <Route path="/loglens" element={<Loglens />} />
               <Route path="/work/:slug" element={<CaseStudy />} />

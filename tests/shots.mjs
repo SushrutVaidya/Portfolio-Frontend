@@ -97,6 +97,10 @@ await shoot('desktop-case-study', { width: 1512, height: 945, path: `${BASE}/wor
 // The loglens product page (long, full-page capture).
 await shoot('desktop-loglens', { width: 1512, height: 945, path: `${BASE}/loglens` })
 
+// The About Me page (long, full-page capture).
+await shoot('desktop-about', { width: 1512, height: 945, path: `${BASE}/about` })
+await shoot('mobile-about', { width: 390, height: 844, path: `${BASE}/about` })
+
 // Mobile: full page + the two frames most likely to break at 390px.
 await shoot('mobile-full', { width: 390, height: 844, path: BASE })
 for (const id of ['intro', 'now', 'contact']) {

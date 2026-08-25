@@ -150,30 +150,41 @@ export function Nav() {
             SV
           </Link>
 
-          <button
-            ref={triggerRef}
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls="chapter-register"
-            className="group t-label z-10 flex items-center gap-3 py-2 text-ink transition-colors hover:text-accent"
-          >
-            {open ? 'Close' : 'Index'}
-            <span aria-hidden="true" className="relative block h-3 w-4">
-              {/* Two hairlines that cross into an X. Cheaper and quieter than
-                  a hamburger, and the state change is unambiguous. */}
-              <motion.span
-                className="absolute left-0 block h-px w-4 bg-current"
-                animate={open ? { top: 6, rotate: 45 } : { top: 2, rotate: 0 }}
-                transition={{ duration: DUR.fast, ease: EASE }}
-              />
-              <motion.span
-                className="absolute left-0 block h-px w-4 bg-current"
-                animate={open ? { top: 6, rotate: -45 } : { top: 10, rotate: 0 }}
-                transition={{ duration: DUR.fast, ease: EASE }}
-              />
-            </span>
-          </button>
+          <div className="flex items-center gap-6">
+            {/* Direct link to the personal page; the Index still holds the
+                on-page chapters. */}
+            <Link
+              to="/about"
+              className="t-label hidden text-ink transition-colors hover:text-accent sm:block"
+            >
+              About
+            </Link>
+
+            <button
+              ref={triggerRef}
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="chapter-register"
+              className="group t-label z-10 flex items-center gap-3 py-2 text-ink transition-colors hover:text-accent"
+            >
+              {open ? 'Close' : 'Index'}
+              <span aria-hidden="true" className="relative block h-3 w-4">
+                {/* Two hairlines that cross into an X. Cheaper and quieter than
+                    a hamburger, and the state change is unambiguous. */}
+                <motion.span
+                  className="absolute left-0 block h-px w-4 bg-current"
+                  animate={open ? { top: 6, rotate: 45 } : { top: 2, rotate: 0 }}
+                  transition={{ duration: DUR.fast, ease: EASE }}
+                />
+                <motion.span
+                  className="absolute left-0 block h-px w-4 bg-current"
+                  animate={open ? { top: 6, rotate: -45 } : { top: 10, rotate: 0 }}
+                  transition={{ duration: DUR.fast, ease: EASE }}
+                />
+              </span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -265,6 +276,14 @@ export function Nav() {
                 </a>
 
                 <ul className="flex flex-wrap items-center gap-x-9 gap-y-4">
+                  <li>
+                    <Link to="/about" className="group/swap flex items-baseline gap-2">
+                      <Swap className="t-label">About</Swap>
+                      <span aria-hidden="true" className="t-label">
+                        →
+                      </span>
+                    </Link>
+                  </li>
                   {DESTINATIONS.map((link) => (
                     <li key={link.label}>
                       <a

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Corner, Frame, Grid, col } from '@/components/layout/Frame'
 import { HoverTrigger } from '@/components/HoverTrigger'
 import { Reveal } from '@/components/Reveal'
@@ -27,6 +28,50 @@ export function Now() {
   const { stats, live } = useStats()
   const time = useLiveClock()
 
+  // Memoised so the once-a-minute clock re-render doesn't recreate these object
+  // literals. Unstable spec references re-register every tick, which churns the
+  // provider's spec map and restarts an open video overlay (audit finding).
+  const citySpec = useMemo(
+    () => ({
+      id: 'city',
+      label: `${stats.location} city loop`,
+      visual: { kind: 'image' as const, src: '/img/Hyderabad.gif' },
+    }),
+    [stats.location],
+  )
+  const songSpec = useMemo(
+    () => ({
+      id: 'song',
+      label: `${stats.songName}, playing`,
+      visual: { kind: 'image' as const, src: '/img/gintamaBreakDancing.gif' },
+      audio: stats.songURL ? { src: stats.songURL, volume: 0.5, resume: true } : undefined,
+    }),
+    [stats.songName, stats.songURL],
+  )
+  const gameSpec = useMemo(
+    () => ({
+      id: 'game',
+      label: `${stats.game} clip`,
+      visual: { kind: 'image' as const, src: '/img/counterStrike2.gif' },
+    }),
+    [stats.game],
+  )
+  const bookSpec = useMemo(
+    () => ({
+      id: 'book',
+      label: `${stats.bookName ?? 'this book'}, with crickets`,
+      visual: {
+        kind: 'video' as const,
+        sources: [
+          { src: '/img/study.mov', type: 'video/mp4; codecs="hvc1"' },
+          { src: '/img/study.mp4', type: 'video/mp4' },
+        ],
+      },
+      audio: { src: '/img/crickets.mp3', volume: 0.3, loop: true },
+    }),
+    [stats.bookName],
+  )
+
   return (
     <Frame full rule id="now" aria-labelledby="now-heading">
       <Grid>
@@ -42,60 +87,13 @@ export function Now() {
           <p className="t-display">
             It&apos;s <span className="tabular-nums italic text-accent">{time}</span> where you
             are. I&apos;m in{' '}
-            <HoverTrigger
-              spec={{
-                id: 'city',
-                label: `${stats.location} city loop`,
-                visual: { kind: 'image', src: '/img/Hyderabad.gif' },
-              }}
-            >
-              {stats.location}
-            </HoverTrigger>
+            <HoverTrigger spec={citySpec}>{stats.location}</HoverTrigger>
             , the last song was{' '}
-            <HoverTrigger
-              spec={{
-                id: 'song',
-                label: `${stats.songName}, playing`,
-                visual: { kind: 'image', src: '/img/gintamaBreakDancing.gif' },
-                // resume:true — one continuous listen across hovers, not a
-                // restart each time. The detail that sells it.
-                audio: stats.songURL
-                  ? { src: stats.songURL, volume: 0.5, resume: true }
-                  : undefined,
-              }}
-            >
-              {stats.songName}
-            </HoverTrigger>
+            <HoverTrigger spec={songSpec}>{stats.songName}</HoverTrigger>
             , the last game was{' '}
-            <HoverTrigger
-              spec={{
-                id: 'game',
-                label: `${stats.game} clip`,
-                visual: { kind: 'image', src: '/img/counterStrike2.gif' },
-              }}
-            >
-              {stats.game}
-            </HoverTrigger>
+            <HoverTrigger spec={gameSpec}>{stats.game}</HoverTrigger>
             , and I&apos;m reading{' '}
-            <HoverTrigger
-              spec={{
-                id: 'book',
-                label: `${stats.bookName ?? 'this book'}, with crickets`,
-                visual: {
-                  kind: 'video',
-                  // .mov (hvc1) first for Safari's better codec support;
-                  // .mp4 fallback for everything else.
-                  sources: [
-                    { src: '/img/study.mov', type: 'video/mp4; codecs="hvc1"' },
-                    { src: '/img/study.mp4', type: 'video/mp4' },
-                  ],
-                },
-                audio: { src: '/img/crickets.mp3', volume: 0.3, loop: true },
-              }}
-            >
-              {stats.bookName ?? 'this book'}
-            </HoverTrigger>
-            .
+            <HoverTrigger spec={bookSpec}>{stats.bookName ?? 'this book'}</HoverTrigger>.
           </p>
         </Reveal>
 

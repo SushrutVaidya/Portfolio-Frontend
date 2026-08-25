@@ -153,6 +153,11 @@
     outline-offset: 2px;
   }
 
+  /* Kill the 300ms double-tap-zoom delay on interactive elements. */
+  button, a, [role="button"], summary, label {
+    touch-action: manipulation;
+  }
+
   h1, h2, h3 {
     hyphens: none;
     text-wrap: balance;
@@ -362,5 +367,23 @@
   }
   to {
     height: 16px;
+  }
+}
+
+/* Now-section full-bleed hover backdrop: a slow ken-burns drift so the media
+   feels alive behind the type. The `scale-110` utility is the static fallback
+   under reduced motion; when motion is allowed this animation owns transform. */
+@media (prefers-reduced-motion: no-preference) {
+  .nowbg-media {
+    animation: nowbg-drift 20s var(--ease) infinite alternate;
+    will-change: transform;
+  }
+}
+@keyframes nowbg-drift {
+  from {
+    transform: scale(1.1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.22) translate3d(1.5%, -1.5%, 0);
   }
 }

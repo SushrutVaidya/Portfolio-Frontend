@@ -24,7 +24,9 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
     <button
       type="button"
       data-hover-trigger
-      aria-expanded={isActive}
+      // No aria-expanded: this isn't a disclosure (the media it reveals is
+      // decorative/aria-hidden). The live region in HoverMediaProvider announces
+      // what opened instead.
       // Pointer devices reveal on hover; touch devices toggle on tap. Binding
       // both would fire twice on hybrid hardware.
       onMouseEnter={hasHover ? () => open(spec.id) : undefined}
@@ -37,7 +39,11 @@ export function HoverTrigger({ spec, children }: HoverTriggerProps) {
         // register wants the live words to pop, not whisper. On hover/focus the
         // word fills with the accent block. Thick underline matches the chunky
         // display face.
-        'cursor-pointer font-bold underline decoration-2 underline-offset-[0.14em] transition-colors duration-[var(--dur-fast)]',
+        // `inline` + `text-left`: a <button> defaults to inline-block with
+        // centered text, so a value long enough to wrap (e.g. a full game title)
+        // renders as a centered two-line box jammed into the sentence. Forcing
+        // inline flow makes it wrap like the surrounding words instead.
+        'inline text-left cursor-pointer font-bold underline decoration-2 underline-offset-[0.14em] transition-colors duration-[var(--dur-fast)]',
         isActive
           ? 'bg-accent text-accent-ink decoration-transparent'
           : 'text-accent decoration-accent hover:bg-accent hover:text-accent-ink hover:decoration-transparent',

@@ -144,20 +144,6 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
     [activeId, close, open],
   )
 
-  // Video follows the active overlay.
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    const spec = activeId ? specs.get(activeId) : null
-    if (spec?.visual.kind === 'video') {
-      video.currentTime = 0
-      void video.play().catch(() => {})
-    } else {
-      video.pause()
-      video.currentTime = 0
-    }
-  }, [activeId, specs])
-
   // Escape dismisses; tap outside dismisses on touch.
   useEffect(() => {
     if (!activeId) return
@@ -185,99 +171,15 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
   )
 
   /**
-   * The overlay follows the pointer.
+   * The overlay is pinned to a fixed corner, not chased along the pointer.
    *
-   * This is the site's signature interaction, and a panel parked in the middle
-   * of the screen while the reader's attention is on a word in the sentence is
-   * the version that reads as a modal rather than a response. Trailing the
-   * cursor with a lag ties the image to the word that opened it.
-   *
-   * Three things it deliberately does:
-   *   - writes `transform` in a rAF loop reading refs, never setState. A
-   *     setState per pointermove re-renders the provider — and therefore the
-   *     entire page beneath it — at pointer frequency.
-   *   - clamps against the measured panel size so the media never leaves the
-   *     viewport, measured ONCE per open rather than per frame.
-   *   - falls back to dead-centre on touch and under reduced motion, where a
-   *     pointer-chasing panel is either impossible or unwelcome.
+   * The "Now" sentence is set at full-viewport display scale, so a cursor-
+   * following plate always landed on top of the very words being read — it read
+   * as clutter rather than a response. A fixed picture-in-picture in the corner
+   * pops up in one predictable place, clear of the type, and reads as an
+   * intentional preview dock. Positioning is pure CSS (see the overlay markup),
+   * so there is no per-frame layout work.
    */
-  const followRef = useRef<HTMLDivElement>(null)
-  const pointer = useRef({ x: 0, y: 0 })
-  const eased = useRef({ x: 0, y: 0 })
-  const seeded = useRef(false)
-  const reduceMotion = useReducedMotion()
-
-  // One passive listener for the whole app, so the panel already knows where the
-  // cursor is the instant it opens instead of flying in from the origin.
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      pointer.current.x = e.clientX
-      pointer.current.y = e.clientY
-      if (!seeded.current) {
-        eased.current.x = e.clientX
-        eased.current.y = e.clientY
-        seeded.current = true
-      }
-    }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onMove)
-  }, [])
-
-  useEffect(() => {
-    const el = followRef.current
-    if (!el) return
-
-    const centre = () => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
-    const chase = hasHover && !reduceMotion && Boolean(activeId)
-
-    if (!chase) {
-      const c = centre()
-      el.style.transform = `translate3d(${c.x}px, ${c.y}px, 0) translate(-50%, -50%)`
-      return
-    }
-
-    /**
-     * Size, for the clamp. Not measured once: the effect runs before the browser
-     * has painted the <img>, so at that moment the panel is genuinely 0x0 and a
-     * clamp built on it would let a 46vw GIF run off the right edge.
-     *
-     * So it re-reads until the media reports a size, then stops. That is a
-     * handful of layout reads at the start of an open, not one per frame for as
-     * long as the overlay is up.
-     */
-    let halfW = 0
-    let halfH = 0
-    const margin = 16
-
-    let frame = 0
-    const tick = () => {
-      if (halfW === 0 || halfH === 0) {
-        const rect = el.getBoundingClientRect()
-        halfW = rect.width / 2
-        halfH = rect.height / 2
-      }
-
-      const targetX = Math.min(
-        Math.max(pointer.current.x + halfW + 44, halfW + margin),
-        window.innerWidth - halfW - margin,
-      )
-      // Nudged UP by a third of the plate height so it sits beside-and-above the
-      // word rather than centred on it — a plate centred on the pointer covers
-      // the line above and below the word you're actually reading.
-      const targetY = Math.min(
-        Math.max(pointer.current.y - halfH * 0.35, halfH + margin),
-        window.innerHeight - halfH - margin,
-      )
-      // Exponential smoothing. The lag is the whole effect — an overlay locked
-      // to the cursor reads as a bug in the cursor.
-      eased.current.x += (targetX - eased.current.x) * 0.14
-      eased.current.y += (targetY - eased.current.y) * 0.14
-      el.style.transform = `translate3d(${eased.current.x}px, ${eased.current.y}px, 0) translate(-50%, -50%)`
-      frame = requestAnimationFrame(tick)
-    }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [activeId, hasHover, reduceMotion])
 
   const value = useMemo(
     () => ({ activeId, open, close, toggle, register, hasHover }),
@@ -299,73 +201,68 @@ export function HoverMediaProvider({ children }: { children: ReactNode }) {
     if (active) setShown(active)
   }, [active])
 
+  // Play the book clip, but keyed on `shown` — the state that actually drives
+  // the <source> children — not on `active`, which leads it by a render. Keying
+  // on `active` fired play() against stale/absent sources and never retried, so
+  // the video usually never started. load() ensures the current source set is
+  // picked up; gated on reduced-motion so it doesn't autoplay when unwelcome.
+  const reduceMotion = useReducedMotion()
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    if (activeId && shown?.visual.kind === 'video' && !reduceMotion) {
+      video.load()
+      void video.play().catch(() => {})
+    } else {
+      video.pause()
+    }
+  }, [activeId, shown, reduceMotion])
+
+  // One persistent <video> (play() must never race a mount); mediaClass sizes it.
+  const media = (mediaClass: string) => (
+    <>
+      {shown?.visual.kind === 'image' && (
+        <img src={shown.visual.src} alt="" decoding="async" className={mediaClass} />
+      )}
+      <video
+        ref={videoRef}
+        loop
+        muted
+        playsInline
+        className={`${mediaClass} ${shown?.visual.kind === 'video' ? 'block' : 'hidden'}`}
+      >
+        {shown?.visual.kind === 'video' &&
+          shown.visual.sources.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
+      </video>
+    </>
+  )
+
   return (
     <HoverMediaContext.Provider value={value}>
       {children}
-      {/* Single overlay surface. aria-live announces what opened, since the
-          visual is decorative and conveys nothing to a screen reader. */}
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {active ? `Showing ${active.label}` : ''}
+      </span>
+
+      {/* Full-bleed backdrop: the media fills the section behind the text. It is
+          scaled + softly blurred (the source GIFs are small, so a hard object-
+          cover would pixelate) and veiled in cream so the display type stays
+          legible over any frame. -z-10 keeps it above the page ground but behind
+          the in-flow sentence. A slow ken-burns drift keeps it alive. */}
       <div
-        className="pointer-events-none fixed inset-0 z-50"
-        aria-live="polite"
-        aria-atomic="true"
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-0 -z-10 overflow-hidden transition-opacity duration-[var(--dur-smooth)] ${
+          active ? 'opacity-100' : 'opacity-0'
+        }`}
       >
-        <span className="sr-only">{active ? `Showing ${active.label}` : ''}</span>
-        {/* Positioned from the top-left origin and moved entirely by transform.
-            Anchoring with left/top would force layout on every frame of the
-            follow loop — the exact mistake PERFORMANCE_NOTES.md recorded on the
-            previous site's cursor. */}
-        <div ref={followRef} className="absolute top-0 left-0">
-          {/* Scale and opacity live on THIS element, not the one above it: the
-              follow loop owns the outer transform, and animating transform on
-              the same node would have the two fighting frame by frame.
-
-              A plate, not a floating image. The media sits in a bordered panel
-              with a mono cutline under it, the way a figure in print does — which
-              is what makes it read as a considered inset rather than something
-              stuck to the cursor. Sized at ~30rem: the previous 34vh/46vw was
-              small enough that on a 15" display it genuinely looked like part of
-              the pointer. */}
-          <figure
-            aria-hidden="true"
-            className={`w-fit border border-line-strong bg-paper-raised shadow-2xl transition-[opacity,transform] duration-[var(--dur-base)] ${
-              active ? 'scale-100 opacity-100' : 'scale-[0.96] opacity-0'
-            }`}
-          >
-            {shown?.visual.kind === 'image' && (
-              // No explicit width/height: this is a fixed, aria-hidden overlay,
-              // not in-flow content, so it causes no layout shift, and the GIFs
-              // are mixed aspect ratios that fixed dims would distort. object-
-              // contain within the max box handles sizing; decoding async keeps
-              // the first hover from blocking the main thread.
-              <img
-                src={shown.visual.src}
-                alt=""
-                decoding="async"
-                className="block max-h-[38vh] max-w-[min(22rem,64vw)] object-contain"
-              />
-            )}
-            {/* Always mounted so play() is never racing a mount. */}
-            <video
-              ref={videoRef}
-              loop
-              muted
-              playsInline
-              className={`max-h-[38vh] max-w-[min(22rem,64vw)] object-contain ${
-                shown?.visual.kind === 'video' ? 'block' : 'hidden'
-              }`}
-            >
-              {shown?.visual.kind === 'video' &&
-                shown.visual.sources.map((s) => (
-                  <source key={s.src} src={s.src} type={s.type} />
-                ))}
-            </video>
-
-            <figcaption className="t-label flex items-baseline gap-3 border-t border-line px-3 py-2.5">
-              <span className="text-accent">◆</span>
-              {shown?.label}
-            </figcaption>
-          </figure>
-        </div>
+        {media('nowbg-media h-full w-full scale-110 object-cover blur-[4px]')}
+        {/* Cream veil, a touch heavier top and bottom so the type reads no matter
+            which line it lands on. Mid-band kept high enough that a dark clip
+            frame (e.g. gameplay) can't drop the display text below ~3:1. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-paper/80 via-paper/68 to-paper/82" />
+        <span className="t-label absolute bottom-6 left-6 rounded-full border-2 border-line-strong bg-paper-raised px-3 py-1.5">
+          <span className="text-accent">◆</span> {shown?.label}
+        </span>
       </div>
     </HoverMediaContext.Provider>
   )

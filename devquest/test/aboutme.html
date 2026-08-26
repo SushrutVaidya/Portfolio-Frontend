@@ -12,6 +12,7 @@
   <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/tokens.css">
   <link rel="stylesheet" href="css/aboutme-v2.css">
   <script>
     if(new URLSearchParams(location.search).get('skip_intro')){
@@ -24,9 +25,7 @@
     }
   </script>
   <script src="../js/mobile-banner.js"></script>
-  <script src="../js/transitions.js"></script>
-  <script src="../js/cursor.js"></script>
-  <script src="js/theme.js" defer></script>
+  <script src="../js/transitions.js"></script>  <script src="js/theme.js" defer></script>
 </head>
 <body class="gta-page loading">
 
@@ -650,7 +649,7 @@
 
   <!-- ══ JUKEBOX — Pixel Boombox (copied as-is) ══ -->
   <div class="am-jb-backdrop" id="jb-backdrop"></div>
-  <div class="am-jukebox" id="jukebox">
+  <div class="am-jukebox paused" id="jukebox">
     <button class="am-jb-pill" id="jb-pill">
       <div class="am-jb-vinyl" id="jb-vinyl"></div>
       <div class="am-jb-track-name" id="jb-track-name"><span class="am-jb-track-name-inner" id="jb-track-name-inner">Corridors of Time — Chrono Trigger</span></div>

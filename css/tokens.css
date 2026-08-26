@@ -1,0 +1,78 @@
+/* ═══════════════════════════════════════════════════════════════════
+   DevQuest Portfolio — Design Tokens (Apple/iOS palette)
+   Scope: portfolio pages only (index.html, devquest/test/aboutme.html,
+          card-experiments.html, leaderboard.html).
+   Game pages (devquest/landing.html, captcha, devtype, incident)
+   intentionally keep their dark playful aesthetic — don't import this.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Color ─────────────────────────────────────────────── */
+  --bg:               #fafafa;
+  --bg-elevated:      #ffffff;       /* cards, modals on top of bg */
+  --bg-subtle:        #f5f5f7;       /* hover background, inputs */
+  --text-primary:     #1d1d1f;
+  --text-secondary:   #6e6e73;       /* Apple's standard secondary gray */
+  --text-tertiary:    #86868b;       /* timestamps, captions */
+  --text-on-accent:   #ffffff;
+  --border:           #e5e5e7;
+  --border-strong:    #d2d2d7;
+  --accent:           #0a84ff;       /* iOS blue */
+  --accent-hover:     #0066cc;
+  --accent-soft:      rgba(10,132,255,0.08);
+  --success:          #34c759;
+  --danger:           #ff3b30;
+  --warning:          #ff9500;
+
+  /* ── Spacing scale ─────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* ── Radius scale ──────────────────────────────────────── */
+  --radius-sm:  6px;       /* chips, badges */
+  --radius-md: 10px;       /* buttons, inputs */
+  --radius-lg: 14px;       /* cards */
+  --radius-xl: 22px;       /* hero cards, modals */
+
+  /* ── Typography scale ──────────────────────────────────── */
+  --font-12: 12px;
+  --font-14: 14px;
+  --font-16: 16px;
+  --font-20: 20px;
+  --font-28: 28px;
+  --font-40: 40px;
+  --font-system:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* ── Shadows ───────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+
+  /* ── Motion ────────────────────────────────────────────── */
+  /* Apple-style spring — most natural-feeling easing */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast:   150ms;
+  --duration-base:   250ms;
+  --duration-slow:   400ms;
+}
+
+/* Reduced motion users get instant transitions */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast:   1ms;
+    --duration-base:   1ms;
+    --duration-slow:   1ms;
+  }
+}

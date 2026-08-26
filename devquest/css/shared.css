@@ -120,8 +120,11 @@ body::after { display: none; }
   padding: 0 32px;
   height: 52px;
   background: rgba(28, 28, 30, 0.72);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  /* 28px blur × orbs animating behind = expensive re-blur every frame.
+     Reduced to 10px — with 72% opaque background the visual delta is
+     imperceptible, and it drops the header off the compositor hot path. */
+  backdrop-filter: blur(10px) saturate(1.8);
+  -webkit-backdrop-filter: blur(10px) saturate(1.8);
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   position: sticky;
@@ -236,8 +239,9 @@ body::after { display: none; }
   gap: 5px;
   padding: 14px 32px;
   background: rgba(28, 28, 30, 0.72);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  /* Footer — same story as header. 28px was pure waste. */
+  backdrop-filter: blur(10px) saturate(1.8);
+  -webkit-backdrop-filter: blur(10px) saturate(1.8);
   border-top: 0.5px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   position: relative;
@@ -443,3 +447,29 @@ body::after { display: none; }
   .dq-footer    { padding: 12px 16px; flex-direction: column; gap: 4px; text-align: center; }
   .dq-step-name { display: none; }
 }
+
+/* ==========================================
+   Accessibility — prefers-reduced-motion
+   ==========================================
+   Users with the OS setting on (macOS: System Settings → Accessibility →
+   Display → Reduce motion; Windows: Settings → Ease of Access → Display →
+   Show animations) get transitions and animations neutralized. Anything
+   longer than the frame budget can trigger motion sickness for some
+   people — this is an a11y requirement, not a preference.
+
+   Applied here in shared.css so ALL devquest pages (captcha, devtype,
+   incident, aboutme, landing) inherit the guard. Per-page CSS files
+   can still add MORE specific overrides on top of this baseline.
+
+   The universal selector + !important is intentional — it ensures
+   hardcoded per-element durations (of which there are many) get
+   overridden without needing to hunt them down individually. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:       0.001ms !important;
+    animation-iteration-count: 1       !important;
+    transition-duration:      0.001ms !important;
+    scroll-behavior:          auto    !important;
+  }
+}
+

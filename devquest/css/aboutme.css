@@ -78,7 +78,12 @@
 .am-tab-bar {
   position: sticky; top: 0; z-index: 100;
   background: rgba(28,28,30,0.75);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  /* Reduced blur(20)→blur(8) — same pattern as landing header, captcha
+     container, incident container. 75%-opaque bg does the visual work;
+     the extra blur was quadratic per-pixel shader cost for no visible
+     gain. Sticky-positioned + a fixed-width layer → this saves per-scroll
+     re-blur cost across the whole scrollable page. */
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
@@ -272,6 +277,7 @@
   display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.7);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   opacity: 0; pointer-events: none;
   transition: opacity 0.25s;
 }

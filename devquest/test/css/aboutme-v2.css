@@ -13,26 +13,29 @@
 @import url('https://fonts.cdnfonts.com/css/pricedown');
 
 :root {
-  --gta-green: #c8ff00;
-  --gta-orange: #ff6600;
-  --gta-pink: #ff375f;
-  --gta-blue: #0a84ff;
+  /* ── Brand spice (used SPARINGLY — accents only, not interactive elements) ── */
+  --gta-orange: #ff6600;   /* personality accent — section markers, hover hints */
+  --gta-pink:   #ff375f;
+  --gta-amber:  #ff9f0a;
+  --gta-mint:   #30d158;
   --gta-purple: #bf5af2;
-  --gta-amber: #ff9f0a;
-  --gta-mint: #30d158;
+  --gta-green:  #c8ff00;
 
-  /* Light theme base */
-  --gta-bg: #f5f3ef;
-  --gta-bg-warm: #faf8f4;
-  --gta-card: #ffffff;
-  --gta-card-border: rgba(0,0,0,0.08);
-  --gta-text: #1a1a1a;
-  --gta-text-secondary: #555555;
-  --gta-muted: rgba(0,0,0,0.4);
-  --gta-divider: rgba(0,0,0,0.06);
-  --gta-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --gta-shadow-md: 0 8px 32px rgba(0,0,0,0.08);
-  --gta-shadow-lg: 0 16px 48px rgba(0,0,0,0.1);
+  /* ── Interactive / system color (the primary CTA + link color) ── */
+  --gta-blue:   #0a84ff;   /* maps to portfolio --accent — buttons, links, focus */
+
+  /* ── Light theme base — tightened to feel calmer ── */
+  --gta-bg:        #fafafa;   /* was #f5f3ef — match system off-white */
+  --gta-bg-warm:   #f5f5f7;   /* was #faf8f4 — subtle alternation */
+  --gta-card:      #ffffff;
+  --gta-card-border: rgba(0,0,0,0.06);
+  --gta-text:      #1d1d1f;   /* was #1a1a1a — exact Apple gray */
+  --gta-text-secondary: #6e6e73; /* was #555 — official Apple secondary */
+  --gta-muted:     rgba(60,60,67,0.3);
+  --gta-divider:   #e5e5e7;
+  --gta-shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
+  --gta-shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --gta-shadow-lg: 0 16px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .gta-page {
@@ -68,29 +71,49 @@
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   padding: 0 32px; height: 52px;
   background: rgba(28,28,30,0.72);
-  backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  /* Reduced from blur(14px) — the 72% opaque background already hides most
+     of what's behind, so heavy blur is wasted GPU work every scroll frame.
+     8px keeps the frosted-glass feel; the trace showed nav backdrop re-blur
+     was one of the top compositor costs. */
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border-bottom: 0.5px solid rgba(255,255,255,0.1);
   position: sticky; top: 0; z-index: 100;
   transition: opacity 0.6s ease-out;
+  /* Own compositor layer — no per-scroll-frame repaint */
+  will-change: transform;
+  transform: translateZ(0);
 }
 .dq-nav-brand {
   font-family: -apple-system, 'SF Pro Display', sans-serif; font-size: 0.82rem;
   font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.5px; text-decoration: none;
+  display: inline-block;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+.dq-nav-brand:hover { transform: scale(1.06); }
+.dq-nav-brand:active { transform: scale(0.94); }
 .dq-brand-dot { color: #0a84ff; }
 .dq-nav-links { display: flex; align-items: center; gap: 24px; }
 .dq-nav-link {
   font-family: -apple-system, 'SF Pro Text', sans-serif; font-size: 0.72rem; font-weight: 500;
-  color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px; transition: color 0.2s;
+  color: rgba(255,255,255,0.55); text-decoration: none; letter-spacing: 0.2px;
+  display: inline-block;
+  transition: color 200ms ease,
+              transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.dq-nav-link:hover { color: rgba(255,255,255,0.92); }
+.dq-nav-link:hover {
+  color: rgba(255,255,255,0.92);
+  transform: translateY(-2px);
+}
+.dq-nav-link:active {
+  transform: translateY(0) scale(0.96);
+}
 .dq-nav-link.active { color: rgba(255,255,255,0.92); font-weight: 600; }
 .dq-nav-right-group { display: flex; align-items: center; gap: 10px; }
 .dq-theme-toggle {
   display: flex; align-items: center; gap: 6px; padding: 5px 12px 5px 8px;
   border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08); backdrop-filter: blur(16px) saturate(1.6);
-  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  background: rgba(255,255,255,0.08); backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   cursor: pointer; font-size: 0.65rem; font-family: -apple-system, 'SF Pro Text', sans-serif;
   color: rgba(255,255,255,0.65); letter-spacing: 0.3px;
   transition: background 0.2s, border-color 0.2s, color 0.2s; flex-shrink: 0; white-space: nowrap;
@@ -177,7 +200,7 @@
 .gta-page:not(.loading) .gta-scroll-progress { opacity: 1; }
 .gta-scroll-fill {
   height: 100%; width: 0;
-  background: linear-gradient(90deg, var(--gta-orange), var(--gta-pink), var(--gta-purple));
+  background: var(--gta-blue);
   transition: width 0.1s linear;
 }
 
@@ -316,35 +339,28 @@
   min-height: 100vh;
   display: flex; flex-direction: column;
   justify-content: center;
-  padding: 60px 48px;
+  padding: 80px 48px;
   position: relative;
   background:
-    linear-gradient(135deg, #f5f3ef 0%, #fff 40%, #f5f3ef 100%);
+    radial-gradient(ellipse at 20% 30%, rgba(10,132,255,0.06), transparent 50%),
+    linear-gradient(180deg, var(--gta-bg) 0%, var(--gta-bg-warm) 100%);
   overflow: hidden;
 }
 
-/* Bold diagonal color stripe — GTA V box art vibe */
+/* Calm corner accent — replaces the loud rainbow diagonal stripe */
 .gta-hero::before {
   content: '';
   position: absolute;
-  top: -20%; right: -5%; width: 45%; height: 140%;
-  background: linear-gradient(
-    -65deg,
-    var(--gta-green) 0%,
-    var(--gta-amber) 25%,
-    var(--gta-orange) 50%,
-    var(--gta-pink) 75%,
-    var(--gta-purple) 100%
-  );
-  opacity: 0.07;
-  transform: skewX(-12deg);
+  top: 0; right: 0; width: 40%; height: 100%;
+  background:
+    radial-gradient(ellipse at 80% 30%, rgba(255,102,0,0.06), transparent 60%);
   pointer-events: none;
 }
 
 .gta-hero-inner {
-  max-width: 1100px; width: 100%; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 48px; align-items: center;
+  max-width: 1200px; width: 100%; margin: 0 auto;
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  gap: 80px; align-items: center;
   animation: heroSlideIn 1s cubic-bezier(0.16,1,0.3,1) both;
 }
 
@@ -355,15 +371,23 @@
 
 /* ── Photo Placeholders ── */
 .gta-photo-frame {
-  border-radius: 16px;
+  border-radius: 22px;
   overflow: hidden;
   position: relative;
 }
 .gta-photo-hero {
-  width: 100%; max-width: 380px;
-  aspect-ratio: 3 / 4;
-  border: 3px solid var(--gta-card-border);
-  box-shadow: var(--gta-shadow-lg);
+  width: 100%; max-width: 460px;
+  aspect-ratio: 4 / 5;
+  border: none;
+  box-shadow:
+    0 30px 60px -20px rgba(0,0,0,0.18),
+    0 12px 24px -8px rgba(0,0,0,0.10);
+  /* subtle floating effect */
+  animation: heroPhotoFloat 6s ease-in-out infinite;
+}
+@keyframes heroPhotoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 .gta-hero-photo {
   width: 100%; height: 100%;
@@ -397,30 +421,39 @@
 
 /* ── Hero Art ── */
 .gta-hero-art {
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: flex-start;
+  position: relative;
 }
-
 /* ── Hero Info ── */
 .gta-hero-eyebrow {
-  font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 6px;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   color: var(--gta-orange);
-  opacity: 0.8;
-  display: block; margin-bottom: 12px;
+  text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 20px;
+}
+.gta-hero-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px; background: currentColor;
+  display: inline-block;
 }
 .gta-hero-name {
-  font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 5rem; line-height: 0.95;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
   color: var(--gta-text);
-  letter-spacing: 2px;
-  text-shadow: 3px 3px 0 rgba(200,255,0,0.2);
-  margin-bottom: 16px;
+  text-shadow: none;
+  margin-bottom: 20px;
 }
 .gta-hero-divider {
-  width: 80px; height: 5px;
-  background: linear-gradient(90deg, var(--gta-orange), var(--gta-pink));
-  border-radius: 3px;
+  width: 64px; height: 3px;
+  background: var(--gta-blue);
+  border-radius: 2px;
   margin-bottom: 16px;
 }
 .gta-hero-tagline {
@@ -543,22 +576,48 @@
 .gta-section {
   padding: 72px 48px;
   position: relative;
+  /* Off-viewport sections skip style/layout/paint entirely. This is the
+     single biggest win on this page: trace showed the compositor
+     painting the whole #document (2626×17606px) ~85 times/sec because
+     ~23 infinite CSS animations were scattered across all 16 sections
+     and Chrome unioned their dirty rects every frame. With this rule,
+     only in-viewport sections participate and off-screen animations
+     pause automatically.
+     `contain-intrinsic-size: auto 800px` reserves a placeholder height
+     until each section's real size is measured, so scroll position
+     doesn't jump when new sections come into view. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 .gta-container { max-width: 960px; margin: 0 auto; }
 
 .gta-section-title {
-  font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 3.2rem; line-height: 0.95;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
   color: var(--gta-text);
-  letter-spacing: 2px;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
+  position: relative;
+  padding-bottom: 20px;
+}
+/* Premium accent rule under every section heading */
+.gta-section-title::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 56px; height: 3px;
+  background: var(--gta-blue);
+  border-radius: 2px;
 }
 
 .gta-sub-title {
-  font-family: 'Pricedown', Impact, sans-serif;
-  font-size: 1.3rem;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--gta-text-secondary);
-  letter-spacing: 2px;
   margin: 40px 0 16px;
 }
 
@@ -651,13 +710,14 @@
   flex-shrink: 0;
   position: relative;
 }
+/* Pentagon glow used to be `filter: drop-shadow(...)`. That blew Chrome's
+   paint bounds to 16777215×16777215 (its infinity marker) because a CSS
+   drop-shadow has no defined edge, forcing the compositor to walk the
+   layer tree as if the canvas were the size of the world. Trace showed
+   240-390ms GPU stalls from it. The shadow is now baked into the canvas
+   draw itself — see animatePentagon() in aboutme-v2.js. */
 #gta-stat-pentagon {
-  filter: drop-shadow(0 4px 16px rgba(255,102,0,0.08));
-  transition: filter 0.6s ease;
-}
-#gta-stat-pentagon.glow {
-  filter: drop-shadow(0 4px 16px rgba(255,102,0,0.08))
-          drop-shadow(0 0 24px rgba(255,102,0,0.15));
+  /* No filter — shadow is drawn inside the canvas bitmap. */
 }
 /* Pentagon pulse ring after animation */
 .stats-pentagon-wrap::after {
@@ -1569,6 +1629,66 @@
   color: var(--gta-purple);
 }
 
+/* ── Game detail panel (verdict + tags + last played) ── */
+.cf-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+.cf-last-played {
+  font: 500 0.65rem/1 'SF Mono', monospace;
+  color: var(--gta-muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  position: relative;
+  padding-left: 14px;
+}
+.cf-last-played::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gta-muted);
+  opacity: 0.5;
+}
+.cf-verdict {
+  font: 400 0.92rem/1.55 'Inter', -apple-system, sans-serif;
+  color: var(--gta-text);
+  margin: 14px 0 12px;
+  max-width: 520px;
+  letter-spacing: -0.005em;
+  /* Premium pull-quote feel: subtle left accent rule */
+  padding-left: 14px;
+  border-left: 2px solid var(--gta-blue);
+}
+.cf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.cf-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(10,132,255,0.08);
+  color: var(--gta-blue);
+  font: 600 0.62rem/1 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  border-radius: 100px;
+  text-transform: uppercase;
+  transition: background 200ms ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cf-tag:hover {
+  background: rgba(10,132,255,0.14);
+  transform: translateY(-1px);
+}
+
 /* ── Controls ── */
 .cf-controls {
   display: flex;
@@ -1854,12 +1974,20 @@
   background: rgba(255,255,255,0.12);
   z-index: 5; pointer-events: none;
   opacity: 0;
+  /* top:0 anchors the element; motion happens via translateY (composite). */
+  top: 0;
   animation: vhsSweep 8s linear infinite;
 }
+/* Was animating `top: -5px → 0 → 100%` — `top` is a layout-triggering
+   property, so every frame of this infinite loop forced a style recalc
+   on the whole document (trace 06 showed 75 full-doc paints/sec).
+   `transform: translateY(...)` runs on the compositor thread. Same
+   visual, near-zero cost. Requires the element to sit at top:0 (above)
+   so the translate values below place it correctly. */
 @keyframes vhsSweep {
-  0%, 88% { opacity: 0; top: -5px; }
-  90%      { opacity: 1; top: 0; }
-  100%     { opacity: 0; top: 100%; }
+  0%, 88% { opacity: 0; transform: translateY(-5px); }
+  90%      { opacity: 1; transform: translateY(0);     }
+  100%     { opacity: 0; transform: translateY(var(--vhs-sweep-h, 100vh)); }
 }
 
 /* ── Channel flash ── */

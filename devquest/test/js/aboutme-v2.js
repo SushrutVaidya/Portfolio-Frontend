@@ -1,8 +1,26 @@
 // About Me v2 — GTA V Light + Bold
 (() => {
-  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8081'
-    : '';
+  const API_BASE = (() => {
+    const h = window.location.hostname, p = window.location.port;
+    if (h !== 'localhost' && h !== '127.0.0.1') return '';
+    if (p === '8888') return '';   // local e2e via nginx-proxy
+    return 'http://localhost:8081';
+  })();
+
+  // HTML escape for anywhere API-supplied strings get injected via innerHTML.
+  // Backend has no auth by default — a malicious PUT could put <img onerror=...>
+  // into a bio/title, so treat any /api/* string as untrusted.
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  // CSS color validator — accepts only #rgb / #rrggbb / #rrggbbaa. Anything
+  // else (raw text, url(), expression()) is rejected and falls back.
+  function safeColor(c, fallback) {
+    return typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c) ? c : fallback;
+  }
 
   if (!localStorage.getItem('dq-stat-social')) {
     localStorage.setItem('dq-stat-social', '70');
@@ -231,7 +249,15 @@
       ctx.stroke();
     }
 
-    // Data polygon — STATIC (no animation for now)
+    // Data polygon — draw twice: once with a soft baked-in shadow (replaces
+    // the old CSS `filter: drop-shadow` that blew paint bounds to Chrome's
+    // infinity marker), once solid on top. shadowBlur is capped at 20px so
+    // the halo fits within the 320×320 canvas — no bounds expansion.
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,102,0,0.55)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
     ctx.beginPath();
     for (let i = 0; i <= n; i++) {
       const idx = i % n;
@@ -242,9 +268,21 @@
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.closePath();
-
     ctx.fillStyle = 'rgba(255,102,0,0.35)';
     ctx.fill();
+    ctx.restore();
+
+    // Solid outline on top (no shadow, so the stroke stays crisp)
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const idx = i % n;
+      const a = startAngle + step * idx;
+      const v = (values[idx] / 100) * r;
+      const x = cx + Math.cos(a) * v;
+      const y = cy + Math.sin(a) * v;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
     ctx.strokeStyle = '#ff6600';
     ctx.lineWidth = 3;
     ctx.stroke();
@@ -277,6 +315,8 @@
       ctx.fillText(values[i], lx, ly + 14);
     }
 
+    // .glow class kept for API compatibility (some CSS/JS may still key off
+    // it) even though the visual effect is now baked into the canvas.
     canvas.classList.add('glow');
     const wrap = canvas.closest('.stats-pentagon-wrap');
     if (wrap) wrap.classList.add('pulse');
@@ -765,22 +805,12 @@
     }, { threshold: 0, rootMargin: '0px' });
     tvObs.observe(screen);
 
-    // Also pause TV when card section comes into view
-    var cardgenEl = document.getElementById('cardgen');
-    if (cardgenEl) {
-      var cardObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(e) {
-          if (e.isIntersecting && videoEl) {
-            videoEl.pause();
-            if (window._tvPausedJukebox && window._dqJukeboxAudio) {
-              window._dqJukeboxAudio.play().catch(function() {});
-              window._tvPausedJukebox = false;
-            }
-          }
-        });
-      }, { threshold: 0.1 });
-      cardObs.observe(cardgenEl);
-    }
+    // (Previously: cardObs paused the TV when #cardgen became 10% visible.
+    //  On most viewports the next section is partially in view while the user
+    //  is still centered on the TV — so the TV would freeze right when they
+    //  arrived at it. tvObs above already handles pause-when-leaving via
+    //  threshold:0 / rootMargin:0, so the cardObs was both redundant and
+    //  actively buggy. Removed.)
 
     TV_CHANNELS.forEach(ch => (ch.clips || []).forEach(url => tryLoadClip(url)));
     display(0);
@@ -973,6 +1003,37 @@
   };
   const DEFAULT_META = { emoji: '🎮', color: '#666' };
 
+  // Hardcoded "hot take" verdicts per game. Shown in the expanded panel.
+  // Keep these tight + opinionated — generic descriptions are boring.
+  const GAME_VERDICTS = {
+    730:     { verdict: 'My comfort food. 1500 hrs deep and counting. PS4 controller, full ranked. Valorant players, look away.', tags: ['Competitive', 'Daily Driver'] },
+    782330:  { verdict: 'The most metal game ever made. Doom Eternal is what happens when level designers also play in metal bands.', tags: ['Single-player', 'Stress Relief'] },
+    379720:  { verdict: 'The game that proved Doom could come back. Faster than memory allows.', tags: ['Replayed'] },
+    271590:  { verdict: 'Los Santos is the reason this whole portfolio exists. Played the campaign 4 times, never tire of it.', tags: ['Heart', 'Replayed'] },
+    1222140: { verdict: 'David Cage at his best. Branching narrative actually branches. Cried at least twice.', tags: ['Story-Driven', 'Emotional'] },
+    1190460: { verdict: 'Walking simulator that earned it. Kojima at peak Kojima — pretentious, weird, somehow profound.', tags: ['Slow Burn', 'Cinematic'] },
+    1240440: { verdict: 'Master Chief\'s grappling hook turned the whole franchise around. The open world finally fits.', tags: ['Replayed'] },
+    1088850: { verdict: 'Best Marvel game by a mile. Banter that actually lands. Star-Lord is a likable idiot.', tags: ['Underrated'] },
+    870780: { verdict: 'Remedy weird. Probably the best level design they\'ve ever shipped. Astral plane stuff = chef\'s kiss.', tags: ['Single-player'] },
+    2183900: { verdict: 'For the Emperor. No notes. Combat feels meatier than any other shooter this year.', tags: ['Fresh'] },
+    236870: { verdict: 'I\'m bald, I\'m built, I\'m problematic. Sandbox assassinations never get old.', tags: ['Sandbox'] },
+    447040: { verdict: 'San Francisco hackers in jorts. The vibe is everything. Combat ages, the world doesn\'t.', tags: ['Vibes'] },
+    202140: { verdict: 'B.J. Blazkowicz is the protagonist America needed in 2014 — still rips.', tags: ['Classic'] },
+    612880: { verdict: 'Tonally everywhere. Still a banger. Wheelchair mech segments live rent-free in my head.', tags: [] },
+    350080: { verdict: 'Castle Wolfenstein but with cosmic horror tentacles. Short, brutal, perfect.', tags: ['Short'] },
+  };
+  const DEFAULT_VERDICT = { verdict: 'Solid time spent here.', tags: [] };
+
+  // Approximate "last played" from data we already have. Real lastPlayed is
+  // available on Steam's playtime_2weeks field — TODO wire when STEAM_API_KEY
+  // is set in prod. For now derive from `played`.
+  function inferLastPlayed(g) {
+    if (g.played === 'Recently') return 'This week';
+    if (g.played === 'Completed') return 'Wrapped up';
+    if (g.played === 'A while ago') return 'A few months back';
+    return g.played || 'A while ago';
+  }
+
   function enrichGames(games) {
     return games.map(g => {
       const meta = GAME_META[g.appid] || DEFAULT_META;
@@ -1058,10 +1119,14 @@
       const card = document.createElement('div');
       card.className = 'cf-card';
       card.dataset.idx = i;
+      const safeBg = safeColor(g.color, '#666');
+      const safeTitle = esc(g.title);
+      const safeEmoji = esc(g.emoji);
+      const safeImgUrl = esc(imgUrl);
       card.innerHTML = imgUrl
-        ? '<img src="' + imgUrl + '" alt="' + g.title + '" draggable="false" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
-          '<div class="cf-card-fallback" style="display:none;background:' + g.color + '"><span>' + g.emoji + '</span></div>'
-        : '<div class="cf-card-fallback" style="background:' + g.color + '"><span>' + g.emoji + '</span></div>';
+        ? '<img src="' + safeImgUrl + '" alt="' + safeTitle + '" draggable="false" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+          '<div class="cf-card-fallback" style="display:none;background:' + safeBg + '"><span>' + safeEmoji + '</span></div>'
+        : '<div class="cf-card-fallback" style="background:' + safeBg + '"><span>' + safeEmoji + '</span></div>';
       card.addEventListener('click', () => { if (i !== activeIdx) goTo(i); });
       stage.appendChild(card);
 
@@ -1123,17 +1188,33 @@
     function updateInfo() {
       const g = games[activeIdx];
       const pct = Math.round((g.xp / maxXp) * 100);
+      const v = GAME_VERDICTS[g.appid] || DEFAULT_VERDICT;
+      const last = inferLastPlayed(g);
 
       // Crossfade: fade out, swap, fade in
       infoEl.classList.add('cf-info-out');
       setTimeout(() => {
+        const tagsHtml = (v.tags && v.tags.length)
+          ? '<div class="cf-tags">' +
+              v.tags.map(t => '<span class="cf-tag">' + esc(t) + '</span>').join('') +
+            '</div>'
+          : '';
+
+        const barBg = safeColor(g.color, '#666');
+        const statusRaw = (g.played || '').toString();
+        const statusClass = statusRaw === 'Recently' ? 'cf-recent' : statusRaw === 'Completed' ? 'cf-completed' : '';
         infoEl.innerHTML =
-          '<h3 class="cf-title">' + g.emoji + ' ' + g.title + '</h3>' +
+          '<h3 class="cf-title">' + esc(g.emoji) + ' ' + esc(g.title) + '</h3>' +
           '<div class="cf-bar-wrap">' +
-            '<div class="cf-bar"><div class="cf-bar-fill" style="width:0%;background:' + g.color + '"></div></div>' +
+            '<div class="cf-bar"><div class="cf-bar-fill" style="width:0%;background:' + barBg + '"></div></div>' +
             '<span class="cf-hrs">' + (g.xp > 0 ? g.xp.toLocaleString() + ' HRS' : 'COMPLETED') + '</span>' +
           '</div>' +
-          '<span class="cf-status ' + (g.played === 'Recently' ? 'cf-recent' : g.played === 'Completed' ? 'cf-completed' : '') + '">' + g.played.toUpperCase() + '</span>';
+          '<div class="cf-meta-row">' +
+            '<span class="cf-status ' + statusClass + '">' + esc(statusRaw.toUpperCase()) + '</span>' +
+            '<span class="cf-last-played">' + esc(last) + '</span>' +
+          '</div>' +
+          '<p class="cf-verdict">' + esc(v.verdict) + '</p>' +
+          tagsHtml;
         infoEl.classList.remove('cf-info-out');
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
@@ -1242,8 +1323,8 @@
         div.className = 'am-jb-track' + (i === currentTrack ? ' active' : '');
         div.innerHTML =
           '<div class="am-jb-track-info">' +
-            '<span class="am-jb-track-title">' + track.title + '</span>' +
-            '<span class="am-jb-track-game">' + track.game + '</span>' +
+            '<span class="am-jb-track-title">' + esc(track.title) + '</span>' +
+            '<span class="am-jb-track-game">' + esc(track.game) + '</span>' +
           '</div>';
         div.addEventListener('click', function(e) { e.stopPropagation(); selectTrack(i); });
         trackList.appendChild(div);

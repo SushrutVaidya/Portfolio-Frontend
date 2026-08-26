@@ -1,16 +1,19 @@
 {
   "name": "devquest-e2e",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "End-to-end tests for the DevQuest portfolio site. Two suites: the standalone script (e2e.smoke.js — kept for ad-hoc runs) and the Playwright test-runner suite (specs/**, runs cross-browser).",
   "type": "commonjs",
+  "scripts": {
+    "test:smoke": "node ./e2e.smoke.js",
+    "test:e2e":   "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
+    "install:browsers": "playwright install chromium firefox"
+  },
   "dependencies": {
     "playwright": "^1.61.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
   }
 }

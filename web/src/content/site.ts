@@ -22,7 +22,7 @@ export const links = {
   github: 'https://github.com/SushrutVaidya',
   linkedin: 'https://linkedin.com/in/Sushrutsvaidya',
   steam: 'https://steamcommunity.com/profiles/76561199065609624',
-  devquest: '/devquest/landing.html',
+  devquest: '/devquest/',
   // The rickroll. Kept deliberately — the counter behind it is a real
   // Redis-backed endpoint, which is the joke.
   youtube: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',

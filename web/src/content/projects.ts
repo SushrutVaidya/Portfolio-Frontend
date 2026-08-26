@@ -165,7 +165,7 @@ export const projects: readonly Project[] = [
     role: 'Sole engineer: API, frontend, infrastructure',
     theme: { accent: '#f7c948' },
     hue: 'yellow',
-    href: '/devquest/landing.html',
+    href: '/devquest/',
     repo: 'https://github.com/SushrutVaidya/Portfolio-Backend',
     stack: [
       'Java 17',

@@ -43,6 +43,10 @@ export function CaseStudy() {
   const next = projects[(index + 1) % projects.length]
   const ordinal = String(index + 1).padStart(2, '0')
   const external = project.href?.startsWith('http')
+  // A real in-app SPA route uses <Link> (no reload); anything else internal
+  // (e.g. the DevQuest static sub-app at /devquest/) is a genuine navigation and
+  // must use <a>, or React Router swallows it and lands on the 404.
+  const spaRoute = project.href === '/loglens'
 
   // The project's hue drives the whole route: --accent for links/markers, and a
   // soft tint wash on the masthead so each case study is unmistakably its own
@@ -104,19 +108,8 @@ export function CaseStudy() {
 
               <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
                 {project.href &&
-                  (external ? (
-                    <a
-                      href={project.href}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="btn-pop"
-                      style={{ backgroundColor: hue, color: '#fff' }}
-                    >
-                      {project.status === 'live' ? 'Open it' : 'Read the filing'}
-                      <span aria-hidden="true">↗</span>
-                    </a>
-                  ) : (
-                    // Internal href (loglens product page): client-route, no reload.
+                  (spaRoute ? (
+                    // In-app SPA route (loglens product page): client-route, no reload.
                     <Link
                       to={project.href}
                       className="btn-pop"
@@ -125,6 +118,18 @@ export function CaseStudy() {
                       {project.status === 'live' ? 'Open it' : 'Read the filing'}
                       <span aria-hidden="true">→</span>
                     </Link>
+                  ) : (
+                    // External URL or a standalone static sub-app (e.g. /devquest/):
+                    // a genuine navigation. New tab for external, same tab otherwise.
+                    <a
+                      href={project.href}
+                      {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
+                      className="btn-pop"
+                      style={{ backgroundColor: hue, color: '#fff' }}
+                    >
+                      {project.status === 'live' ? 'Open it' : 'Read the filing'}
+                      <span aria-hidden="true">{external ? '↗' : '→'}</span>
+                    </a>
                   ))}
                 {project.repo && (
                   <a

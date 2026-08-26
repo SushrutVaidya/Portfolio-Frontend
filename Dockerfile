@@ -15,7 +15,10 @@
 #     warning once we `USER nginx` (only meaningful when master is root).
 
 # ---------- Stage 1: build ----------
-FROM node:22-alpine AS build
+# node:22-slim (Debian/glibc), NOT alpine: Tailwind v4's native @tailwindcss/oxide
+# binary is unreliable on musl and crashed `npm ci` ("Exit handler never called")
+# on the deploy VM. The final served image below is still nginx:alpine.
+FROM node:22-slim AS build
 
 WORKDIR /app
 

@@ -172,10 +172,84 @@ export function Loglens() {
   const reduce = useReducedMotion()
   const green = { '--accent': 'var(--color-green)' } as CSSProperties
 
+  // SEO: while the loglens page is mounted, swap the document head to loglens-
+  // specific metadata (title, description, canonical → the subdomain, OG/Twitter,
+  // and a SoftwareApplication JSON-LD). Canonical resolves the duplicate-content
+  // problem between /loglens and loglens.sushrutvaidya.in. Everything is restored
+  // on unmount so the portfolio's own meta returns on other routes.
   useEffect(() => {
-    document.title = 'loglens · readable logs in the terminal'
+    const CANON = 'https://loglens.sushrutvaidya.in/'
+    const TITLE = 'loglens · readable logs in the terminal'
+    const DESC =
+      'A fast Java CLI that makes structured logs (JSON, logfmt, klog) legible in the terminal: pretty-print, follow one request by trace id, and a --stats triage view. Open source, Apache-2.0.'
+    const IMG = 'https://loglens.sushrutvaidya.in/img/loglens-stats.gif'
+
+    const undo: Array<() => void> = []
+    const setMeta = (attr: 'name' | 'property', key: string, val: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`)
+      if (el) {
+        const old = el.getAttribute('content') ?? ''
+        const ref = el
+        undo.push(() => ref.setAttribute('content', old))
+      } else {
+        el = document.createElement('meta')
+        el.setAttribute(attr, key)
+        document.head.appendChild(el)
+        const ref = el
+        undo.push(() => ref.remove())
+      }
+      el.setAttribute('content', val)
+    }
+    const setCanonical = (href: string) => {
+      let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+      if (el) {
+        const old = el.getAttribute('href') ?? ''
+        const ref = el
+        undo.push(() => ref.setAttribute('href', old))
+      } else {
+        el = document.createElement('link')
+        el.setAttribute('rel', 'canonical')
+        document.head.appendChild(el)
+        const ref = el
+        undo.push(() => ref.remove())
+      }
+      el.setAttribute('href', href)
+    }
+
+    const prevTitle = document.title
+    document.title = TITLE
+    setCanonical(CANON)
+    setMeta('name', 'description', DESC)
+    setMeta('property', 'og:type', 'website')
+    setMeta('property', 'og:url', CANON)
+    setMeta('property', 'og:title', TITLE)
+    setMeta('property', 'og:description', DESC)
+    setMeta('property', 'og:image', IMG)
+    setMeta('name', 'twitter:title', TITLE)
+    setMeta('name', 'twitter:description', DESC)
+    setMeta('name', 'twitter:image', IMG)
+
+    const ld = document.createElement('script')
+    ld.type = 'application/ld+json'
+    ld.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'loglens',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Linux, macOS, Windows',
+      description: DESC,
+      url: CANON,
+      codeRepository: 'https://github.com/SushrutVaidya/loglens',
+      license: 'https://www.apache.org/licenses/LICENSE-2.0',
+      author: { '@type': 'Person', name: 'Sushrut Vaidya', url: 'https://sushrutvaidya.in/' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    })
+    document.head.appendChild(ld)
+
     return () => {
-      document.title = 'Sushrut Vaidya · Platform Engineer'
+      document.title = prevTitle
+      undo.reverse().forEach((fn) => fn())
+      ld.remove()
     }
   }, [])
 
@@ -354,7 +428,9 @@ export function Loglens() {
                       alt={`loglens ${s.flag} demo`}
                       loading="lazy"
                       decoding="async"
-                      className="block w-full object-contain"
+                      width={1452}
+                      height={781}
+                      className="block h-auto w-full object-contain"
                     />
                   </div>
                   <div>

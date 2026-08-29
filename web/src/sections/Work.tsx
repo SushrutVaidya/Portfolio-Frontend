@@ -93,7 +93,9 @@ function ProjectCard({
               alt={project.preview.alt}
               loading="lazy"
               decoding="async"
-              className="block max-h-[42vh] w-full object-contain object-center"
+              width={1452}
+              height={781}
+              className="block max-h-[42vh] h-auto w-full object-contain object-center"
             />
           </div>
         )}

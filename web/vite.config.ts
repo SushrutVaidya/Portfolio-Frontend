@@ -90,6 +90,15 @@ export default defineConfig({
     // NOT the default 'assets' — the site already serves /assets/resume.pdf
     // from the repo root, and nginx would have a collision.
     assetsDir: 'static',
+    // Two HTML entries: the portfolio (index.html) and a dedicated loglens
+    // product page (loglens.html) with its own baked-in SEO. nginx serves
+    // loglens.html on the loglens.sushrutvaidya.in host; both load the same app.
+    rollupOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, 'index.html'),
+        loglens: path.resolve(import.meta.dirname, 'loglens.html'),
+      },
+    },
   },
   server: {
     // Same-origin /api in dev, so the app never needs an API_BASE branch.

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- loglens product page. This is a second Vite entry served (via nginx) on
+         loglens.sushrutvaidya.in, so the SEO tags below are baked into the raw
+         HTML — crawlers and link-preview bots (which don't run JS) read them
+         directly, and the canonical is correct on first byte. -->
+    <title>loglens · readable logs in the terminal</title>
+    <meta
+      name="description"
+      content="A fast Java CLI that makes structured logs (JSON, logfmt, klog) legible in the terminal: pretty-print, follow one request by trace id, and a --stats triage view. Open source, Apache-2.0."
+    />
+    <meta name="author" content="Sushrut Vaidya" />
+    <link rel="canonical" href="https://loglens.sushrutvaidya.in/" />
+    <meta name="theme-color" content="#eeefe4" />
+    <meta name="color-scheme" content="light" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="loglens" />
+    <meta property="og:url" content="https://loglens.sushrutvaidya.in/" />
+    <meta property="og:title" content="loglens · readable logs in the terminal" />
+    <meta
+      property="og:description"
+      content="A fast Java CLI that makes structured logs legible in the terminal: pretty-print, trace-follow, and a --stats triage view. Open source, Apache-2.0."
+    />
+    <meta property="og:image" content="https://loglens.sushrutvaidya.in/img/loglens-stats.gif" />
+    <meta property="og:image:alt" content="loglens --stats collapsing noisy logs into a triage summary" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="loglens · readable logs in the terminal" />
+    <meta
+      name="twitter:description"
+      content="A fast Java CLI that makes structured logs legible in the terminal. Open source, Apache-2.0."
+    />
+    <meta name="twitter:image" content="https://loglens.sushrutvaidya.in/img/loglens-stats.gif" />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232f9e57' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='72' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='800' font-size='52' fill='%23ffffff'%3E%E2%80%BA_%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="apple-touch-icon" href="/img/loglens-stats.gif" />
+
+    <!-- SoftwareApplication schema for the tool. No aggregateRating (no real
+         ratings; not going to fabricate one), so this won't earn the Software
+         App rich result yet, but it correctly types the page as a free dev tool
+         with its repo, license, and author. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "loglens",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Linux, macOS, Windows",
+        "description": "A fast Java CLI that makes structured logs (JSON, logfmt, klog) legible in the terminal: pretty-print, follow one request by trace id, and a --stats triage view.",
+        "url": "https://loglens.sushrutvaidya.in/",
+        "softwareLicense": "https://www.apache.org/licenses/LICENSE-2.0",
+        "author": {
+          "@type": "Person",
+          "name": "Sushrut Vaidya",
+          "url": "https://sushrutvaidya.in/"
+        },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "sameAs": ["https://github.com/SushrutVaidya/loglens"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

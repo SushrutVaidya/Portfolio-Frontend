@@ -229,27 +229,37 @@ export function Loglens() {
     setMeta('name', 'twitter:description', DESC)
     setMeta('name', 'twitter:image', IMG)
 
-    const ld = document.createElement('script')
-    ld.type = 'application/ld+json'
-    ld.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: 'loglens',
-      applicationCategory: 'DeveloperApplication',
-      operatingSystem: 'Linux, macOS, Windows',
-      description: DESC,
-      url: CANON,
-      codeRepository: 'https://github.com/SushrutVaidya/loglens',
-      license: 'https://www.apache.org/licenses/LICENSE-2.0',
-      author: { '@type': 'Person', name: 'Sushrut Vaidya', url: 'https://sushrutvaidya.in/' },
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    })
-    document.head.appendChild(ld)
+    // Only inject JSON-LD if the shell didn't already bake one in: loglens.html
+    // (the subdomain shell) ships a static SoftwareApplication, while the apex
+    // index.html ships a Person node, so there we add ours. Prevents a duplicate
+    // SoftwareApplication when the loglens page renders on the subdomain shell.
+    const hasSoftwareLd = Array.from(
+      document.head.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'),
+    ).some((s) => (s.textContent ?? '').includes('SoftwareApplication'))
+    let ld: HTMLScriptElement | null = null
+    if (!hasSoftwareLd) {
+      ld = document.createElement('script')
+      ld.type = 'application/ld+json'
+      ld.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'loglens',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Linux, macOS, Windows',
+        description: DESC,
+        url: CANON,
+        softwareLicense: 'https://www.apache.org/licenses/LICENSE-2.0',
+        author: { '@type': 'Person', name: 'Sushrut Vaidya', url: 'https://sushrutvaidya.in/' },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        sameAs: ['https://github.com/SushrutVaidya/loglens'],
+      })
+      document.head.appendChild(ld)
+    }
 
     return () => {
       document.title = prevTitle
       undo.reverse().forEach((fn) => fn())
-      ld.remove()
+      ld?.remove()
     }
   }, [])
 

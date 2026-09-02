@@ -10,10 +10,15 @@ import '@fontsource-variable/jetbrains-mono'
 import './index.css'
 import App from './App.tsx'
 import { initAnalytics } from './lib/analytics.ts'
+import { initAnimatedFavicon } from './lib/animatedFavicon.ts'
 
 // Injected from bundled JS rather than an inline <script>, which is what lets
 // the CSP drop 'unsafe-inline' from script-src. No-ops in dev and under DNT.
 initAnalytics()
+
+// Animated tab icon — sprinting "SV" figure on the portfolio, a scanning log
+// line on loglens. Reduced-motion safe, pauses when the tab is hidden.
+initAnimatedFavicon()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

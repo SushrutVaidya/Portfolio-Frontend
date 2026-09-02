@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>favicon lab</title>
+<link rel="icon" id="live-favicon" href="data:," />
+<style>
+  :root { --bg: #f4f4f2; --fg: #1a1a1a; --card: #ffffff; --line: #e2e2dc; }
+  body.dark { --bg: #202124; --fg: #e8eaed; --card: #2a2b2e; --line: #3c3d40; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px; background: var(--bg); color: var(--fg);
+    font: 15px/1.5 -apple-system, system-ui, sans-serif; transition: background .2s;
+  }
+  header { display:flex; align-items:baseline; gap:16px; margin-bottom: 8px; flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; }
+  .hint { color: #888; font-size: 13px; }
+  .toggle { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  button { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line);
+           background: var(--card); color: var(--fg); cursor: pointer; }
+  button:hover { border-color: #f54e00; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px;
+          display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .card.active { border-color: #f54e00; box-shadow: 0 0 0 2px #f54e0033; }
+  .big { width: 96px; height: 96px; border-radius: 16px; }
+  .mini { display: flex; align-items: flex-end; gap: 12px; height: 34px; }
+  .mini canvas { image-rendering: auto; }
+  .label { font-size: 13px; font-weight: 600; text-align: center; }
+  .sub { font-size: 11px; color: #999; }
+  .use.on { background:#f54e00; color:#fff; border-color:#f54e00; }
+  .note { margin-top: 24px; font-size: 13px; color: #888; max-width: 720px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>favicon lab</h1>
+  <span class="hint">big = 96px · then 32px &amp; 16px (actual tab sizes). Click <b>Use in tab</b> to see it live in this browser tab ↗</span>
+  <label class="toggle"><input type="checkbox" id="darkToggle" /> dark tab background</label>
+</header>
+<div class="grid" id="grid"></div>
+<p class="note">
+  In production this runs as a tiny canvas loop that repaints the tab icon (Chrome/Firefox/Edge animate; Safari shows a static frame).
+  It respects <code>prefers-reduced-motion</code> and pauses when the tab is hidden. Pick your favorite for <b>SV</b> and for <b>loglens</b> and I'll wire them in.
+</p>
+
+<script>
+const SRC = 128;          // source canvas is drawn at 2× (64-space) for crisp downscaling
+const K = SRC / 64;
+
+function line(c, x1, y1, x2, y2) { c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); }
+function tile(c, color) {
+  const s = 64, r = 13;
+  c.beginPath();
+  c.moveTo(r,0); c.arcTo(s,0,s,s,r); c.arcTo(s,s,0,s,r); c.arcTo(0,s,0,0,r); c.arcTo(0,0,s,0,r); c.closePath();
+  c.fillStyle = color; c.fill();
+}
+
+// ── Shared SV-headed stick figure (all coords in 64-space) ──
+function figureSV(c, p) {
+  const cx = p.cx ?? 32;
+  const lean = p.lean ?? 0;
+  const legLen = p.legLen ?? 13, armLen = p.armLen ?? 9;
+  const shX = cx + lean * 0.6, hdX = cx + lean;
+  c.strokeStyle = '#f54e00'; c.fillStyle = '#f54e00';
+  c.lineWidth = 3; c.lineCap = 'round'; c.lineJoin = 'round';
+  // torso
+  line(c, shX, p.shoulderY, cx, p.hipY);
+  // legs (opposite swing)
+  line(c, cx, p.hipY, cx + Math.sin(p.legA) * legLen, p.hipY + Math.cos(p.legA) * legLen);
+  line(c, cx, p.hipY, cx - Math.sin(p.legA) * legLen, p.hipY + Math.cos(p.legA) * legLen);
+  // arms
+  const ay = p.shoulderY + 2;
+  line(c, shX, ay, shX + Math.sin(p.armA) * armLen, ay + Math.cos(p.armA) * armLen * 0.9);
+  line(c, shX, ay, shX - Math.sin(p.armA) * armLen, ay + Math.cos(p.armA) * armLen * 0.9);
+  // head = "SV"
+  c.font = '800 12px Inter, system-ui, sans-serif';
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText('SV', hdX, p.headY);
+}
+
+const TAU = Math.PI * 2;
+
+const VARIANTS = [
+  // ─────────────── SV / portfolio ───────────────
+  { id:'sv-jog', name:'SV · jog', sub:'subtle hop', cycleMs:1000, draw(c,t){
+      tile(c,'#eeefe4'); const ph=t*TAU; const bob=-Math.abs(Math.sin(ph))*3;
+      figureSV(c,{headY:16+bob, shoulderY:26+bob, hipY:40+bob, legA:Math.sin(ph)*0.5, armA:-Math.sin(ph)*0.45});
+  }},
+  { id:'sv-sprint', name:'SV · sprint', sub:'lean + big swing', cycleMs:620, draw(c,t){
+      tile(c,'#eeefe4'); const ph=t*TAU; const bob=-Math.abs(Math.sin(ph))*2;
+      figureSV(c,{lean:5, headY:17+bob, shoulderY:26+bob, hipY:40+bob, legA:Math.sin(ph)*0.85, armA:-Math.sin(ph)*0.7});
+  }},
+  { id:'sv-jump', name:'SV · long jump', sub:'crouch → leap → land', cycleMs:1300, draw(c,t){
+      tile(c,'#eeefe4'); let y, legA, armA;
+      if(t<0.2){ const p=t/0.2; y=6*p; legA=0.2; armA=0.4; }
+      else if(t<0.8){ const p=(t-0.2)/0.6; y=-Math.sin(p*Math.PI)*16; legA=0.15+0.15*Math.sin(p*Math.PI); armA=1.2; }
+      else { const p=(t-0.8)/0.2; y=6*(1-p); legA=0.3; armA=0.4; }
+      figureSV(c,{headY:16+y, shoulderY:26+y, hipY:40+y, legA, armA});
+  }},
+  { id:'sv-hop', name:'SV · hops', sub:'playful double hop', cycleMs:900, draw(c,t){
+      tile(c,'#eeefe4'); const bob=-Math.abs(Math.sin(t*TAU*2))*6;
+      figureSV(c,{headY:16+bob, shoulderY:26+bob, hipY:40+bob, legA:0.16, armA:0.5*Math.sin(t*TAU*2)});
+  }},
+
+  // ─────────────── loglens ───────────────
+  { id:'ll-blink', name:'loglens · cursor', sub:'blinking _', cycleMs:1100, draw(c,t){
+      tile(c,'#2f9e57'); c.fillStyle='#fff'; c.textAlign='left'; c.textBaseline='alphabetic';
+      c.font='800 34px Inter, system-ui, sans-serif';
+      c.fillText('›', 16, 44);
+      if(t<0.5) c.fillText('_', 34, 44);
+  }},
+  { id:'ll-pulse', name:'loglens · pulse', sub:'breathing chevron', cycleMs:1600, draw(c,t){
+      tile(c,'#2f9e57'); const s=1+Math.sin(t*TAU)*0.12;
+      c.save(); c.translate(32,32); c.scale(s,s); c.translate(-32,-32);
+      c.fillStyle='#fff'; c.textAlign='center'; c.textBaseline='middle';
+      c.font='800 40px Inter, system-ui, sans-serif'; c.fillText('›', 33, 34);
+      c.restore();
+  }},
+  { id:'ll-scan', name:'loglens · scan', sub:'log line sweep', cycleMs:1400, draw(c,t){
+      tile(c,'#2f9e57'); c.fillStyle='#fff'; c.textAlign='left'; c.textBaseline='alphabetic';
+      c.font='800 30px Inter, system-ui, sans-serif'; c.fillText('›', 14, 42);
+      const y=14+t*38; c.strokeStyle='rgba(255,255,255,.75)'; c.lineWidth=2.4; c.lineCap='round';
+      line(c, 33, y, 52, y);
+  }},
+];
+
+// ── Build cards ──
+const grid = document.getElementById('grid');
+const live = document.getElementById('live-favicon');
+let activeIdx = -1;
+
+VARIANTS.forEach((v, i) => {
+  const card = document.createElement('div'); card.className='card'; v.card = card;
+  const big = document.createElement('canvas'); big.className='big'; big.width=SRC; big.height=SRC;
+  v.sctx = big.getContext('2d'); v.scanvas = big;
+  const mini = document.createElement('div'); mini.className='mini';
+  const c32 = document.createElement('canvas'); c32.width=32; c32.height=32;
+  const c16 = document.createElement('canvas'); c16.width=16; c16.height=16;
+  v.c32 = c32.getContext('2d'); v.c16 = c16.getContext('2d');
+  mini.append(c32, c16);
+  const label = document.createElement('div'); label.className='label'; label.textContent=v.name;
+  const sub = document.createElement('div'); sub.className='sub'; sub.textContent=v.sub;
+  const use = document.createElement('button'); use.className='use'; use.textContent='Use in tab ▶';
+  use.onclick = () => {
+    activeIdx = (activeIdx === i) ? -1 : i;
+    VARIANTS.forEach((w,j)=>{ w.card.classList.toggle('active', j===activeIdx); w.use.classList.toggle('on', j===activeIdx); });
+    if (activeIdx === -1) live.href = 'data:,';
+  };
+  v.use = use;
+  card.append(big, mini, label, sub, use);
+  grid.append(card);
+});
+
+document.getElementById('darkToggle').onchange = e => document.body.classList.toggle('dark', e.target.checked);
+
+// ── Single animation loop drives every variant ──
+function frame(now) {
+  VARIANTS.forEach(v => {
+    const t = (now % v.cycleMs) / v.cycleMs;
+    const c = v.sctx;
+    c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,SRC,SRC);
+    c.setTransform(K,0,0,K,0,0); v.draw(c, t);
+    c.setTransform(1,0,0,1,0,0);
+    v.c32.clearRect(0,0,32,32); v.c32.drawImage(v.scanvas,0,0,32,32);
+    v.c16.clearRect(0,0,16,16); v.c16.drawImage(v.scanvas,0,0,16,16);
+  });
+  if (activeIdx >= 0) live.href = VARIANTS[activeIdx].scanvas.toDataURL('image/png');
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
